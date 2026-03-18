@@ -6,10 +6,18 @@ import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import { useNavigate } from 'react-router-dom';
 
+const INITIAL_PATIENTS = [
+  { id: 'PID-101', name: 'Alice Johnson', age: 34, gender: 'Female', lastVisit: '2026-03-12', status: 'Active', phone: '+1 234-567-8901', email: 'alice.j@example.com' },
+  { id: 'PID-102', name: 'James Wilson', age: 45, gender: 'Male', lastVisit: '2026-03-14', status: 'Active', phone: '+1 234-567-8902', email: 'j.wilson@example.com' },
+  { id: 'PID-103', name: 'Emily Brown', age: 28, gender: 'Female', lastVisit: '2026-03-10', status: 'Delayed', phone: '+1 234-567-8903', email: 'emily.b@example.com' },
+  { id: 'PID-104', name: 'Michael Chen', age: 52, gender: 'Male', lastVisit: '2026-03-08', status: 'Inactive', phone: '+1 234-567-8904', email: 'm.chen@example.com' },
+  { id: 'PID-105', name: 'Sarah Jenkins', age: 39, gender: 'Female', lastVisit: '2026-03-15', status: 'Active', phone: '+1 234-567-8905', email: 's.jenkins@example.com' },
+  { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
+];
+
 const Patients = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const itemsPerPage = 5;
@@ -19,31 +27,14 @@ const Patients = () => {
     setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
   };
 
-  const [patients, setPatients] = useState([
-    { id: 'PID-101', name: 'Alice Johnson', age: 34, gender: 'Female', lastVisit: '2026-03-12', status: 'Active', phone: '+1 234-567-8901', email: 'alice.j@example.com' },
-    { id: 'PID-102', name: 'James Wilson', age: 45, gender: 'Male', lastVisit: '2026-03-14', status: 'Active', phone: '+1 234-567-8902', email: 'j.wilson@example.com' },
-    { id: 'PID-103', name: 'Emily Brown', age: 28, gender: 'Female', lastVisit: '2026-03-10', status: 'Delayed', phone: '+1 234-567-8903', email: 'emily.b@example.com' },
-    { id: 'PID-104', name: 'Michael Chen', age: 52, gender: 'Male', lastVisit: '2026-03-08', status: 'Inactive', phone: '+1 234-567-8904', email: 'm.chen@example.com' },
-    { id: 'PID-105', name: 'Sarah Jenkins', age: 39, gender: 'Female', lastVisit: '2026-03-15', status: 'Active', phone: '+1 234-567-8905', email: 's.jenkins@example.com' },
-    { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
-  ]);
+  const [patients, setPatients] = useState([]);
 
-  const [newPatient, setNewPatient] = useState({
-    name: '', age: '', gender: 'Male', phone: '', email: ''
-  });
+  React.useEffect(() => {
+    const savedPatients = JSON.parse(localStorage.getItem('deephysio_patients') || '[]');
+    setPatients([...INITIAL_PATIENTS, ...savedPatients]);
+  }, []);
 
-  const handleAddPatient = () => {
-    if (!newPatient.name) return;
-    const newId = `PID-${100 + patients.length + 1}`;
-    setPatients([...patients, { 
-      ...newPatient, 
-      id: newId, 
-      lastVisit: new Date().toISOString().split('T')[0], 
-      status: 'Active' 
-    }]);
-    setIsAddModalOpen(false);
-    setNewPatient({ name: '', age: '', gender: 'Male', phone: '', email: '' });
-  };
+
 
   const filteredPatients = patients.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -245,76 +236,7 @@ const Patients = () => {
         </div>
       </div>
 
-      <Modal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)}
-        title="Register New Subject Identity"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Cancel Registration</Button>
-            <Button variant="accent" onClick={handleAddPatient} leftIcon={<FaPlus />}>Finalize Subject</Button>
-          </div>
-        }
-      >
-        <div className="space-y-6 p-2 font-sans">
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Legal Full Name</label>
-              <input 
-                type="text" 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
-                placeholder="e.g. Johnathan Doe" 
-                value={newPatient.name}
-                onChange={(e) => setNewPatient({...newPatient, name: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Age Node</label>
-              <input 
-                type="number" 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
-                placeholder="e.g. 34" 
-                value={newPatient.age}
-                onChange={(e) => setNewPatient({...newPatient, age: e.target.value})}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Primary Biometric Phone</label>
-              <input 
-                type="text" 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
-                placeholder="+1 000-000-0000" 
-                value={newPatient.phone}
-                onChange={(e) => setNewPatient({...newPatient, phone: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Gender Identification</label>
-              <select 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
-                value={newPatient.gender}
-                onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
-              >
-                <option>Male</option>
-                <option>Female</option>
-                <option>Non-Binary</option>
-              </select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Ledger</label>
-            <input 
-              type="email" 
-              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
-              placeholder="e.g. subject@example.com" 
-              value={newPatient.email}
-              onChange={(e) => setNewPatient({...newPatient, email: e.target.value})}
-            />
-          </div>
-        </div>
-      </Modal>
+
     </div>
   );
 };
