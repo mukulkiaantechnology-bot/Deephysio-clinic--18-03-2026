@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCalendarPlus, FaFilter, FaChevronLeft, FaChevronRight, FaClock, FaCheckCircle, FaUserMd, FaPlus, FaSearch } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
 const Appointments = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date('2026-03-18'));
   const [selectedPractitioner, setSelectedPractitioner] = useState('All Practitioners');
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('day');
 
   const practitioners = [
     { id: 1, name: 'Dr. Sarah Wilson', role: 'Senior Physiotherapist', color: 'bg-emerald-500' },
@@ -21,9 +24,9 @@ const Appointments = () => {
   ];
 
   const [appointments, setAppointments] = useState([
-    { id: 101, patient: 'James Wilson', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
-    { id: 102, patient: 'Alice Johnson', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
-    { id: 103, patient: 'Robert Fox', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
+    { id: 101, patient: 'James Wilson', date: '2026-03-18', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
+    { id: 102, patient: 'Alice Johnson', date: '2026-03-18', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
+    { id: 103, patient: 'Robert Fox', date: '2026-03-18', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
   ]);
 
   const [newBooking, setNewBooking] = useState({
@@ -36,7 +39,8 @@ const Appointments = () => {
   const handleAddAppointment = () => {
     if (!newBooking.patient) return;
     const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 101;
-    setAppointments([...appointments, { ...newBooking, id: newId, status: 'Confirmed' }]);
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    setAppointments([...appointments, { ...newBooking, id: newId, date: formattedDate, status: 'Confirmed' }]);
     setIsBookModalOpen(false);
     setNewBooking({ patient: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', time: '09:00 AM' });
   };
@@ -44,6 +48,12 @@ const Appointments = () => {
   const handleCancelAppointment = (id) => {
     setAppointments(appointments.filter(a => a.id !== id));
     setIsDetailModalOpen(false);
+  };
+
+  const handleDateChange = (days) => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + days);
+    setCurrentDate(d);
   };
 
   return (
@@ -55,9 +65,9 @@ const Appointments = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 w-full lg:w-auto">
           <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 shadow-inner-soft">
-             <button className="px-6 py-3 bg-white shadow-premium rounded-xl text-[11px] font-black uppercase tracking-widest text-clinicPrimary transition-all">Day View</button>
-             <button className="px-6 py-3 text-slate-400 text-[11px] font-black uppercase tracking-widest hover:text-slate-600 transition-all" onClick={() => alert('Week View Visualization Node: Loading calendar metrics...')}>Week</button>
-             <button className="px-6 py-3 text-slate-400 text-[11px] font-black uppercase tracking-widest hover:text-slate-600 transition-all" onClick={() => alert('Month Grid Node: Synchronizing monthly availability logs...')}>Month</button>
+             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day View</button>
+             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
+             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'month' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
           </div>
           <Button 
             variant="accent" 
@@ -128,14 +138,14 @@ const Appointments = () => {
            <Card className="p-0 overflow-hidden border-none shadow-premium bg-white">
              <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/30 border-b border-slate-50 gap-6">
                 <div className="flex items-center gap-6">
-                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => alert('Chronology Hop: Navigating to previous schedule node...')}>
+                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => handleDateChange(-1)}>
                       <FaChevronLeft size={10} className="mx-auto"/>
                    </button>
                    <div className="text-center">
-                      <h2 className="text-lg font-bold text-slate-900 tracking-tight">Wednesday, 18 March 2026</h2>
-                      <p className="text-[10px] font-black text-clinicPrimary uppercase tracking-[0.3em] mt-1">Today's Protocol</p>
+                      <h2 className="text-lg font-bold text-slate-900 tracking-tight">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h2>
+                      <p className="text-[10px] font-black text-clinicPrimary uppercase tracking-[0.3em] mt-1">Daily Protocol</p>
                    </div>
-                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => alert('Chronology Hop: Accessing future schedule node...')}>
+                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => handleDateChange(1)}>
                       <FaChevronRight size={10} className="mx-auto"/>
                    </button>
                 </div>
@@ -152,8 +162,14 @@ const Appointments = () => {
              </div>
 
              <div className="relative">
-                {timeSlots.map((slot, index) => {
-                  const appointment = appointments.find(a => a.time === slot && (selectedPractitioner === 'All Practitioners' || a.practitioner === selectedPractitioner));
+                {viewMode === 'day' ? timeSlots.map((slot, index) => {
+                  const formattedCurrentDate = currentDate.toISOString().split('T')[0];
+                  const appointment = appointments.find(a => 
+                    a.time === slot && 
+                    a.date === formattedCurrentDate &&
+                    (selectedPractitioner === 'All Practitioners' || a.practitioner === selectedPractitioner) &&
+                    (searchTerm === '' || a.patient.toLowerCase().includes(searchTerm.toLowerCase()))
+                  );
                   return (
                     <div key={index} className="flex border-b border-slate-50 last:border-none group/slot">
                        <div className="w-24 sm:w-32 p-8 border-r border-slate-50 bg-slate-50/20 flex flex-col items-center justify-center">
@@ -187,10 +203,10 @@ const Appointments = () => {
                                       </p>
                                    </div>
                                    <div className="flex gap-2 opacity-0 group-hover/booking:opacity-100 transition-opacity">
-                                      <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); alert('Initializing Tele-Protocol Node...'); }}>
+                                      <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); /* alert('Initializing Tele-Protocol Node...'); */ }}>
                                          <FaUserMd size={14} className="mx-auto"/>
                                       </button>
-                                      <button className="w-9 h-9 rounded-xl bg-clinicPrimary text-white shadow-soft transition-all hover:shadow-google active:scale-90" onClick={(e) => { e.stopPropagation(); alert('Finalizing Session Checkout...'); }}>
+                                      <button className="w-9 h-9 rounded-xl bg-clinicPrimary text-white shadow-soft transition-all hover:shadow-google active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
                                          <FaCheckCircle size={14} className="mx-auto"/>
                                       </button>
                                    </div>
@@ -199,7 +215,10 @@ const Appointments = () => {
                           ) : (
                              <button 
                               className="w-full h-full min-h-[80px] rounded-[24px] border-2 border-dashed border-slate-100 hover:border-clinicPrimary/40 hover:bg-clinicPrimary/5 transition-all text-[11px] font-black text-slate-300 hover:text-clinicPrimary uppercase tracking-[0.2em] flex items-center justify-center group/add active:scale-[0.99]"
-                              onClick={() => setIsBookModalOpen(true)}
+                              onClick={() => {
+                                setNewBooking({ ...newBooking, time: slot, practitioner: selectedPractitioner !== 'All Practitioners' ? selectedPractitioner : 'Dr. Sarah Wilson' });
+                                setIsBookModalOpen(true);
+                              }}
                              >
                                 <FaPlus size={14} className="mr-3 transform group-hover/add:rotate-90 transition-transform"/> Available Slot Node
                              </button>
@@ -207,7 +226,12 @@ const Appointments = () => {
                        </div>
                     </div>
                   );
-                })}
+                }) : (
+                  <div className="p-20 text-center space-y-4">
+                     <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{viewMode} View Grid Pipeline setup</p>
+                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Temporal Nodes display buffers activated.</p>
+                  </div>
+                )}
              </div>
            </Card>
         </div>
