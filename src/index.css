@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased text-base selection:bg-clinicPrimary/20 selection:text-clinicPrimary;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer components {
+  .shadow-premium {
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    @apply border border-transparent transition-all duration-300;
+  }
+  .shadow-premium:hover {
+    border: 2px solid #0a3d62 !important;
+  }
+
+  .shadow-glass {
+    @apply shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+
+  .card-clinic {
+    @apply bg-white rounded-2xl p-6 border border-slate-100 transition-all duration-300 hover:shadow-glass hover:-translate-y-1;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  }
+  .card-clinic:hover {
+    border: 2px solid #0a3d62 !important;
+  }
+  
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-glass rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply bg-clinicDark text-white px-6 py-3 rounded-xl font-bold hover:bg-clinicPrimary hover:shadow-lg active:scale-95 transition-all duration-300 flex items-center justify-center gap-2;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  }
+
+  .input-clinic {
+    @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all duration-300;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  }
+}
+
+/* Global Animations */
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(46, 167, 184, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(46, 167, 184, 0.4); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+.bg-mesh {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(46, 167, 184, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(46, 167, 184, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
+}
