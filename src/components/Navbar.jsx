@@ -6,15 +6,8 @@ import { FaSearch, FaBell, FaEnvelope, FaChevronDown, FaBars, FaEnvelopeOpenText
 const Navbar = ({ toggleSidebar, onLogout }) => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-
   const togglePanel = (panel) => {
     setActivePanel(activePanel === panel ? null : panel);
-  };
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    // Real-time search logic would go here
   };
 
   const notificationData = [
@@ -33,22 +26,10 @@ const Navbar = ({ toggleSidebar, onLogout }) => {
       <div className="flex items-center gap-6">
         <button 
           onClick={toggleSidebar}
-          className="p-2.5 text-slate-500 hover:text-clinicPrimary bg-white rounded-xl shadow-soft active:scale-95 transition-all border border-slate-100 hover:border-clinicPrimary/30 hover:shadow-google"
+          className="p-2.5 text-slate-500 hover:text-clinicPrimary bg-white rounded-xl shadow-soft active:scale-95 transition-all border border-slate-100 hover:border-clinicPrimary/30 hover:shadow-google lg:hidden"
         >
           <FaBars size={18} />
         </button>
-        
-        {/* Search Section */}
-        <div className="flex-1 max-w-xl relative group hidden lg:block">
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-base group-focus-within:text-clinicPrimary transition-all duration-300 group-focus-within:scale-110" />
-          <input 
-            type="text" 
-            placeholder="Search records, patients or notes..." 
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all caret-clinicPrimary shadow-soft placeholder:text-slate-300"
-          />
-        </div>
       </div>
 
       {/* Profile / Actions */}

@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaClock, FaUser, FaPhone, FaCalendarPlus, FaFilter, FaSearch, FaEllipsisV, FaCheckCircle, FaArrowRight, FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
 const Waitlist = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newEntry, setNewEntry] = useState({
+    patient: '',
+    requestedService: 'Physio Evolution',
+    preferredDays: '',
+    status: 'Normal'
+  });
 
   const [waitlistEntries, setWaitlistEntries] = useState([
     { id: 'WL-101', patient: 'Emma Watson', requestedService: 'Physio Evolution', preferredDays: 'Mon, Wed', addedDate: '15 Mar 2026', status: 'Priority' },
@@ -21,8 +29,17 @@ const Waitlist = () => {
     e.requestedService.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleAddEntry = () => {
+    if (!newEntry.patient) return;
+    const id = `WL-${Math.floor(Math.random() * 900) + 100}`;
+    const addedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    setWaitlistEntries([...waitlistEntries, { ...newEntry, id, addedDate }]);
+    setIsAddModalOpen(false);
+    setNewEntry({ patient: '', requestedService: 'Physio Evolution', preferredDays: '', status: 'Normal' });
+  };
+
   const handleAction = (action, entry) => {
-    alert(`Node Execution: Initiating ${action} for ${entry ? entry.patient : 'new subject'}. Protocol synchronized.`);
+    // alert(`Node Execution: Initiating ${action} for ${entry ? entry.patient : 'new subject'}. Protocol synchronized.`);
   };
 
   return (
@@ -58,9 +75,6 @@ const Waitlist = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <button className="p-5 border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google hover:bg-white transition-all bg-slate-50 shadow-soft active:scale-90" onClick={() => alert('Search Parameters: Initializing queue filter nodes...')}>
-                <FaFilter size={16}/>
-              </button>
             </div>
 
             <div className="overflow-x-auto custom-scrollbar">
@@ -109,10 +123,10 @@ const Waitlist = () => {
                       </td>
                       <td className="px-10 py-8 text-right">
                         <div className="flex items-center justify-end gap-3">
-                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100 hover:shadow-google transition-all flex items-center justify-center active:scale-90" title="Book Instant Slot" onClick={(e) => { e.stopPropagation(); handleAction('Instant Slot Reconciliation', entry); }}>
+                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100 hover:shadow-google transition-all flex items-center justify-center active:scale-90" title="Book Instant Slot" onClick={(e) => { e.stopPropagation(); navigate('/appointments/book'); }}>
                               <FaCheckCircle size={14}/>
                            </button>
-                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); handleAction('Context Audit', entry); }}>
+                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
                               <FaEllipsisV size={14}/>
                            </button>
                         </div>
@@ -170,7 +184,7 @@ const Waitlist = () => {
             </div>
           </Card>
 
-          <Card className="p-10 border-none shadow-premium bg-white flex flex-col items-center justify-center text-center py-12 hover:shadow-google transition-all group cursor-pointer" onClick={() => alert('Automation Node: SMS synchronization active for all priority subjects.')}>
+          <Card className="p-10 border-none shadow-premium bg-white flex flex-col items-center justify-center text-center py-12 hover:shadow-google transition-all group cursor-pointer" onClick={() => navigate('/appointments/settings')}>
              <div className="w-16 h-16 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-soft">
                 <FaClock className="text-clinicPrimary" size={24}/>
              </div>
@@ -190,7 +204,7 @@ const Waitlist = () => {
         footer={
           <div className="flex gap-4 justify-end w-full px-2">
             <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Discard</Button>
-            <Button variant="accent" onClick={() => { setIsAddModalOpen(false); alert('System: Subject successfully added to longitudinal queue.'); }} leftIcon={<FaPlus />}>Authorize Entry</Button>
+            <Button variant="accent" onClick={handleAddEntry} leftIcon={<FaPlus />}>Authorize Entry</Button>
           </div>
         }
       >
@@ -199,13 +213,23 @@ const Waitlist = () => {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Identification</label>
               <div className="relative group/input">
                  <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
-                 <input type="text" className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" placeholder="Lookup subject identity..." />
+                  <input 
+                    type="text" 
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                    placeholder="Lookup subject identity..." 
+                    value={newEntry.patient}
+                    onChange={(e) => setNewEntry({...newEntry, patient: e.target.value})}
+                  />
               </div>
            </div>
            <div className="grid grid-cols-2 gap-8">
               <div className="space-y-3">
                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Proposed Clinical Protocol</label>
-                 <select className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer">
+                 <select 
+                    className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer"
+                    value={newEntry.requestedService}
+                    onChange={(e) => setNewEntry({...newEntry, requestedService: e.target.value})}
+                 >
                     <option>Physio Evolution</option>
                     <option>Bio-Metric Pulse</option>
                     <option>Assigned Rehab</option>
@@ -222,7 +246,13 @@ const Waitlist = () => {
            </div>
            <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporal Prefereces (Available Slots)</label>
-              <input type="text" className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" placeholder="e.g. Mornings, Weekends, Mon-Wed..." />
+              <input 
+                type="text" 
+                className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                placeholder="e.g. Mornings, Weekends, Mon-Wed..." 
+                value={newEntry.preferredDays}
+                onChange={(e) => setNewEntry({...newEntry, preferredDays: e.target.value})}
+              />
            </div>
         </div>
       </Modal>
