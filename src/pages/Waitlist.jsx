@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaClock, FaUser, FaPhone, FaCalendarPlus, FaFilter, FaSearch, FaEllipsisV, FaCheckCircle, FaArrowRight, FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
+import { FaClock, FaUser, FaPhone, FaCalendarPlus, FaFilter, FaSearch, FaEllipsisV, FaCheckCircle, FaArrowRight, FaChevronLeft, FaChevronRight, FaPlus, FaTrash, FaCheck } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Modal from '../components/ui/Modal';
 
 const Waitlist = () => {
   const navigate = useNavigate();
@@ -15,13 +15,26 @@ const Waitlist = () => {
     preferredDays: '',
     status: 'Normal'
   });
+  const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
 
-  const [waitlistEntries, setWaitlistEntries] = useState([
-    { id: 'WL-101', patient: 'Emma Watson', requestedService: 'Physio Evolution', preferredDays: 'Mon, Wed', addedDate: '15 Mar 2026', status: 'Priority' },
-    { id: 'WL-102', patient: 'James Bond', requestedService: 'Bio-Metric Massage', preferredDays: 'Weekends', addedDate: '16 Mar 2026', status: 'Normal' },
-    { id: 'WL-103', patient: 'Sarah Parker', requestedService: 'Assessment Protocol', preferredDays: 'Any morning', addedDate: '14 Mar 2026', status: 'Priority' },
-    { id: 'WL-104', patient: 'Robert Downey', requestedService: 'Neural Rehab', preferredDays: 'Fri afternoon', addedDate: '17 Mar 2026', status: 'Normal' },
-  ]);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, visible: true });
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
+  };
+
+  const [waitlistEntries, setWaitlistEntries] = useState(() => {
+    const saved = localStorage.getItem('deephysio_waitlist');
+    return saved ? JSON.parse(saved) : [
+      { id: 'WL-101', patient: 'Emma Watson', requestedService: 'Physio Evolution', preferredDays: 'Mon, Wed', addedDate: '15 Mar 2026', status: 'Priority' },
+      { id: 'WL-102', patient: 'James Bond', requestedService: 'Bio-Metric Massage', preferredDays: 'Weekends', addedDate: '16 Mar 2026', status: 'Normal' },
+      { id: 'WL-103', patient: 'Sarah Parker', requestedService: 'Assessment Protocol', preferredDays: 'Any morning', addedDate: '14 Mar 2026', status: 'Priority' },
+      { id: 'WL-104', patient: 'Robert Downey', requestedService: 'Neural Rehab', preferredDays: 'Fri afternoon', addedDate: '17 Mar 2026', status: 'Normal' },
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('deephysio_waitlist', JSON.stringify(waitlistEntries));
+  }, [waitlistEntries]);
 
   const filteredEntries = waitlistEntries.filter(e => 
     e.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -30,12 +43,27 @@ const Waitlist = () => {
   );
 
   const handleAddEntry = () => {
-    if (!newEntry.patient) return;
+    if (!newEntry.patient) {
+      showToast('Subject Identification required for queue entry.', 'error');
+      return;
+    }
     const id = `WL-${Math.floor(Math.random() * 900) + 100}`;
     const addedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     setWaitlistEntries([...waitlistEntries, { ...newEntry, id, addedDate }]);
     setIsAddModalOpen(false);
     setNewEntry({ patient: '', requestedService: 'Physio Evolution', preferredDays: '', status: 'Normal' });
+    showToast(`${newEntry.patient} successfully added to the clinical queue. Node ${id} active.`);
+  };
+
+  const handleReclaimSlot = (entry) => {
+    setWaitlistEntries(waitlistEntries.filter(e => e.id !== entry.id));
+    showToast(`Slot Reclaimed for ${entry.patient}. Redirecting to Appointment Node...`);
+    setTimeout(() => navigate('/appointments/book'), 1500);
+  };
+
+  const handleRemoveEntry = (id) => {
+    setWaitlistEntries(waitlistEntries.filter(e => e.id !== id));
+    showToast('Queue entry successfully purged from system.', 'error');
   };
 
   const handleAction = (action, entry) => {
@@ -43,21 +71,38 @@ const Waitlist = () => {
   };
 
   return (
-    <div className="space-y-10 p-6 md:p-10 animate-fade-in custom-scrollbar font-sans">
+    <div className="space-y-10 p-6 md:p-10 animate-fade-in custom-scrollbar font-sans relative">
+      <AnimatePresence>
+        {toast.visible && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className={`fixed top-10 left-1/2 -translate-x-1/2 z-[100] px-8 py-4 rounded-2xl shadow-premium border flex items-center gap-4 min-w-[320px] ${
+              toast.type === 'success' 
+              ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
+              : 'bg-rose-50 border-rose-100 text-rose-700'
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+              {toast.type === 'success' ? <FaCheck size={12}/> : <FaTrash size={12}/>}
+            </div>
+            <p className="text-[13px] font-black uppercase tracking-widest">{toast.message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Waitlist Intelligence</h1>
           <p className="text-slate-500 font-bold mt-3 uppercase tracking-widest text-[11px] opacity-80">Synchronize subject queues for optimized slot reclamation.</p>
         </div>
-        <Button 
-          variant="accent" 
-          size="lg"
-          className="rounded-[24px] h-14 px-10 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-[0.2em] w-full lg:w-auto relative z-10"
-          onClick={() => setIsAddModalOpen(true)}
-          leftIcon={<FaCalendarPlus size={14}/>}
+        <button 
+          className="rounded-[24px] h-14 px-10 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-[0.2em] w-full lg:w-auto relative z-10 bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark text-white flex items-center justify-center gap-2"
+          onClick={() => { console.log('Opening form...'); setIsAddModalOpen(true); }}
         >
-          Add to Queue
-        </Button>
+          <FaCalendarPlus size={14}/>
+          ADD TO QUEUE
+        </button>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
 
@@ -123,11 +168,26 @@ const Waitlist = () => {
                       </td>
                       <td className="px-10 py-8 text-right">
                         <div className="flex items-center justify-end gap-3">
-                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100 hover:shadow-google transition-all flex items-center justify-center active:scale-90" title="Book Instant Slot" onClick={(e) => { e.stopPropagation(); navigate('/appointments/book'); }}>
+                           <button 
+                             className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100 hover:shadow-google transition-all flex items-center justify-center active:scale-90" 
+                             title="Slot Reclamation (Book Now)" 
+                             onClick={(e) => { e.stopPropagation(); handleReclaimSlot(entry); }}
+                           >
                               <FaCheckCircle size={14}/>
                            </button>
-                           <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
+                           <button 
+                             className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-90" 
+                             title="Audit Subject Profile"
+                             onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}
+                           >
                               <FaEllipsisV size={14}/>
+                           </button>
+                           <button 
+                             className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-rose-300 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 hover:shadow-google transition-all flex items-center justify-center active:scale-90" 
+                             title="Purge Entry"
+                             onClick={(e) => { e.stopPropagation(); handleRemoveEntry(entry.id); }}
+                           >
+                              <FaTrash size={12}/>
                            </button>
                         </div>
                       </td>
@@ -197,65 +257,90 @@ const Waitlist = () => {
         </div>
       </div>
 
-      <Modal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)}
-        title="Register New Queue Node"
-        footer={
-          <div className="flex gap-4 justify-end w-full px-2">
-            <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Discard</Button>
-            <Button variant="accent" onClick={handleAddEntry} leftIcon={<FaPlus />}>Authorize Entry</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-4 font-sans">
-           <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Identification</label>
-              <div className="relative group/input">
-                 <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
+      {/* Inline Modal Overlay */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+              onClick={() => setIsAddModalOpen(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-2xl bg-white rounded-[40px] shadow-premium overflow-hidden border border-slate-100"
+            >
+              <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Register New Queue Node</h2>
+                <button onClick={() => setIsAddModalOpen(false)} className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all"><FaPlus className="rotate-45"/></button>
+              </div>
+
+              <div className="p-10 space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Identification</label>
+                  <div className="relative group/input">
+                    <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
+                    <input 
+                      type="text" 
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                      placeholder="Lookup subject identity..." 
+                      value={newEntry.patient}
+                      onChange={(e) => setNewEntry({...newEntry, patient: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Proposed Clinical Protocol</label>
+                    <select 
+                      className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer"
+                      value={newEntry.requestedService}
+                      onChange={(e) => setNewEntry({...newEntry, requestedService: e.target.value})}
+                    >
+                      <option>Physio Evolution</option>
+                      <option>Bio-Metric Pulse</option>
+                      <option>Assigned Rehab</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporal Priority</label>
+                    <select 
+                      className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer"
+                      value={newEntry.status === 'Normal' ? 'Normal (Routine)' : newEntry.status === 'Priority' ? 'Priority (Accelerated)' : 'Urgent (Immediate Sync)'}
+                      onChange={(e) => setNewEntry({...newEntry, status: e.target.value.split(' ')[0]})}
+                    >
+                      <option>Normal (Routine)</option>
+                      <option>Priority (Accelerated)</option>
+                      <option>Urgent (Immediate Sync)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporal Prefereces (Available Slots)</label>
                   <input 
                     type="text" 
-                    className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
-                    placeholder="Lookup subject identity..." 
-                    value={newEntry.patient}
-                    onChange={(e) => setNewEntry({...newEntry, patient: e.target.value})}
+                    className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                    placeholder="e.g. Mornings, Weekends, Mon-Wed..." 
+                    value={newEntry.preferredDays}
+                    onChange={(e) => setNewEntry({...newEntry, preferredDays: e.target.value})}
                   />
+                </div>
               </div>
-           </div>
-           <div className="grid grid-cols-2 gap-8">
-              <div className="space-y-3">
-                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Proposed Clinical Protocol</label>
-                 <select 
-                    className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer"
-                    value={newEntry.requestedService}
-                    onChange={(e) => setNewEntry({...newEntry, requestedService: e.target.value})}
-                 >
-                    <option>Physio Evolution</option>
-                    <option>Bio-Metric Pulse</option>
-                    <option>Assigned Rehab</option>
-                 </select>
+
+              <div className="px-10 py-8 bg-slate-50/50 border-t border-slate-100 flex justify-end gap-4">
+                <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Discard Selection</Button>
+                <Button variant="accent" onClick={handleAddEntry} leftIcon={<FaPlus />}>Authorize Entry</Button>
               </div>
-              <div className="space-y-3">
-                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporal Priority</label>
-                 <select className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all cursor-pointer">
-                    <option>Normal (Routine)</option>
-                    <option>Priority (Accelerated)</option>
-                    <option>Urgent (Immediate Sync)</option>
-                 </select>
-              </div>
-           </div>
-           <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporal Prefereces (Available Slots)</label>
-              <input 
-                type="text" 
-                className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
-                placeholder="e.g. Mornings, Weekends, Mon-Wed..." 
-                value={newEntry.preferredDays}
-                onChange={(e) => setNewEntry({...newEntry, preferredDays: e.target.value})}
-              />
-           </div>
-        </div>
-      </Modal>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
