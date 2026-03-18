@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FaUserPlus, FaSearch, FaFilter, FaDownload, FaEllipsisV, FaChevronLeft, FaChevronRight, FaPlus, FaPhoneAlt, FaEnvelope, FaCalendarAlt, FaHistory } from 'react-icons/fa';
+import { FaUserPlus, FaSearch, FaFilter, FaDownload, FaEllipsisV, FaChevronLeft, FaChevronRight, FaPlus, FaPhoneAlt, FaEnvelope, FaCalendarAlt, FaHistory, FaTrash, FaCheck } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
@@ -10,7 +11,13 @@ const Patients = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const itemsPerPage = 5;
+
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
+  };
 
   const [patients, setPatients] = useState([
     { id: 'PID-101', name: 'Alice Johnson', age: 34, gender: 'Female', lastVisit: '2026-03-12', status: 'Active', phone: '+1 234-567-8901', email: 'alice.j@example.com' },
@@ -61,8 +68,32 @@ const Patients = () => {
     document.body.removeChild(link);
   };
 
+  const handleDeletePatient = (id) => {
+    setPatients(patients.filter(p => p.id !== id));
+    showToast('Patient record purged from clinical partition.', 'error');
+  };
+
   return (
-    <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans">
+    <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans relative">
+      <AnimatePresence>
+        {toast.visible && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className={`fixed top-10 left-1/2 -translate-x-1/2 z-[100] px-8 py-4 rounded-2xl shadow-premium border flex items-center gap-4 min-w-[320px] ${
+              toast.type === 'success' 
+              ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
+              : 'bg-rose-50 border-rose-100 text-rose-700'
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+              {toast.type === 'success' ? <FaCheck size={12}/> : <FaTrash size={12}/>}
+            </div>
+            <p className="text-[13px] font-black uppercase tracking-widest">{toast.message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8 p-6 sm:p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10 text-center lg:text-left">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Patient Directory</h1>
@@ -82,7 +113,7 @@ const Patients = () => {
             variant="accent" 
             size="lg"
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest"
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => navigate('/patients/add')}
             leftIcon={<FaUserPlus size={14}/>}
           >
             Add Patient
@@ -102,14 +133,6 @@ const Patients = () => {
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             />
-          </div>
-          <div className="flex gap-4">
-            <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90" onClick={() => alert('Advanced Filtering Node: Loading demographic parameters...')}>
-              <FaFilter size={16}/>
-            </button>
-            <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90" onClick={() => alert('Search Chronology: Accessing historical lookup logs...')}>
-              <FaHistory size={16}/>
-            </button>
           </div>
         </div>
 
@@ -162,15 +185,27 @@ const Patients = () => {
                       {p.status}
                     </div>
                   </td>
-                  <td className="px-10 py-8">
+                   <td className="px-10 py-8">
                     <div className="flex items-center justify-end gap-3">
-                      <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); alert(`Initiating Communication: ${p.email}`); }}>
+                      <button 
+                        className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center active:scale-90" 
+                        title="Communicate Subject"
+                        onClick={(e) => { e.stopPropagation(); navigate('/communication'); }}
+                      >
                         <FaEnvelope size={14}/>
                       </button>
-                      <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-emerald-500 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/appointments'); }}>
-                        <FaCalendarAlt size={14}/>
+                      <button 
+                        className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-rose-500 hover:border-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center active:scale-90" 
+                        title="Purge Record"
+                        onClick={(e) => { e.stopPropagation(); handleDeletePatient(p.id); }}
+                      >
+                        <FaTrash size={14}/>
                       </button>
-                      <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary hover:bg-clinicPrimary/5 transition-all flex items-center justify-center active:scale-90" onClick={(e) => { e.stopPropagation(); alert(`Context Menu for ${p.name}: Edit, Archive, or Transfer Node.`); }}>
+                      <button 
+                        className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary hover:bg-clinicPrimary/5 transition-all flex items-center justify-center active:scale-90" 
+                        title="Audit Patient Profile"
+                        onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}
+                      >
                         <FaEllipsisV size={14}/>
                       </button>
                     </div>
