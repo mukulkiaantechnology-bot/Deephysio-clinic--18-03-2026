@@ -73,7 +73,7 @@ const Appointments = () => {
             variant="accent" 
             size="lg"
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest"
-            onClick={() => setIsBookModalOpen(true)}
+            onClick={() => navigate('/appointments/book')}
             leftIcon={<FaCalendarPlus size={14}/>}
           >
             New Booking
@@ -203,7 +203,7 @@ const Appointments = () => {
                                       </p>
                                    </div>
                                    <div className="flex gap-2 opacity-0 group-hover/booking:opacity-100 transition-opacity">
-                                      <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); /* alert('Initializing Tele-Protocol Node...'); */ }}>
+                                       <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
                                          <FaUserMd size={14} className="mx-auto"/>
                                       </button>
                                       <button className="w-9 h-9 rounded-xl bg-clinicPrimary text-white shadow-soft transition-all hover:shadow-google active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
