@@ -8,13 +8,36 @@ const Billing = () => {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
-  const invoices = [
+  const [invoicesList, setInvoicesList] = useState([
     { id: 'INV-2026-001', patient: 'James Wilson', date: '15 Mar 2026', amount: '£120.00', status: 'Paid', method: 'Premium Card' },
     { id: 'INV-2026-002', patient: 'Emily Brown', date: '14 Mar 2026', amount: '£85.00', status: 'Pending', method: 'N/A' },
     { id: 'INV-2026-003', patient: 'Robert Davis', date: '13 Mar 2026', amount: '£210.00', status: 'Overdue', method: 'Insurance Direct' },
     { id: 'INV-2026-004', patient: 'Sophie Taylor', date: '12 Mar 2026', amount: '£60.00', status: 'Paid', method: 'Cash Node' },
     { id: 'INV-2026-005', patient: 'Michael Smith', date: '11 Mar 2026', amount: '£150.00', status: 'Paid', method: 'Digital Sync' },
-  ];
+  ]);
+
+  const [newInvoice, setNewInvoice] = useState({
+    patient: 'James Wilson (PID-102)', amount: '', date: '', description: ''
+  });
+
+  const handleAddInvoice = () => {
+    if (!newInvoice.amount) return;
+    const newId = `INV-2026-00${invoicesList.length + 1}`;
+    const formattedDate = newInvoice.date 
+      ? new Date(newInvoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '18 Mar 2026';
+    
+    setInvoicesList([...invoicesList, { 
+      id: newId, 
+      patient: newInvoice.patient.split(' (')[0], 
+      date: formattedDate,
+      amount: `£${parseFloat(newInvoice.amount).toFixed(2)}`, 
+      status: 'Pending', 
+      method: 'N/A' 
+    }]);
+    setIsInvoiceModalOpen(false);
+    setNewInvoice({ patient: 'James Wilson (PID-102)', amount: '', date: '', description: '' });
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -54,14 +77,18 @@ const Billing = () => {
         footer={
           <div className="flex gap-3 justify-end w-full">
             <Button variant="secondary" onClick={() => setIsInvoiceModalOpen(false)}>Discard Draft</Button>
-            <Button variant="accent" onClick={() => setIsInvoiceModalOpen(false)} leftIcon={<FaReceipt />}>Finalize Invoice</Button>
+            <Button variant="accent" onClick={handleAddInvoice} leftIcon={<FaReceipt />}>Finalize Invoice</Button>
           </div>
         }
       >
         <div className="space-y-8 p-2">
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Account Subject</label>
-            <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+            <select 
+              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
+              value={newInvoice.patient}
+              onChange={(e) => setNewInvoice({...newInvoice, patient: e.target.value})}
+            >
               <option>James Wilson (PID-102)</option>
               <option>Emily Brown (PID-205)</option>
               <option>Corporate Client: TechHub UK</option>
@@ -72,17 +99,33 @@ const Billing = () => {
               <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Asset Valuation (£)</label>
               <div className="relative">
                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">£</span>
-                <input type="number" className="w-full pl-10 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" placeholder="0.00" />
+                <input 
+                  type="number" 
+                  className="w-full pl-10 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" 
+                  placeholder="0.00" 
+                  value={newInvoice.amount}
+                  onChange={(e) => setNewInvoice({...newInvoice, amount: e.target.value})}
+                />
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Temporal Deadline</label>
-              <input type="date" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" />
+              <input 
+                type="date" 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" 
+                value={newInvoice.date}
+                onChange={(e) => setNewInvoice({...newInvoice, date: e.target.value})}
+              />
             </div>
           </div>
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Service Breakdown</label>
-            <textarea className="w-full p-5 bg-slate-50 border border-slate-200 rounded-3xl text-[13px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all h-28 custom-scrollbar placeholder:text-slate-300" placeholder="Describe the therapeutic services or medical supplies provided..."></textarea>
+            <textarea 
+              className="w-full p-5 bg-slate-50 border border-slate-200 rounded-3xl text-[13px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all h-28 custom-scrollbar placeholder:text-slate-300" 
+              placeholder="Describe the therapeutic services..."
+              value={newInvoice.description}
+              onChange={(e) => setNewInvoice({...newInvoice, description: e.target.value})}
+            ></textarea>
           </div>
         </div>
       </Modal>
@@ -170,7 +213,7 @@ const Billing = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {invoices.map((inv) => (
+              {invoicesList.map((inv) => (
                 <tr key={inv.id} className="hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer border-l-4 border-transparent hover:border-clinicPrimary">
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-6">

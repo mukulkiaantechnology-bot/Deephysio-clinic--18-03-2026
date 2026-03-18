@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -50,6 +50,7 @@ const StatCard = ({ title, value, icon, color, trend, path }) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   return (
     <div className="space-y-8 p-6 md:p-8 animate-fade-in custom-scrollbar">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -62,7 +63,7 @@ const Dashboard = () => {
             variant="secondary" 
             className="flex-1 sm:flex-none h-12 px-6 rounded-2xl shadow-premium hover:shadow-google transition-all active:scale-95" 
             leftIcon={<FaChartLine size={14} />}
-            onClick={() => { alert('Analytics Module: Synchronizing real-time clinic metrics...'); navigate('/analytics'); }}
+            onClick={() => navigate('/analytics')}
           >
             Analytics
           </Button>
@@ -130,7 +131,7 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-clinicPrimary border-2 border-transparent transition-all" onClick={() => alert('Trend Analysis: Navigating to detailed appointment reports...')}>
+        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-clinicPrimary border-2 border-transparent transition-all" onClick={() => navigate('/analytics')}>
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest leading-none">Appointment Trends</h3>
@@ -162,7 +163,7 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-amber-500 border-2 border-transparent transition-all" onClick={() => alert('Revenue Node: Navigating to comprehensive financial analysis...')}>
+        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-amber-500 border-2 border-transparent transition-all" onClick={() => navigate('/analytics')}>
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest leading-none">Revenue Analysis</h3>
@@ -277,7 +278,7 @@ const Dashboard = () => {
               { type: 'New Patient Intake', patient: 'Michael Myers', time: '2 hours ago' },
               { type: 'Insurance Approval', patient: 'AXA Healthcare', time: '3 hours ago' }
             ].map((activity, i) => (
-              <div key={i} className="relative pl-14 group/act cursor-pointer" onClick={() => alert(`Activity Node: ${activity.type} details loaded.`)}>
+              <div key={i} className="relative pl-14 group/act cursor-pointer" onClick={() => navigate(activity.type.includes('Financial') ? '/billing' : '/patients')}>
                 <div className="absolute left-0 top-0 w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-soft z-10 flex items-center justify-center group-hover/act:border-clinicPrimary group-hover/act:scale-110 transition-all">
                    <div className="w-2.5 h-2.5 rounded-full bg-clinicPrimary shadow-[0_0_12px_rgba(46,167,184,0.6)] group-hover/act:scale-125 transition-all"></div>
                 </div>
@@ -291,7 +292,7 @@ const Dashboard = () => {
           </div>
           <div className="p-6 bg-slate-50/50 border-t border-slate-50">
             <button 
-              onClick={() => { alert('Audit Trail: Accessing full historical activity logs...'); navigate('/analytics'); }}
+              onClick={() => setIsActivityModalOpen(true)}
               className="w-full py-4 text-[11px] font-black text-slate-400 hover:text-clinicPrimary uppercase tracking-[0.2em] transition-all bg-white border border-slate-100 rounded-xl shadow-premium active:scale-95"
             >
               See Full History
@@ -299,6 +300,36 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Activity History Modal */}
+      <Modal
+        isOpen={isActivityModalOpen}
+        onClose={() => setIsActivityModalOpen(false)}
+        title="Full Clinic Activity Log"
+      >
+        <div className="space-y-6 max-h-[500px] overflow-y-auto custom-scrollbar p-2">
+          {[
+            { type: 'Physio Evolution', patient: 'Samantha Reed', time: '12 mins ago' },
+            { type: 'Financial Ledger Update', patient: 'System Sync', time: '45 mins ago' },
+            { type: 'New Patient Intake', patient: 'Michael Myers', time: '2 hours ago' },
+            { type: 'Insurance Approval', patient: 'AXA Healthcare', time: '3 hours ago' },
+            { type: 'Note Finalized', patient: 'Alice Johnson', time: '5 hours ago' },
+            { type: 'Appointment Canceled', patient: 'James Wilson', time: '6 hours ago' },
+            { type: 'Invoice Paid', patient: 'Emily Brown', time: '1 day ago' },
+          ].map((activity, i) => (
+            <div key={i} className="relative pl-14 py-2 border-b border-slate-50 last:border-none">
+              <div className="absolute left-0 top-3 w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                 <div className="w-2 h-2 rounded-full bg-clinicPrimary"></div>
+              </div>
+              <div>
+                <p className="text-[13px] font-bold text-slate-900">{activity.type}</p>
+                <p className="text-xs text-slate-500 mt-1 font-medium">{activity.patient} updated.</p>
+                <p className="text-[9px] font-bold text-slate-400 mt-2 uppercase tracking-widest">{activity.time}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </div>
   );
 };

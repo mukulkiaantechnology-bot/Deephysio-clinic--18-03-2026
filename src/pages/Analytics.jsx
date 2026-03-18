@@ -1,25 +1,81 @@
 import React, { useState } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import Modal from '../components/ui/Modal';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, Legend
 } from 'recharts';
 import { FaDownload, FaFilter, FaCalendarAlt, FaChartPie, FaChartLine, FaUsers, FaArrowUp, FaArrowDown, FaCog, FaMicroscope } from 'react-icons/fa';
 
-const data = [
-  { name: 'Jan', revenue: 4000, appointments: 240, activePatients: 180 },
-  { name: 'Feb', revenue: 3000, appointments: 198, activePatients: 190 },
-  { name: 'Mar', revenue: 5000, appointments: 310, activePatients: 210 },
-  { name: 'Apr', revenue: 2780, appointments: 150, activePatients: 220 },
-  { name: 'May', revenue: 1890, appointments: 110, activePatients: 230 },
-  { name: 'Jun', revenue: 2390, appointments: 180, activePatients: 250 },
+const quarterlyData = [
+  { name: 'Jan', revenue: 4200, appointments: 240, activePatients: 180 },
+  { name: 'Feb', revenue: 3800, appointments: 198, activePatients: 190 },
+  { name: 'Mar', revenue: 5100, appointments: 310, activePatients: 210 },
+  { name: 'Apr', revenue: 4780, appointments: 250, activePatients: 220 },
+  { name: 'May', revenue: 5890, appointments: 290, activePatients: 230 },
+  { name: 'Jun', revenue: 6390, appointments: 320, activePatients: 250 },
+];
+
+const monthlyData = [
+  { name: 'Week 1', revenue: 1200, appointments: 60, activePatients: 240 },
+  { name: 'Week 2', revenue: 1500, appointments: 75, activePatients: 242 },
+  { name: 'Week 3', revenue: 1800, appointments: 85, activePatients: 245 },
+  { name: 'Week 4', revenue: 1890, appointments: 100, activePatients: 250 },
+];
+
+const annualData = [
+  { name: '2023', revenue: 45000, appointments: 2200, activePatients: 380 },
+  { name: '2024', revenue: 52000, appointments: 2500, activePatients: 410 },
+  { name: '2025', revenue: 58000, appointments: 2800, activePatients: 425 },
+  { name: '2026', revenue: 65000, appointments: 3200, activePatients: 428 },
 ];
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#6366F1'];
 
 const Analytics = () => {
   const [activeTab, setActiveTab] = useState('quarterly');
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  const currentData = activeTab === 'monthly' ? monthlyData : activeTab === 'annual' ? annualData : quarterlyData;
+
+  const handleExport = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Period,Revenue,Appointments,Patients\n" + currentData.map(d => `${d.name},${d.revenue},${d.appointments},${d.activePatients}`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `analytics_${activeTab}_report.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const getStats = () => {
+    if (activeTab === 'monthly') {
+      return [
+        { label: 'Growth Gradient', value: '+4.2%', delta: 'Stable Velocity', icon: <FaChartLine />, color: 'emerald' },
+        { label: 'Patient Density', value: '25 Active', delta: '+2.1% Week', icon: <FaUsers />, color: 'blue' },
+        { label: 'Clinical Ops', value: '97.5%', delta: 'Optimized', icon: <FaMicroscope />, color: 'clinicPrimary' },
+        { label: 'System Sync', value: 'Nominal', delta: 'Audited 10m ago', icon: <FaCog />, color: 'amber' }
+      ];
+    }
+    if (activeTab === 'annual') {
+      return [
+        { label: 'Growth Gradient', value: '+18.5%', delta: 'Peak Velocity', icon: <FaChartLine />, color: 'emerald' },
+        { label: 'Patient Density', value: '428 Total', delta: 'Year Match', icon: <FaUsers />, color: 'blue' },
+        { label: 'Clinical Ops', value: '98.5%', delta: 'Optimized', icon: <FaMicroscope />, color: 'clinicPrimary' },
+        { label: 'System Sync', value: 'Nominal', delta: 'Audited 2d ago', icon: <FaCog />, color: 'amber' }
+      ];
+    }
+    return [
+      { label: 'Growth Gradient', value: '+12.4%', delta: 'High Velocity', icon: <FaChartLine />, color: 'emerald' },
+      { label: 'Patient Density', value: '428 Active', delta: '+4.2% Month', icon: <FaUsers />, color: 'blue' },
+      { label: 'Clinical Ops', value: '98.2%', delta: 'Optimized', icon: <FaMicroscope />, color: 'clinicPrimary' },
+      { label: 'System Sync', value: 'Nominal', delta: 'Audited 2m ago', icon: <FaCog />, color: 'amber' }
+    ];
+  };
+
+  const stats = getStats();
 
   return (
     <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar">
@@ -40,19 +96,14 @@ const Analytics = () => {
                </button>
              ))}
           </div>
-          <Button variant="secondary" leftIcon={<FaFilter />}>Analytical Filter</Button>
-          <Button variant="accent" leftIcon={<FaDownload />}>Export Report</Button>
+          <Button variant="secondary" leftIcon={<FaFilter />} onClick={() => setIsFilterModalOpen(true)}>Analytical Filter</Button>
+          <Button variant="accent" leftIcon={<FaDownload />} onClick={handleExport}>Export Report</Button>
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {[
-          { label: 'Growth Gradient', value: '+12.4%', delta: 'High Velocity', icon: <FaChartLine />, color: 'emerald' },
-          { label: 'Patient Density', value: '428 Active', delta: '+4.2% Month', icon: <FaUsers />, color: 'blue' },
-          { label: 'Clinical Ops', value: '98.2%', delta: 'Optimized', icon: <FaMicroscope />, color: 'clinicPrimary' },
-          { label: 'System Sync', value: 'Nominal', delta: 'Audited 2m ago', icon: <FaCog />, color: 'amber' }
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <Card key={i} className="p-8 border-none shadow-premium bg-white group hover:shadow-glass hover:-translate-y-1 transition-all">
              <div className="flex justify-between items-start mb-6">
                 <div className={`p-4 rounded-xl bg-${stat.color === 'clinicPrimary' ? 'blue-50' : stat.color + '-50'} text-${stat.color === 'clinicPrimary' ? 'blue-500' : stat.color + '-500'} transition-transform group-hover:scale-110`}>
@@ -85,7 +136,7 @@ const Analytics = () => {
           </div>
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
+              <AreaChart data={currentData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
@@ -177,7 +228,7 @@ const Analytics = () => {
                    contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)', padding: '20px' }}
                 />
                 <Bar dataKey="appts" fill="#3B82F6" radius={[10, 10, 0, 0]} barSize={24} />
-                <AreaChart data={data}>
+                <AreaChart data={currentData}>
                    <Area dataKey="revenue" fill="#F59E0B" />
                 </AreaChart>
               </BarChart>
@@ -218,6 +269,48 @@ const Analytics = () => {
           <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-clinicPrimary/10 rounded-full blur-[60px] pointer-events-none group-hover:bg-clinicPrimary/20 transition-all duration-1000"></div>
         </Card>
       </div>
+
+      {/* Filter Modal */}
+      <Modal 
+        isOpen={isFilterModalOpen} 
+        onClose={() => setIsFilterModalOpen(false)}
+        title="Analytical Parameter Filter"
+        footer={
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="secondary" onClick={() => setIsFilterModalOpen(false)}>Discard</Button>
+            <Button variant="accent" onClick={() => setIsFilterModalOpen(false)}>Apply Filter</Button>
+          </div>
+        }
+      >
+        <div className="space-y-6 p-2 font-sans">
+           <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Clinic Location</label>
+              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+                 <option>All Locations</option>
+                 <option>London Central</option>
+                 <option>Manchester Suite</option>
+              </select>
+           </div>
+           <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Date Start</label>
+                 <input type="date" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" value="2026-01-01" readOnly/>
+              </div>
+              <div className="space-y-2">
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Date End</label>
+                 <input type="date" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" value="2026-03-18" readOnly/>
+              </div>
+           </div>
+           <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Practitioner Segment</label>
+              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+                 <option>All Staff</option>
+                 <option>Senior Physio</option>
+                 <option>Junior Staff</option>
+              </select>
+           </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -11,6 +11,29 @@ const NewNote = () => {
     { id: 4, name: 'Referral Response', desc: 'Report for GP/Specialist' },
   ];
 
+  const [notes, setNotes] = useState({
+    subjective: '', objective: '', plan: ''
+  });
+
+  const handleTemplateClick = (id) => {
+    setActiveTemplate(id);
+    if (id === 1) {
+      setNotes({
+        subjective: 'Onset: Sudden\nPain: 7/10 VAS\nAggravating: Walking\nEasing: Rest',
+        objective: 'ROM Flexion: 90 deg\nStrength: 4/5 LQS\nPalpation: Tender L4/5',
+        plan: 'Manual therapy - 20 mins Lumbar Mobilizations\nHEP Given: Cat/Camel, Knee Rolls'
+      });
+    } else if (id === 2) {
+      setNotes({
+        subjective: 'Pain down to 4/10\nSleeping better, less stiffness in morning.',
+        objective: 'ROM Flexion: 110 deg\nStability improving.',
+        plan: 'Increase repetitions in HEP.\nReview in 1 week.'
+      });
+    } else {
+      setNotes({ subjective: '', objective: '', plan: '' });
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -46,7 +69,7 @@ const NewNote = () => {
                 {templates.map(t => (
                   <button 
                     key={t.id}
-                    onClick={() => setActiveTemplate(t.id)}
+                    onClick={() => handleTemplateClick(t.id)}
                     className={`w-full text-left p-2.5 rounded-lg border transition-all ${activeTemplate === t.id ? 'border-clinicPrimary bg-clinicPrimary/5 text-clinicPrimary' : 'border-gray-50 text-gray-500 hover:bg-gray-50'}`}
                   >
                     <p className="text-base font-bold leading-none mb-1">{t.name}</p>
@@ -83,6 +106,8 @@ const NewNote = () => {
                 <textarea 
                   className="w-full min-h-[100px] bg-transparent text-base font-medium text-gray-700 leading-relaxed outline-none resize-none placeholder:text-gray-300 placeholder:italic"
                   placeholder="Record patient complaints, onset of symptoms, pain levels (VAS 0-10)..."
+                  value={notes.subjective}
+                  onChange={(e) => setNotes({...notes, subjective: e.target.value})}
                 ></textarea>
               </div>
               
@@ -91,6 +116,8 @@ const NewNote = () => {
                 <textarea 
                   className="w-full min-h-[100px] bg-transparent text-base font-medium text-gray-700 leading-relaxed outline-none resize-none placeholder:text-gray-300 placeholder:italic"
                   placeholder="Observe gait, ROM testing, special tests, palpation findings..."
+                  value={notes.objective}
+                  onChange={(e) => setNotes({...notes, objective: e.target.value})}
                 ></textarea>
               </div>
 
@@ -99,6 +126,8 @@ const NewNote = () => {
                 <textarea 
                   className="w-full min-h-[100px] bg-transparent text-base font-medium text-gray-700 leading-relaxed outline-none resize-none placeholder:text-gray-300 placeholder:italic"
                   placeholder="Exercises prescribed, manual therapy used, home advice given..."
+                  value={notes.plan}
+                  onChange={(e) => setNotes({...notes, plan: e.target.value})}
                 ></textarea>
               </div>
             </div>

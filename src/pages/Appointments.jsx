@@ -20,11 +20,31 @@ const Appointments = () => {
     '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
   ];
 
-  const initialAppointments = [
+  const [appointments, setAppointments] = useState([
     { id: 101, patient: 'James Wilson', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
     { id: 102, patient: 'Alice Johnson', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
     { id: 103, patient: 'Robert Fox', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
-  ];
+  ]);
+
+  const [newBooking, setNewBooking] = useState({
+    patient: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', time: '09:00 AM'
+  });
+
+  const [selectedAppt, setSelectedAppt] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleAddAppointment = () => {
+    if (!newBooking.patient) return;
+    const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 101;
+    setAppointments([...appointments, { ...newBooking, id: newId, status: 'Confirmed' }]);
+    setIsBookModalOpen(false);
+    setNewBooking({ patient: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', time: '09:00 AM' });
+  };
+
+  const handleCancelAppointment = (id) => {
+    setAppointments(appointments.filter(a => a.id !== id));
+    setIsDetailModalOpen(false);
+  };
 
   return (
     <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans">
@@ -133,7 +153,7 @@ const Appointments = () => {
 
              <div className="relative">
                 {timeSlots.map((slot, index) => {
-                  const appointment = initialAppointments.find(a => a.time === slot && (selectedPractitioner === 'All Practitioners' || a.practitioner === selectedPractitioner));
+                  const appointment = appointments.find(a => a.time === slot && (selectedPractitioner === 'All Practitioners' || a.practitioner === selectedPractitioner));
                   return (
                     <div key={index} className="flex border-b border-slate-50 last:border-none group/slot">
                        <div className="w-24 sm:w-32 p-8 border-r border-slate-50 bg-slate-50/20 flex flex-col items-center justify-center">
@@ -148,7 +168,7 @@ const Appointments = () => {
                                 appointment.status === 'Arrived' ? 'bg-blue-50/40 hover:bg-blue-50' : 
                                 'bg-white hover:bg-slate-50'
                               }`}
-                              onClick={() => alert(`Reviewing Booking ID: ${appointment.id}\nPatient: ${appointment.patient}\nSession: ${appointment.type}`)}
+                              onClick={() => { setSelectedAppt(appointment); setIsDetailModalOpen(true); }}
                              >
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                    <div>
@@ -200,7 +220,7 @@ const Appointments = () => {
         footer={
           <div className="flex gap-3 justify-end w-full">
             <Button variant="secondary" onClick={() => setIsBookModalOpen(false)}>Discard Protocol</Button>
-            <Button variant="accent" onClick={() => { setIsBookModalOpen(false); alert('Booking Node Verified & Locked in Ledger.'); }} leftIcon={<FaPlus />}>Finalize Reservation</Button>
+            <Button variant="accent" onClick={handleAddAppointment} leftIcon={<FaPlus />}>Finalize Reservation</Button>
           </div>
         }
       >
@@ -209,19 +229,33 @@ const Appointments = () => {
             <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Subject Identity</label>
             <div className="relative group">
                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-clinicPrimary transition-colors" size={12}/>
-               <input type="text" className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" placeholder="Search registered subjects..." />
+               <input 
+                type="text" 
+                className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
+                placeholder="Search registered subjects..." 
+                value={newBooking.patient}
+                onChange={(e) => setNewBooking({...newBooking, patient: e.target.value})}
+               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Practitioner Node</label>
-              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+              <select 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
+                value={newBooking.practitioner}
+                onChange={(e) => setNewBooking({...newBooking, practitioner: e.target.value})}
+              >
                 {practitioners.map(dr => <option key={dr.id}>{dr.name}</option>)}
               </select>
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Clinical Protocol</label>
-              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+              <select 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
+                value={newBooking.type}
+                onChange={(e) => setNewBooking({...newBooking, type: e.target.value})}
+              >
                 <option>Physio Assessment</option>
                 <option>Follow-up Review</option>
                 <option>Rehab Exercise Session</option>
@@ -236,12 +270,56 @@ const Appointments = () => {
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Protocol Time</label>
-              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+              <select 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
+                value={newBooking.time}
+                onChange={(e) => setNewBooking({...newBooking, time: e.target.value})}
+              >
                 {timeSlots.map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
           </div>
         </div>
+      </Modal>
+
+      {/* Detail Modal */}
+      <Modal 
+        isOpen={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)}
+        title="Appointment Details"
+        footer={
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="danger" onClick={() => handleCancelAppointment(selectedAppt?.id)}>Cancel Appointment</Button>
+            <Button variant="secondary" onClick={() => setIsDetailModalOpen(false)}>Close Node</Button>
+          </div>
+        }
+      >
+        {selectedAppt && (
+          <div className="space-y-4 p-4 font-sans">
+             <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Subject Node</p>
+                <p className="text-xl font-black text-slate-900 mt-1">{selectedAppt.patient}</p>
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Practitioner</p>
+                   <p className="text-[13px] font-bold text-slate-700 mt-1">{selectedAppt.practitioner}</p>
+                </div>
+                <div>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Protocol Type</p>
+                   <p className="text-[13px] font-bold text-slate-700 mt-1">{selectedAppt.type}</p>
+                </div>
+                <div>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Session Time</p>
+                   <p className="text-[13px] font-bold text-slate-700 mt-1">{selectedAppt.time}</p>
+                </div>
+                <div>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                   <p className="text-[13px] font-bold text-emerald-600 mt-1">{selectedAppt.status}</p>
+                </div>
+             </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

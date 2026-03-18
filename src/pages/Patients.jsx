@@ -21,6 +21,23 @@ const Patients = () => {
     { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
   ]);
 
+  const [newPatient, setNewPatient] = useState({
+    name: '', age: '', gender: 'Male', phone: '', email: ''
+  });
+
+  const handleAddPatient = () => {
+    if (!newPatient.name) return;
+    const newId = `PID-${100 + patients.length + 1}`;
+    setPatients([...patients, { 
+      ...newPatient, 
+      id: newId, 
+      lastVisit: new Date().toISOString().split('T')[0], 
+      status: 'Active' 
+    }]);
+    setIsAddModalOpen(false);
+    setNewPatient({ name: '', age: '', gender: 'Male', phone: '', email: '' });
+  };
+
   const filteredPatients = patients.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -109,7 +126,7 @@ const Patients = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {currentPatients.length > 0 ? currentPatients.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => alert(`Accessing Bio-History for: ${p.name}`)}>
+                <tr key={p.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => navigate('/patients/profile')}>
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-clinicPrimary/10 to-clinicPrimary/5 text-clinicPrimary flex items-center justify-center font-bold text-sm shadow-soft border border-clinicPrimary/10 group-hover:scale-110 transition-transform">
@@ -200,7 +217,7 @@ const Patients = () => {
         footer={
           <div className="flex gap-3 justify-end w-full">
             <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Cancel Registration</Button>
-            <Button variant="accent" onClick={() => { setIsAddModalOpen(false); alert('Subject Registered Successfully in Encrypted Ledger.'); }} leftIcon={<FaPlus />}>Finalize Subject</Button>
+            <Button variant="accent" onClick={handleAddPatient} leftIcon={<FaPlus />}>Finalize Subject</Button>
           </div>
         }
       >
@@ -208,26 +225,58 @@ const Patients = () => {
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Legal Full Name</label>
-              <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" placeholder="e.g. Johnathan Doe" />
+              <input 
+                type="text" 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
+                placeholder="e.g. Johnathan Doe" 
+                value={newPatient.name}
+                onChange={(e) => setNewPatient({...newPatient, name: e.target.value})}
+              />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">DOB / Age Node</label>
-              <input type="date" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all" />
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Age Node</label>
+              <input 
+                type="number" 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
+                placeholder="e.g. 34" 
+                value={newPatient.age}
+                onChange={(e) => setNewPatient({...newPatient, age: e.target.value})}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Primary Biometric Phone</label>
-              <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" placeholder="+1 000-000-0000" />
+              <input 
+                type="text" 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
+                placeholder="+1 000-000-0000" 
+                value={newPatient.phone}
+                onChange={(e) => setNewPatient({...newPatient, phone: e.target.value})}
+              />
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Gender Identification</label>
-              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+              <select 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
+                value={newPatient.gender}
+                onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
+              >
                 <option>Male</option>
                 <option>Female</option>
                 <option>Non-Binary</option>
               </select>
             </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Ledger</label>
+            <input 
+              type="email" 
+              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300" 
+              placeholder="e.g. subject@example.com" 
+              value={newPatient.email}
+              onChange={(e) => setNewPatient({...newPatient, email: e.target.value})}
+            />
           </div>
         </div>
       </Modal>
