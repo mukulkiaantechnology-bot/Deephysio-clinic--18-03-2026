@@ -5,20 +5,27 @@ import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import { useNavigate } from 'react-router-dom';
 
+const INITIAL_PATIENTS = [
+  { id: 'PID-101', name: 'Alice Johnson', age: 34, gender: 'Female', lastVisit: '2026-03-12', status: 'Active', phone: '+1 234-567-8901', email: 'alice.j@example.com' },
+  { id: 'PID-102', name: 'James Wilson', age: 45, gender: 'Male', lastVisit: '2026-03-14', status: 'Active', phone: '+1 234-567-8902', email: 'j.wilson@example.com' },
+  { id: 'PID-103', name: 'Emily Brown', age: 28, gender: 'Female', lastVisit: '2026-03-10', status: 'Delayed', phone: '+1 234-567-8903', email: 'emily.b@example.com' },
+  { id: 'PID-104', name: 'Michael Chen', age: 52, gender: 'Male', lastVisit: '2026-03-08', status: 'Inactive', phone: '+1 234-567-8904', email: 'm.chen@example.com' },
+  { id: 'PID-105', name: 'Sarah Jenkins', age: 39, gender: 'Female', lastVisit: '2026-03-15', status: 'Active', phone: '+1 234-567-8905', email: 's.jenkins@example.com' },
+  { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
+];
+
 const Patients = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const [patients, setPatients] = useState([
-    { id: 'PID-101', name: 'Alice Johnson', age: 34, gender: 'Female', lastVisit: '2026-03-12', status: 'Active', phone: '+1 234-567-8901', email: 'alice.j@example.com' },
-    { id: 'PID-102', name: 'James Wilson', age: 45, gender: 'Male', lastVisit: '2026-03-14', status: 'Active', phone: '+1 234-567-8902', email: 'j.wilson@example.com' },
-    { id: 'PID-103', name: 'Emily Brown', age: 28, gender: 'Female', lastVisit: '2026-03-10', status: 'Delayed', phone: '+1 234-567-8903', email: 'emily.b@example.com' },
-    { id: 'PID-104', name: 'Michael Chen', age: 52, gender: 'Male', lastVisit: '2026-03-08', status: 'Inactive', phone: '+1 234-567-8904', email: 'm.chen@example.com' },
-    { id: 'PID-105', name: 'Sarah Jenkins', age: 39, gender: 'Female', lastVisit: '2026-03-15', status: 'Active', phone: '+1 234-567-8905', email: 's.jenkins@example.com' },
-    { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
-  ]);
+  const [patients, setPatients] = useState([]);
+
+  React.useEffect(() => {
+    const savedPatients = JSON.parse(localStorage.getItem('deephysio_patients') || '[]');
+    setPatients([...INITIAL_PATIENTS, ...savedPatients]);
+  }, []);
 
 
 

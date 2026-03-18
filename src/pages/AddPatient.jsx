@@ -7,16 +7,55 @@ import Card from '../components/ui/Card';
 const AddPatient = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
-  const [selectedGender, setSelectedGender] = useState('Male');
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    dob: '',
+    gender: 'Male',
+    phone: '',
+    email: '',
+    address: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const setSelectedGender = (gender) => {
+    setFormData(prev => ({ ...prev, gender }));
+  };
+
+  const selectedGender = formData.gender;
 
   const handleFinalize = (e) => {
     e.preventDefault();
+    if (!formData.firstName || !formData.lastName) {
+      return;
+    }
+
     setIsSaving(true);
     setTimeout(() => {
+      // Create new patient object
+      const newPatient = {
+        id: `PID-${Math.floor(1000 + Math.random() * 9000)}`,
+        name: `${formData.firstName} ${formData.lastName}`,
+        age: formData.dob ? new Date().getFullYear() - new Date(formData.dob).getFullYear() : '??',
+        gender: formData.gender,
+        lastVisit: new Date().toISOString().split('T')[0],
+        status: 'Active',
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.address
+      };
+
+      // Save to localStorage
+      const existingPatients = JSON.parse(localStorage.getItem('deephysio_patients') || '[]');
+      localStorage.setItem('deephysio_patients', JSON.stringify([...existingPatients, newPatient]));
+
       setIsSaving(false);
-      alert('Clinical Protocol Success: New subject identity has been registered in the medical partition.');
       navigate('/patients');
-    }, 2000);
+    }, 1500);
   };
 
   const handleAttach = (type) => {
@@ -65,17 +104,37 @@ const AddPatient = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Legal Given Name</label>
-                <input type="text" className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-300" placeholder="e.g. Johnathan" />
+                <input 
+                  type="text" 
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-300" 
+                  placeholder="e.g. Johnathan" 
+                />
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Legal Family Name</label>
-                <input type="text" className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-300" placeholder="e.g. Wilson" />
+                <input 
+                  type="text" 
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="w-full p-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-300" 
+                  placeholder="e.g. Wilson" 
+                />
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Temporal Birth Origin (DOB)</label>
                 <div className="relative group/input">
                   <FaBirthdayCake className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
-                  <input type="date" className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all" />
+                  <input 
+                    type="date" 
+                    name="dob"
+                    value={formData.dob}
+                    onChange={handleChange}
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all" 
+                  />
                 </div>
               </div>
               <div className="space-y-3">
@@ -110,21 +169,42 @@ const AddPatient = () => {
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Biometric Phone Sequence</label>
                 <div className="relative group/input">
                   <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[13px] font-black text-slate-300">+44</span>
-                  <input type="tel" className="w-full pl-16 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" placeholder="7000 000 000" />
+                  <input 
+                    type="tel" 
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full pl-16 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                    placeholder="7000 000 000" 
+                  />
                 </div>
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Secured Email Ledger</label>
                 <div className="relative group/input">
                   <FaEnvelope className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
-                  <input type="email" className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" placeholder="subject@medical-node.com" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                    placeholder="subject@medical-node.com" 
+                  />
                 </div>
               </div>
               <div className="sm:col-span-2 space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none ml-1">Physical Residential Coordinates</label>
                 <div className="relative group/input">
                   <FaMapMarkerAlt className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-clinicPrimary transition-colors" size={14}/>
-                  <input type="text" className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" placeholder="Street Address, Sector, Postcode" />
+                  <input 
+                    type="text" 
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 focus:border-clinicPrimary shadow-inner-soft transition-all placeholder:text-slate-200" 
+                    placeholder="Street Address, Sector, Postcode" 
+                  />
                 </div>
               </div>
             </div>

@@ -4,6 +4,14 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
+const INITIAL_NOTES = [
+  { id: 1, patientName: 'James Wilson', type: 'Physio Note', date: '2026-03-14', time: '10:30 AM', content: 'Demonstrated significant improvement in knee stability during weight-bearing exercises. Assessment confirms 12% increase in flexion gradient...', category: 'Physio' },
+  { id: 2, patientName: 'Emily Brown', date: '2026-03-13', time: '14:20 PM', content: 'Patient reports mild discomfort in lower lumbar region after initial mobilization. Suggested home care plan adjustments...', category: 'Assessment' },
+  { id: 3, patientName: 'James Wilson', date: '2026-03-12', time: '09:15 AM', content: 'Gait analysis shows slight internal rotation of the left ankle. Prescribed custom orthotics and follow-up in 2 weeks...', category: 'Gait Analysis' },
+  { id: 4, patientName: 'Sarah Jenkins', date: '2026-03-11', time: '11:45 AM', content: 'Post-operative rehab session 4. Range of motion at 85 degrees. Pain managed well with current medication protocol...', category: 'Rehab' },
+  { id: 5, patientName: 'Michael Chen', date: '2026-03-10', time: '16:00 PM', content: 'Initial assessment for shoulder impingement. Positive painful arc test. Exercises provided for rotator cuff strengthening...', category: 'Initial Assessment' },
+];
+
 const ClinicalNotes = () => {
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -14,13 +22,12 @@ const ClinicalNotes = () => {
   const itemsPerPage = 3;
   const textareaRef = useRef(null);
 
-  const [notes, setNotes] = useState([
-    { id: 1, patientName: 'James Wilson', type: 'Physio Note', date: '2026-03-14', time: '10:30 AM', content: 'Demonstrated significant improvement in knee stability during weight-bearing exercises. Assessment confirms 12% increase in flexion gradient...', category: 'Physio' },
-    { id: 2, patientName: 'Emily Brown', date: '2026-03-13', time: '14:20 PM', content: 'Patient reports mild discomfort in lower lumbar region after initial mobilization. Suggested home care plan adjustments...', category: 'Assessment' },
-    { id: 3, patientName: 'James Wilson', date: '2026-03-12', time: '09:15 AM', content: 'Gait analysis shows slight internal rotation of the left ankle. Prescribed custom orthotics and follow-up in 2 weeks...', category: 'Gait Analysis' },
-    { id: 4, patientName: 'Sarah Jenkins', date: '2026-03-11', time: '11:45 AM', content: 'Post-operative rehab session 4. Range of motion at 85 degrees. Pain managed well with current medication protocol...', category: 'Rehab' },
-    { id: 5, patientName: 'Michael Chen', date: '2026-03-10', time: '16:00 PM', content: 'Initial assessment for shoulder impingement. Positive painful arc test. Exercises provided for rotator cuff strengthening...', category: 'Initial Assessment' },
-  ]);
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const savedNotes = JSON.parse(localStorage.getItem('deephysio_clinical_notes') || '[]');
+    setNotes([...savedNotes, ...INITIAL_NOTES]);
+  }, []);
 
   const filteredNotes = notes.filter(note => 
     note.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,7 +87,7 @@ const ClinicalNotes = () => {
             size="lg" 
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-google transition-all active:scale-95" 
             leftIcon={<FaHistory size={12}/>}
-            onClick={() => alert('Journal Archive Synchronization: 1,280 Records Verified.')}
+            onClick={() => {}}
           >
             Archive
           </Button>
@@ -112,8 +119,24 @@ const ClinicalNotes = () => {
         title={selectedNote ? `Review: ${selectedNote.patientName}` : "New Clinical Observation"}
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => { setIsNoteModalOpen(false); alert('Draft Discarded'); }}>Discard Draft</Button>
-            <Button variant="accent" onClick={() => { setIsNoteModalOpen(false); alert('Note Finalized & Encrypted in Blockchain Record'); }} leftIcon={<FaPlus />}>Finalize & Save</Button>
+            <Button variant="secondary" onClick={() => { setIsNoteModalOpen(false); }}>Discard Draft</Button>
+            <Button variant="accent" onClick={() => {
+              if (!noteText) return;
+              const newNote = {
+                id: Date.now(),
+                patientName: document.getElementById('patient-select')?.value || 'James Wilson',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                content: noteText,
+                category: 'Physio Note'
+              };
+              const existingNotes = JSON.parse(localStorage.getItem('deephysio_clinical_notes') || '[]');
+              const updatedNotes = [newNote, ...existingNotes];
+              localStorage.setItem('deephysio_clinical_notes', JSON.stringify(updatedNotes));
+              setNotes([...updatedNotes, ...INITIAL_NOTES]);
+              setIsNoteModalOpen(false);
+              setNoteText('');
+            }} leftIcon={<FaPlus />}>Finalize & Save</Button>
           </div>
         }
       >
@@ -121,11 +144,12 @@ const ClinicalNotes = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Patient Subject</label>
-              <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
+              <select id="patient-select" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
                 {selectedNote ? <option>{selectedNote.patientName}</option> : (
                   <>
-                    <option>James Wilson (PID-102)</option>
-                    <option>Emily Brown (PID-205)</option>
+                    <option value="James Wilson">James Wilson (PID-102)</option>
+                    <option value="Emily Brown">Emily Brown (PID-205)</option>
+                    <option value="Alice Johnson">Alice Johnson (PID-101)</option>
                   </>
                 )}
               </select>

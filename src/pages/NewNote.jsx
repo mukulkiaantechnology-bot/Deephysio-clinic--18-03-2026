@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { FaFileMedical, FaUser, FaSave, FaMagic, FaPrint, FaShareAlt, FaPlus, FaTimes, FaBold, FaItalic, FaListUl } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaFileMedical, FaUser, FaSave, FaMagic, FaPrint, FaShareAlt, FaPlus, FaTimes, FaBold, FaItalic, FaListUl, FaChevronDown } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
+const INITIAL_PATIENTS = [
+  { id: 'PID-101', name: 'Alice Johnson' },
+  { id: 'PID-102', name: 'James Wilson' },
+  { id: 'PID-103', name: 'Emily Brown' },
+  { id: 'PID-104', name: 'Michael Chen' },
+  { id: 'PID-105', name: 'Sarah Jenkins' },
+  { id: 'PID-106', name: 'David Miller' },
+];
 
 const NewNote = () => {
+  const navigate = useNavigate();
   const [activeTemplate, setActiveTemplate] = useState(null);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const templates = [
     { id: 1, name: 'Initial SOAP', desc: 'Subjective, Objective, Assessment, Plan' },
@@ -10,6 +24,15 @@ const NewNote = () => {
     { id: 3, name: 'Discharge Summary', desc: 'Final assessment & outcome' },
     { id: 4, name: 'Referral Response', desc: 'Report for GP/Specialist' },
   ];
+
+  useEffect(() => {
+    const savedPatients = JSON.parse(localStorage.getItem('deephysio_patients') || '[]');
+    const allPatients = [...INITIAL_PATIENTS, ...savedPatients];
+    setPatients(allPatients);
+    if (allPatients.length > 0) {
+      setSelectedPatient(allPatients[0]);
+    }
+  }, []);
 
   const [notes, setNotes] = useState({
     subjective: '', objective: '', plan: ''
@@ -34,6 +57,33 @@ const NewNote = () => {
     }
   };
 
+  const handleFinalize = () => {
+    if (!selectedPatient) {
+      return;
+    }
+    if (!notes.subjective && !notes.objective && !notes.plan) {
+      return;
+    }
+
+    setIsSaving(true);
+    setTimeout(() => {
+      const newNote = {
+        id: Date.now(),
+        patientName: selectedPatient.name,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        content: `SUBJECTIVE: ${notes.subjective}\nOBJECTIVE: ${notes.objective}\nPLAN: ${notes.plan}`,
+        category: activeTemplate ? templates.find(t => t.id === activeTemplate).name : 'General Note'
+      };
+
+      const existingNotes = JSON.parse(localStorage.getItem('deephysio_clinical_notes') || '[]');
+      localStorage.setItem('deephysio_clinical_notes', JSON.stringify([newNote, ...existingNotes]));
+      
+      setIsSaving(false);
+      navigate('/notes');
+    }, 1500);
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -43,7 +93,13 @@ const NewNote = () => {
         </div>
         <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
           <button className="w-full sm:w-auto px-4 py-2 sm:py-1.5 bg-white border border-gray-200 rounded-lg text-sm sm:text-base font-black text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest flex items-center justify-center gap-2"><FaShareAlt size={10}/> Share</button>
-          <button className="w-full sm:w-auto btn-primary flex justify-center items-center gap-2 text-sm sm:text-base uppercase tracking-widest shadow-lg py-3 sm:py-2"><FaSave size={10}/> Finalize Note</button>
+          <button 
+            onClick={handleFinalize}
+            disabled={isSaving}
+            className={`w-full sm:w-auto btn-primary flex justify-center items-center gap-2 text-sm sm:text-base uppercase tracking-widest shadow-lg py-3 sm:py-2 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FaSave size={10}/> {isSaving ? 'Finalizing...' : 'Finalize Note'}
+          </button>
         </div>
       </div>
 
@@ -51,13 +107,25 @@ const NewNote = () => {
         <div className="lg:col-span-1 space-y-6">
           <div className="card-clinic">
             <h3 className="text-base font-black uppercase tracking-widest mb-4 text-clinicPrimary">Patient Context</h3>
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 mb-4">
+            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 mb-4 relative group">
+              <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest mb-2 block opacity-60">Active Subject</label>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-clinicPrimary/10 flex items-center justify-center text-clinicPrimary font-black">AJ</div>
-                <div>
-                  <p className="text-base font-black text-gray-900 leading-none">Alice Johnson</p>
-                  <p className="text-base font-bold text-gray-400 uppercase tracking-widest mt-1">ID: #DP-2026-084</p>
+                <div className="w-10 h-10 rounded-full bg-clinicPrimary/10 flex items-center justify-center text-clinicPrimary font-black">
+                  {selectedPatient ? selectedPatient.name.split(' ').map(n => n[0]).join('') : '??'}
                 </div>
+                <div className="flex-1">
+                  <select 
+                    className="w-full bg-transparent text-base font-black text-gray-900 leading-none outline-none cursor-pointer appearance-none pr-6"
+                    value={selectedPatient ? selectedPatient.id : ''}
+                    onChange={(e) => setSelectedPatient(patients.find(p => p.id === e.target.value))}
+                  >
+                    {patients.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">ID: {selectedPatient ? selectedPatient.id : 'N/A'}</p>
+                </div>
+                <FaChevronDown size={10} className="text-gray-300 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none group-hover:text-clinicPrimary transition-colors" />
               </div>
             </div>
             <div className="space-y-4">
