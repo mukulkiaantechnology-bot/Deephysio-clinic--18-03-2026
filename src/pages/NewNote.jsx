@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaFileMedical, FaUser, FaSave, FaMagic, FaPrint, FaShareAlt, FaPlus, FaTimes, FaBold, FaItalic, FaListUl, FaChevronDown } from 'react-icons/fa';
+import { FaFileMedical, FaUser, FaSave, FaMagic, FaPrint, FaShareAlt, FaPlus, FaTimes, FaBold, FaItalic, FaListUl, FaChevronDown, FaLink, FaShieldAlt, FaKey, FaCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../components/ui/Modal';
+import Button from '../components/ui/Button';
 
 const INITIAL_PATIENTS = [
   { id: 'PID-101', name: 'Alice Johnson' },
@@ -92,7 +94,6 @@ const NewNote = () => {
           <p className="text-sm sm:text-base font-bold text-gray-400 mt-1 uppercase tracking-widest">Record treatment and progress.</p>
         </div>
         <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
-          <button className="w-full sm:w-auto px-4 py-2 sm:py-1.5 bg-white border border-gray-200 rounded-lg text-sm sm:text-base font-black text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest flex items-center justify-center gap-2"><FaShareAlt size={10}/> Share</button>
           <button 
             onClick={handleFinalize}
             disabled={isSaving}

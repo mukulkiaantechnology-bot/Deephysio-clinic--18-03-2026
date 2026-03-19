@@ -123,7 +123,7 @@ const PatientProfile = () => {
                   </div>
                   <Button 
                     variant="accent" 
-                    onClick={() => setIsPaymentModalOpen(true)}
+                    onClick={() => navigate('/billing/payments')}
                     className="w-full shadow-google h-14 rounded-[20px] text-[11px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all mt-auto"
                   >
                     Authorize Payment Node
@@ -139,14 +139,14 @@ const PatientProfile = () => {
                      <div className="w-1.5 h-6 bg-amber-400 rounded-full"></div>
                      Clinical Progress Timeline
                   </h4>
-                  <button className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest hover:underline" onClick={() => handleAction('Full History Audit')}>See Full Chronology</button>
+                  <button className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest hover:underline" onClick={() => navigate('/patients/history')}>See Full Chronology</button>
                </div>
                <div className="space-y-6">
                   {[
                     { label: 'Follow-up Treatment Protocol', date: 'Yesterday at 14:00', type: 'Clinical', icon: <FaNotesMedical />, status: 'Verified', color: 'emerald' },
                     { label: 'Service Invoice Finalized', date: 'March 10, 2026', type: 'Billing', icon: <FaFileInvoiceDollar />, status: 'Settled', color: 'blue' }
                   ].map((item, idx) => (
-                    <div key={idx} className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 shadow-inner-soft rounded-[28px] border border-slate-100 hover:bg-white hover:shadow-google hover:-translate-y-1 transition-all group/item cursor-pointer" onClick={() => handleAction(`Node Audit: ${item.label}`)}>
+                    <div key={idx} className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 shadow-inner-soft rounded-[28px] border border-slate-100 hover:bg-white hover:shadow-google hover:-translate-y-1 transition-all group/item cursor-pointer" onClick={() => navigate(item.type === 'Clinical' ? '/notes' : '/billing')}>
                        <div className="flex items-center gap-6">
                           <div className={`w-14 h-14 bg-white rounded-2xl shadow-premium flex items-center justify-center text-${item.color}-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all`}>{item.icon}</div>
                           <div>

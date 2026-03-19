@@ -1,19 +1,36 @@
 import React, { useState } from 'react';
-import { FaUsers, FaPlus, FaSearch, FaHistory, FaShieldAlt, FaEllipsisV, FaCheckCircle, FaTimesCircle, FaBuilding, FaKey, FaHandshake, FaChartBar } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaUsers, FaPlus, FaSearch, FaHistory, FaShieldAlt, FaEllipsisV, FaCheckCircle, FaTimesCircle, FaBuilding, FaKey, FaHandshake, FaChartBar, FaTrash } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Modal from '../components/ui/Modal';
 
 const ClientsInsurers = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const clients = [
+  const [clients, setClients] = useState([
     { id: 1, name: 'Bupa Health UK', email: 'portal@bupa.co.uk', activeAppointments: 124, status: 'Active', permissions: ['Calendar', 'Booking'], lastLogin: '2h ago' },
     { id: 2, name: 'AXA PPP Healthcare', email: 'admin@axappp.com', activeAppointments: 86, status: 'Active', permissions: ['Calendar', 'Booking'], lastLogin: '5h ago' },
     { id: 3, name: 'Aviva Insurance', email: 'bookings@aviva.co.uk', activeAppointments: 42, status: 'Restricted', permissions: ['Calendar'], lastLogin: '1d ago' },
     { id: 4, name: 'Vitality Health', email: 'external@vitality.co.uk', activeAppointments: 18, status: 'Inactive', permissions: [], lastLogin: 'Never' },
-  ];
+  ]);
+
+  const filteredClients = clients.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleRegister = () => {
+    navigate('/clients/register');
+  };
+
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
+    if(window.confirm('Are you sure you want to revoke and delete this external node?')) {
+      setClients(clients.filter(c => c.id !== id));
+    }
+  };
 
   return (
     <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar">
@@ -23,59 +40,11 @@ const ClientsInsurers = () => {
           <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">Manage external insurance company access nodes and configure booking permissions.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 w-full lg:w-auto">
-           <Button variant="secondary" size="lg" className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-glass" leftIcon={<FaHistory size={12}/>}>History</Button>
-           <Button variant="accent" size="lg" className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-lg " leftIcon={<FaPlus size={12}/>} onClick={() => setIsAddModalOpen(true)}>Register</Button>
+           <Button variant="secondary" size="lg" onClick={() => navigate('/patients/history')} className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-glass" leftIcon={<FaHistory size={12}/>}>History</Button>
+           <Button variant="accent" size="lg" className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-lg " leftIcon={<FaPlus size={12}/>} onClick={() => navigate('/clients/register')}>Register</Button>
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
-
-      <Modal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)}
-        title="Register External Insurer"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>Cancel Action</Button>
-            <Button variant="accent" onClick={() => setIsAddModalOpen(false)} leftIcon={<FaHandshake />}>Create Account</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-2">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Company Entity Name</label>
-            <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" placeholder="e.g. Allianz Global" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Portal Administrator Email</label>
-              <input type="email" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" placeholder="portal@company.com" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Account Secret Key (API/Auth)</label>
-              <div className="relative">
-                <input type="password" readonly className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-400 outline-none cursor-not-allowed" value="******************" />
-                <FaKey className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" />
-              </div>
-            </div>
-          </div>
-          <div className="space-y-4">
-             <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Module Permission Matrix</label>
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { id: 'cal', label: 'View Calendar', default: true },
-                  { id: 'book', label: 'Create Bookings', default: true },
-                  { id: 'pat', label: 'View Patient Data', default: false },
-                  { id: 'bill', label: 'Access Billing', default: false },
-                ].map(perm => (
-                  <div key={perm.id} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
-                    <input type="checkbox" defaultChecked={perm.default} className="w-5 h-5 rounded-lg border-slate-300 text-clinicPrimary focus:ring-clinicPrimary/20 transition-all" />
-                    <span className="text-[12px] font-bold text-slate-600">{perm.label}</span>
-                  </div>
-                ))}
-             </div>
-          </div>
-        </div>
-      </Modal>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
@@ -127,8 +96,8 @@ const ClientsInsurers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {clients.map(client => (
-                <tr key={client.id} className="hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer border-l-4 border-transparent hover:border-clinicPrimary">
+              {filteredClients.map(client => (
+                <tr key={client.id} onClick={() => navigate(`/patients/profile`)} className="hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer border-l-4 border-transparent hover:border-clinicPrimary">
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-6">
                       <div className="w-14 h-14 rounded-2xl bg-white shadow-premium text-slate-400 flex items-center justify-center border border-slate-50 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 group-hover:bg-clinicPrimary/10 group-hover:text-clinicPrimary">
@@ -161,9 +130,9 @@ const ClientsInsurers = () => {
                   </td>
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="secondary" size="icon" className="h-10 w-10 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass"><FaKey size={12}/></Button>
-                      <Button variant="secondary" size="icon" className="h-10 w-10 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass"><FaChartBar size={12}/></Button>
-                      <Button variant="secondary" size="icon" className="h-10 w-10 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass"><FaEllipsisV size={12}/></Button>
+                      <Button variant="secondary" size="icon" onClick={(e) => { e.stopPropagation(); alert('API Key copied to system clipboard.'); }} title="Copy API Key" className="h-10 w-10 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass"><FaKey size={12}/></Button>
+                      <Button variant="secondary" size="icon" onClick={(e) => { e.stopPropagation(); navigate('/analytics'); }} title="View Analytics" className="h-10 w-10 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass"><FaChartBar size={12}/></Button>
+                      <Button variant="secondary" size="icon" onClick={(e) => handleDelete(client.id, e)} title="Revoke Node" className="h-10 w-10 rounded-xl bg-white border border-slate-50 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 shadow-premium hover:shadow-glass transition-colors"><FaTrash size={12}/></Button>
                     </div>
                   </td>
                 </tr>
