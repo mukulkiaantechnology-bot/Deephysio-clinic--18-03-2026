@@ -26,6 +26,7 @@ import BulkMessaging from './pages/BulkMessaging';
 const Telehealth = lazy(() => import('./pages/Telehealth'));
 import CommTemplates from './pages/CommTemplates';
 import Billing from './pages/Billing';
+import NewInvoice from './pages/NewInvoice';
 import Payments from './pages/Payments';
 import InsuranceClaims from './pages/InsuranceClaims';
 const PaymentReminders = lazy(() => import('./pages/PaymentReminders'));
@@ -90,10 +91,10 @@ function App() {
   };
 
   const roleMenuAccess = {
-    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
+    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing & Payments', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
     therapist: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Forms', 'Communication'],
     receptionist: ['Dashboard', 'Appointments', 'Patients', 'Forms', 'Communication'],
-    billing: ['Dashboard', 'Patients', 'Billing', 'Analytics']
+    billing: ['Dashboard', 'Patients', 'Billing & Payments', 'Analytics']
   };
 
   const hasAccess = (menuName) => {
@@ -146,12 +147,13 @@ function App() {
               <Route path="communication/telehealth" element={<Telehealth />} />
               <Route path="communication/templates" element={<CommTemplates />} />
 
-              {/* Billing & Payments - 5 Pages */}
-              <Route path="billing" element={<Billing />} />
-              <Route path="billing/payments" element={<Payments />} />
-              <Route path="billing/claims" element={<InsuranceClaims />} />
-              <Route path="billing/reminders" element={<PaymentReminders />} />
-              <Route path="billing/pricing" element={<PricingServices />} />
+              {/* Billing & Payments - 6 Pages */}
+              <Route path="billing" element={hasAccess('Billing & Payments') ? <Billing /> : <Navigate to="/" />} />
+              <Route path="billing/new" element={hasAccess('Billing & Payments') ? <NewInvoice /> : <Navigate to="/" />} />
+              <Route path="billing/payments" element={hasAccess('Billing & Payments') ? <Payments /> : <Navigate to="/" />} />
+              <Route path="billing/claims" element={hasAccess('Billing & Payments') ? <InsuranceClaims /> : <Navigate to="/" />} />
+              <Route path="billing/reminders" element={hasAccess('Billing & Payments') ? <PaymentReminders /> : <Navigate to="/" />} />
+              <Route path="billing/pricing" element={hasAccess('Billing & Payments') ? <PricingServices /> : <Navigate to="/" />} />
 
               {/* Forms & Intake - 5 Pages */}
               <Route path="forms" element={hasAccess('Forms') ? <FormBuilder /> : <Navigate to="/" />} />

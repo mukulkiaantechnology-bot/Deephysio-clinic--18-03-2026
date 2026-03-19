@@ -142,10 +142,10 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
   ];
 
   const roleMenuAccess = {
-    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
+    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing & Payments', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
     therapist: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Forms', 'Communication'],
     receptionist: ['Dashboard', 'Appointments', 'Patients', 'Forms', 'Communication'],
-    billing: ['Dashboard', 'Patients', 'Billing', 'Analytics']
+    billing: ['Dashboard', 'Patients', 'Billing & Payments', 'Analytics']
   };
 
   const allowedMenus = roleMenuAccess[userRole] || roleMenuAccess['admin'];

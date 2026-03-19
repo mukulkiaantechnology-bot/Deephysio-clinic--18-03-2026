@@ -42,6 +42,28 @@ const PatientProfile = () => {
     alert(`Node Execution: Initiating ${action} protocol for subject ${patientData.name}.`);
   };
 
+  const getInitializeButtonName = (tab) => {
+    switch (tab) {
+      case 'Clinical Notes': return 'Add Clinical Note';
+      case 'Appointments': return 'New Appointment';
+      case 'Billing': return 'Create Invoice';
+      case 'Forms': return 'New Form';
+      case 'Documents': return 'Upload Document';
+      default: return 'Initialize Record Node';
+    }
+  };
+
+  const handleInitializeClick = (tab) => {
+    switch (tab) {
+      case 'Clinical Notes': navigate('/notes/new'); break;
+      case 'Appointments': navigate('/appointments/book'); break;
+      case 'Billing': navigate('/billing'); break;
+      case 'Forms': navigate('/forms/builder'); break;
+      case 'Documents': navigate('/notes/attachments'); break;
+      default: alert(`Initializing new ${tab} entry`);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Overview':
@@ -156,8 +178,8 @@ const PatientProfile = () => {
             </div>
             <h3 className="text-2xl font-black text-slate-900 mb-4 relative z-10 tracking-tight uppercase tracking-widest">{activeTab} Ledger</h3>
             <p className="text-slate-400 max-w-sm font-bold px-4 relative z-10 uppercase text-[11px] tracking-[0.2em] leading-relaxed">System scan complete. No secondary nodes detected for {patientData.name} in this partition.</p>
-            <Button variant="accent" className="mt-12 px-12 h-14 shadow-google relative z-10 rounded-[24px] uppercase tracking-widest font-black text-[11px]" leftIcon={<FaPlus />} onClick={() => handleAction(`Registering New ${activeTab} Entry`)}>
-              Initialize Record Node
+            <Button variant="accent" className="mt-12 px-12 h-14 shadow-google relative z-10 rounded-[24px] uppercase tracking-widest font-black text-[11px]" leftIcon={<FaPlus />} onClick={() => handleInitializeClick(activeTab)}>
+              {getInitializeButtonName(activeTab)}
             </Button>
             <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-clinicPrimary/5 rounded-full blur-[100px] transition-all duration-1000 group-hover:bg-clinicPrimary/10"></div>
           </div>
@@ -202,13 +224,13 @@ const PatientProfile = () => {
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 w-full lg:w-auto">
-          <button className="h-14 w-14 rounded-2xl bg-white border border-slate-100 text-slate-300 hover:text-emerald-500 hover:border-emerald-100 hover:bg-emerald-50 transition-all flex items-center justify-center active:scale-90 shadow-premium" onClick={() => handleAction('Print Medical Dossier')}><FaPrint size={18}/></button>
-          <button className="h-14 w-14 rounded-2xl bg-white border border-slate-100 text-slate-300 hover:text-blue-500 hover:border-blue-100 hover:bg-blue-50 transition-all flex items-center justify-center active:scale-90 shadow-premium" onClick={() => handleAction('Modify Record Node')}><FaEdit size={18}/></button>
+          <button className="h-14 w-14 rounded-2xl bg-white border border-slate-100 text-slate-300 hover:text-emerald-500 hover:border-emerald-100 hover:bg-emerald-50 transition-all flex items-center justify-center active:scale-90 shadow-premium" onClick={() => window.print()}><FaPrint size={18}/></button>
+          <button className="h-14 w-14 rounded-2xl bg-white border border-slate-100 text-slate-300 hover:text-blue-500 hover:border-blue-100 hover:bg-blue-50 transition-all flex items-center justify-center active:scale-90 shadow-premium" onClick={() => navigate('/patients/add')}><FaEdit size={18}/></button>
           <Button 
             variant="accent" 
             className="flex-1 sm:flex-none sm:w-auto px-10 h-14 shadow-google sm:ml-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-[24px] active:scale-95 transition-all" 
             leftIcon={<FaPlus className="shrink-0" />}
-            onClick={() => handleAction('Clinical Booking Protocol')}
+            onClick={() => navigate('/appointments/book')}
           >
             Protocol Reservation
           </Button>
@@ -246,7 +268,7 @@ const PatientProfile = () => {
         footer={
            <div className="flex gap-4 justify-end w-full">
              <Button variant="secondary" onClick={() => setIsPaymentModalOpen(false)}>Abort Protocol</Button>
-             <Button variant="accent" onClick={() => { setIsPaymentModalOpen(false); alert('Payment Node Authorized. Secure Transmission Successful.'); }}>Confirm Transaction</Button>
+             <Button variant="accent" onClick={() => { setIsPaymentModalOpen(false); navigate('/billing/payments'); }}>Confirm Transaction</Button>
            </div>
         }
       >

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { FaPlus, FaSearch, FaDownload, FaFileInvoice, FaChevronRight, FaPrint, FaTrashAlt, FaWallet, FaChartLine, FaPercentage, FaReceipt, FaFileInvoiceDollar, FaRegClock } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
 const Billing = () => {
-  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   
   const [invoicesList, setInvoicesList] = useState([
@@ -16,29 +17,6 @@ const Billing = () => {
     { id: 'INV-2026-005', patient: 'Michael Smith', date: '11 Mar 2026', amount: '£150.00', status: 'Paid', method: 'Digital Sync' },
   ]);
 
-  const [newInvoice, setNewInvoice] = useState({
-    patient: 'James Wilson (PID-102)', amount: '', date: '', description: ''
-  });
-
-  const handleAddInvoice = () => {
-    if (!newInvoice.amount) return;
-    const newId = `INV-2026-00${invoicesList.length + 1}`;
-    const formattedDate = newInvoice.date 
-      ? new Date(newInvoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-      : '18 Mar 2026';
-    
-    setInvoicesList([...invoicesList, { 
-      id: newId, 
-      patient: newInvoice.patient.split(' (')[0], 
-      date: formattedDate,
-      amount: `£${parseFloat(newInvoice.amount).toFixed(2)}`, 
-      status: 'Pending', 
-      method: 'N/A' 
-    }]);
-    setIsInvoiceModalOpen(false);
-    setNewInvoice({ patient: 'James Wilson (PID-102)', amount: '', date: '', description: '' });
-  };
-
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Paid': return 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/10';
@@ -48,6 +26,12 @@ const Billing = () => {
     }
   };
 
+  const filteredInvoices = invoicesList.filter(inv => 
+    inv.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    inv.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inv.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar">
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
@@ -56,12 +40,12 @@ const Billing = () => {
           <p className="text-slate-500 font-medium mt-1">Acknowledge payments, generate professional invoices, and monitor clinic revenue streams.</p>
         </div>
         <div className="flex gap-4 relative z-10 w-full lg:w-auto">
-           <Button variant="secondary" size="lg" className="flex-1 lg:flex-none rounded-2xl h-14 px-8 border-none shadow-premium hover:shadow-glass hover:-translate-y-1" leftIcon={<FaDownload />}>Export Statement</Button>
+           <Button variant="secondary" size="lg" className="flex-1 lg:flex-none rounded-2xl h-14 px-8 border-none shadow-premium hover:shadow-glass hover:-translate-y-1" leftIcon={<FaDownload />} onClick={() => window.print()}>Export Statement</Button>
            <Button 
             variant="accent" 
             size="lg"
             className="flex-1 lg:flex-none rounded-2xl h-14 px-8 shadow-lg "
-            onClick={() => setIsInvoiceModalOpen(true)}
+            onClick={() => navigate('/billing/new')}
             leftIcon={<FaFileInvoiceDollar className="animate-pulse" />}
           >
             Issue New Invoice
@@ -69,66 +53,6 @@ const Billing = () => {
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
-
-      <Modal 
-        isOpen={isInvoiceModalOpen} 
-        onClose={() => setIsInvoiceModalOpen(false)}
-        title="Revenue Documentation"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setIsInvoiceModalOpen(false)}>Discard Draft</Button>
-            <Button variant="accent" onClick={handleAddInvoice} leftIcon={<FaReceipt />}>Finalize Invoice</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-2">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Account Subject</label>
-            <select 
-              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer"
-              value={newInvoice.patient}
-              onChange={(e) => setNewInvoice({...newInvoice, patient: e.target.value})}
-            >
-              <option>James Wilson (PID-102)</option>
-              <option>Emily Brown (PID-205)</option>
-              <option>Corporate Client: TechHub UK</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Asset Valuation (£)</label>
-              <div className="relative">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">£</span>
-                <input 
-                  type="number" 
-                  className="w-full pl-10 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" 
-                  placeholder="0.00" 
-                  value={newInvoice.amount}
-                  onChange={(e) => setNewInvoice({...newInvoice, amount: e.target.value})}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Temporal Deadline</label>
-              <input 
-                type="date" 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all" 
-                value={newInvoice.date}
-                onChange={(e) => setNewInvoice({...newInvoice, date: e.target.value})}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Service Breakdown</label>
-            <textarea 
-              className="w-full p-5 bg-slate-50 border border-slate-200 rounded-3xl text-[13px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all h-28 custom-scrollbar placeholder:text-slate-300" 
-              placeholder="Describe the therapeutic services..."
-              value={newInvoice.description}
-              onChange={(e) => setNewInvoice({...newInvoice, description: e.target.value})}
-            ></textarea>
-          </div>
-        </div>
-      </Modal>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         <Card className="bg-slate-900 border-none p-10 relative overflow-hidden group shadow-2xl">
@@ -193,7 +117,7 @@ const Billing = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass">
+            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass" onClick={() => alert('Downloading Transaction Ledger...')}>
               <FaDownload size={14}/>
             </Button>
           </div>
@@ -213,7 +137,7 @@ const Billing = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {invoicesList.map((inv) => (
+              {filteredInvoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer border-l-4 border-transparent hover:border-clinicPrimary">
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-6">
@@ -251,10 +175,10 @@ const Billing = () => {
                       <Button onClick={(e) => { e.stopPropagation(); window.print(); }} variant="secondary" size="icon" className="h-11 w-11 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass transform hover:scale-110">
                         <FaPrint size={14}/>
                       </Button>
-                      <Button onClick={(e) => { e.stopPropagation(); setIsInvoiceModalOpen(true); }} variant="secondary" size="icon" className="h-11 w-11 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass transform hover:scale-110">
+                      <Button onClick={(e) => { e.stopPropagation(); alert(`Previewing details for ${inv.id}`); }} variant="secondary" size="icon" className="h-11 w-11 rounded-xl bg-white border border-slate-50 shadow-premium hover:shadow-glass transform hover:scale-110">
                          <FaChevronRight size={14}/>
                       </Button>
-                      <Button onClick={(e) => { e.stopPropagation(); if(confirm('Are you sure?')) {} }} variant="secondary" size="icon" className="h-11 w-11 rounded-xl bg-white border border-rose-50 text-rose-300 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all transform hover:scale-110">
+                      <Button onClick={(e) => { e.stopPropagation(); if(confirm('Are you sure you want to delete this invoice?')) { setInvoicesList(prev => prev.filter(i => i.id !== inv.id)); } }} variant="secondary" size="icon" className="h-11 w-11 rounded-xl bg-white border border-rose-50 text-rose-300 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all transform hover:scale-110">
                         <FaTrashAlt size={14}/>
                       </Button>
                     </div>
@@ -266,10 +190,10 @@ const Billing = () => {
         </div>
         
         <div className="p-10 border-t border-slate-50 flex items-center justify-between bg-white group">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em] opacity-60">Audit Archive: 840 Ledger Nodes Validated</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em] opacity-60">Audit Archive: {filteredInvoices.length} Ledger Nodes Validated</p>
           <div className="flex gap-4">
-            <Button variant="secondary" className="text-[10px] font-bold h-11 px-8 rounded-xl border-none shadow-premium hover:shadow-soft">Previous Audit</Button>
-            <Button variant="accent" className="text-[10px] font-bold h-11 px-8 rounded-xl shadow-lg ">Next Audit Sequence</Button>
+            <Button variant="secondary" className="text-[10px] font-bold h-11 px-8 rounded-xl border-none shadow-premium hover:shadow-soft" onClick={() => alert('No previous records.')}>Previous Audit</Button>
+            <Button variant="accent" className="text-[10px] font-bold h-11 px-8 rounded-xl shadow-lg " onClick={() => alert('No more records.')}>Next Audit Sequence</Button>
           </div>
         </div>
       </Card>
