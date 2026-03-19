@@ -53,31 +53,31 @@ const CreateTemplate = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in p-6 md:p-10 font-sans relative">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in p-4 md:p-6 font-sans relative">
       {/* Toast */}
       {toast.visible && (
         <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
-          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
-            <FaCheckCircle className="text-clinicPrimary shrink-0" />
-            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          <div className="bg-slate-900 text-white px-6 py-3 rounded-xl shadow-lg border border-white/10 flex items-center gap-3">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" size={14} />
+            <span className="text-[10px] font-black uppercase tracking-widest">{toast.message}</span>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           <button 
             type="button"
             onClick={() => navigate('/notes/templates')}
-            className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-premium flex items-center justify-center text-slate-300 hover:text-clinicPrimary hover:shadow-google hover:-translate-x-1 transition-all active:scale-90 shrink-0"
+            className="w-10 h-10 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-clinicPrimary hover:bg-slate-50 transition-colors shrink-0"
           >
-            <FaArrowLeft size={16}/>
+            <FaArrowLeft size={12}/>
           </button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter leading-none uppercase">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter leading-none uppercase">
                 {editingTemplate ? 'Edit Template' : 'Template Builder'}
             </h1>
-            <p className="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-widest">
+            <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">
                 {editingTemplate ? 'Modify existing clinical documentation structure' : 'Design custom clinical documentation structures'}
             </p>
           </div>
@@ -86,40 +86,40 @@ const CreateTemplate = () => {
           variant="accent" 
           onClick={handleSave} 
           isLoading={isSaving}
-          className="rounded-xl px-8 h-14 text-[11px] font-black uppercase tracking-widest shadow-google" 
-          leftIcon={isSaving ? <FaCogs className="animate-spin" /> : <FaSave />}
+          className="rounded-lg px-6 h-10 text-[10px] font-black uppercase tracking-widest shadow-sm" 
+          leftIcon={isSaving ? <FaCogs size={10} className="animate-spin" /> : <FaSave size={10} />}
         >
           {isSaving ? 'Committing...' : 'Commit Protocol'}
         </Button>
       </div>
 
-      <Card className="p-8 sm:p-10 border-none shadow-premium bg-white space-y-8 relative overflow-hidden group">
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-clinicPrimary/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
+      <Card hover={false} className="p-5 sm:p-6 border border-slate-100 shadow-none bg-white space-y-5 sm:space-y-6 relative overflow-hidden group">
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-           <div className="space-y-4">
-              <label className="text-[11px] font-black text-clinicPrimary uppercase tracking-[0.3em] flex items-center gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 relative z-10">
+           <div className="space-y-3">
+              <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
                  <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Template Name *
               </label>
               <input 
                  type="text" 
                  placeholder="e.g., Extended Neuro Assessment"
-                 className={`w-full p-5 bg-slate-50 border rounded-2xl text-[14px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all placeholder:text-slate-300 ${nameError ? 'border-rose-300 bg-rose-50/30' : 'border-slate-100 focus:border-clinicPrimary'}`}
+                 className={`w-full p-3 bg-slate-50 border rounded-lg text-[12px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 transition-colors placeholder:text-slate-400 ${nameError ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-clinicPrimary'}`}
                  value={formData.name}
                  onChange={e => { setFormData({...formData, name: e.target.value}); setNameError(''); }}
               />
               {nameError && (
-                <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
+                <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1.5">
                   <FaExclamationTriangle size={10}/> {nameError}
                 </p>
               )}
            </div>
-           <div className="space-y-4">
-              <label className="text-[11px] font-black text-clinicPrimary uppercase tracking-[0.3em] flex items-center gap-2">
+           <div className="space-y-3">
+              <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
                  <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Category Node
               </label>
               <select 
-                 className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer appearance-none"
+                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-colors cursor-pointer appearance-none"
                  value={formData.category}
                  onChange={e => setFormData({...formData, category: e.target.value})}
               >
@@ -127,13 +127,13 @@ const CreateTemplate = () => {
               </select>
            </div>
         </div>
-        <div className="space-y-4 relative z-10">
-           <label className="text-[11px] font-black text-clinicPrimary uppercase tracking-[0.3em] flex items-center gap-2">
+        <div className="space-y-3 relative z-10">
+           <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Protocol Description
            </label>
            <textarea 
               placeholder="Briefly describe the purpose of this template instance..."
-              className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300 min-h-[100px] resize-none"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-colors placeholder:text-slate-400 min-h-[80px] resize-none"
               value={formData.description}
               onChange={e => setFormData({...formData, description: e.target.value})}
            ></textarea>

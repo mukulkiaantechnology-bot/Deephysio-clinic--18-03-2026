@@ -243,23 +243,18 @@ const ClinicalNotes = () => {
                <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div> Protocol Blueprints
             </h3>
             <div className="space-y-3 relative z-10">
-              {[
-                { label: 'SOAP Assessment', path: '/notes/soap/NEW', icon: <FaNotesMedical size={12} /> },
-                { label: 'RMDQ Disability Scan', path: '/notes/rmdq/NEW', icon: <FaChartLine size={12} /> },
-                { label: 'Initial Physical Intake', path: '/notes/new', icon: <FaStethoscope size={12} /> },
-                { label: 'Neural Rehab Evolution', path: '/notes/new', icon: <FaRunning size={12} /> }
-              ].map((template) => (
+              {['Initial Assessment', 'Physio Evolution', 'Discharge Summary', 'Critical Care Note'].map((template) => (
                 <button 
-                  key={template.label} 
-                  onClick={() => navigate(template.path)}
+                  key={template} 
+                  onClick={() => navigate('/notes/new')}
                   className="w-full text-left p-3 sm:p-4 rounded-lg border border-slate-100 bg-slate-50 hover:bg-white hover:border-clinicPrimary hover:shadow-sm transition-colors group flex items-center justify-between"
                 >
                   <div>
-                    <p className="text-[11px] font-bold text-slate-800 group-hover:text-clinicPrimary uppercase tracking-tight transition-colors">{template.label}</p>
+                    <p className="text-[11px] font-bold text-slate-800 group-hover:text-clinicPrimary uppercase tracking-tight transition-colors">{template}</p>
                     <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-black opacity-60">Verified Node Template</p>
                   </div>
                   <div className="w-8 h-8 rounded-md bg-white border border-slate-100 shadow-sm flex items-center justify-center text-clinicPrimary opacity-0 group-hover:opacity-100 transition-opacity">
-                     {template.icon}
+                     <FaStethoscope size={10} />
                   </div>
                 </button>
               ))}

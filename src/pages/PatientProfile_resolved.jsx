@@ -129,9 +129,7 @@ const PatientProfile = () => {
                     <div className="w-8 h-8 bg-white text-blue-500 rounded-lg flex items-center justify-center text-sm shadow-sm"><FaEnvelope /></div>
                     <div>
                       <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5 leading-none">Electronic Ledger</p>
-                      <p className="text-[11px] font-black text-slate-800 tracking-tight">{patientData.email}</p>
                     </div>
-                  </div>
                 </div>
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl"></div>
               </Card>
