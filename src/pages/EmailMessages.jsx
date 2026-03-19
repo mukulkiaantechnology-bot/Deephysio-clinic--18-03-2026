@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { FaEnvelope, FaSearch, FaFilter, FaPlus, FaInbox, FaRegPaperPlane, FaStar, FaTrash, FaChevronRight, FaPaperclip, FaHistory, FaCheckCircle, FaExclamationCircle, FaUserCircle, FaReply, FaShare, FaPrint, FaArchive, FaSync } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -63,27 +62,20 @@ const EmailMessages = () => {
   };
 
   const handleComposeSubmit = () => {
-    if (!composeData.to || !composeData.subject) {
-      showToast('Error: Recipient and Header Required');
-      return;
-    }
-    const newId = Date.now();
     const newEmail = {
-      id: newId,
+      id: Date.now(),
       sender: 'You',
       email: 'practitioner@deephysio.com',
       subject: composeData.subject,
-      excerpt: composeData.message.substring(0, 50) + (composeData.message.length > 50 ? '...' : ''),
+      excerpt: composeData.message.substring(0, 50) + '...',
       date: 'Just Now',
       read: true,
       priority: 'Normal',
       content: composeData.message,
-      folder: 'Inbox', 
+      folder: 'Inbox', // User wants it to appear in Inbox as well for dummy flow
       isStarred: false
     };
     setEmails([newEmail, ...emails]);
-    setSelectedEmailId(newId);
-    setActiveFolder('Inbox');
     setIsComposeOpen(false);
     setComposeData({ to: '', subject: '', message: '' });
     showToast('Inbound Transmission Created');
@@ -109,106 +101,22 @@ const EmailMessages = () => {
 
   return (
     <div className="space-y-10 p-6 md:p-10 animate-fade-in font-sans relative">
-      {/* Toast Notification - Portaled to body to escape z-index hell */}
-      {toast.visible && createPortal(
-        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[10000] animate-bounce-in">
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999] animate-bounce-in">
           <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
              <FaCheckCircle className="text-clinicPrimary" />
              <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
-
-      {/* Modals moved to top for better event handling and visibility */}
-      <Modal 
-        isOpen={isComposeOpen} 
-        onClose={() => setIsComposeOpen(false)}
-        title="Compose Clinical Transmission"
-        footer={
-          <div className="flex gap-4 justify-end w-full px-2">
-            <Button variant="secondary" onClick={() => setIsComposeOpen(false)}>Abort Command</Button>
-            <Button variant="accent" onClick={handleComposeSubmit} leftIcon={<FaRegPaperPlane />}>Execute Protocol</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-4 text-left font-sans">
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Recipient Node</label>
-              <div className="relative group">
-                 <FaUserCircle className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 group-focus-within/input:text-clinicPrimary transition-colors" size={16}/>
-                 <input 
-                   type="text" 
-                   value={composeData.to}
-                   onChange={(e) => setComposeData({...composeData, to: e.target.value})}
-                   placeholder="pat_node_01@client.com" 
-                   className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
-                 />
-              </div>
-           </div>
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Transmission Header</label>
-              <input 
-                type="text" 
-                value={composeData.subject}
-                onChange={(e) => setComposeData({...composeData, subject: e.target.value})}
-                placeholder="Protocol Handshake: Initial Clinical Sync" 
-                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
-              />
-           </div>
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Payload Content</label>
-              <textarea 
-                value={composeData.message}
-                onChange={(e) => setComposeData({...composeData, message: e.target.value})}
-                placeholder="Enter clinical or administrative operational data..." 
-                className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[32px] text-[15px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all h-48 custom-scrollbar resize-none"
-              />
-           </div>
-           <div className="flex items-center gap-4 px-4 py-6 bg-blue-50/50 rounded-[28px] border border-blue-100">
-              <FaPaperclip className="text-blue-500" />
-              <p className="text-[11px] font-black text-blue-700 uppercase tracking-widest">Attach Clinical Documentation Nodes</p>
-           </div>
-        </div>
-      </Modal>
-
-      <Modal 
-        isOpen={isForwardOpen} 
-        onClose={() => setIsForwardOpen(false)}
-        title="Forward Operational Node"
-        footer={
-          <div className="flex gap-4 justify-end w-full px-2">
-            <Button variant="secondary" onClick={() => setIsForwardOpen(false)}>Abort</Button>
-            <Button variant="accent" onClick={handleForwardSubmit} leftIcon={<FaRegPaperPlane />}>Forward Sequence</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-4 text-left font-sans">
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Target Node Address</label>
-              <div className="relative group">
-                 <FaUserCircle className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 transition-colors" size={16}/>
-                 <input 
-                   type="text" 
-                   value={forwardData.to}
-                   onChange={(e) => setForwardData({...forwardData, to: e.target.value})}
-                   placeholder="recipient@node.com" 
-                   className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
-                 />
-              </div>
-           </div>
-           <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 italic text-[13px] text-slate-400">
-              "Forwarding: {selectedEmail?.subject}"
-           </div>
-        </div>
-      </Modal>
 
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Intelligence Email Center</h1>
           <p className="text-slate-500 font-bold mt-3 uppercase tracking-widest text-[11px] opacity-80">Synchronize clinical correspondence and administrative transmission nodes.</p>
         </div>
-        <div className="flex gap-4 relative z-30 w-full lg:w-auto">
+        <div className="flex gap-4 relative z-10 w-full lg:w-auto">
            <Button 
              variant="secondary" 
              size="lg" 
@@ -219,14 +127,7 @@ const EmailMessages = () => {
            >
              {isSyncing ? 'Syncing...' : 'Handshake Sync'}
            </Button>
-           
-           <button 
-             key="compose-btn"
-             onClick={() => setIsComposeOpen(true)}
-             className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 bg-[#2EA7B8] text-white shadow-google hover:bg-[#1E6C77] active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 relative z-40 cursor-pointer"
-           >
-             <FaPlus /> Compose Inbound
-           </button>
+           <Button variant="accent" size="lg" className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest" onClick={() => setIsComposeOpen(true)} leftIcon={<FaPlus />}>Compose Inbound</Button>
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
@@ -416,10 +317,92 @@ const EmailMessages = () => {
         </div>
       </div>
 
+      {/* Compose Modal */}
+      <Modal 
+        isOpen={isComposeOpen} 
+        onClose={() => setIsComposeOpen(false)}
+        title="Compose Clinical Transmission"
+        footer={
+          <div className="flex gap-4 justify-end w-full px-2">
+            <Button variant="secondary" onClick={() => setIsComposeOpen(false)}>Abort Command</Button>
+            <Button variant="accent" onClick={handleComposeSubmit} leftIcon={<FaRegPaperPlane />}>Execute Protocol</Button>
+          </div>
+        }
+      >
+        <div className="space-y-8 p-4 text-left font-sans">
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Recipient Node</label>
+              <div className="relative group">
+                 <FaUserCircle className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 group-focus-within/input:text-clinicPrimary transition-colors" size={16}/>
+                 <input 
+                   type="text" 
+                   value={composeData.to}
+                   onChange={(e) => setComposeData({...composeData, to: e.target.value})}
+                   placeholder="pat_node_01@client.com" 
+                   className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
+                 />
+              </div>
+           </div>
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Transmission Header</label>
+              <input 
+                type="text" 
+                value={composeData.subject}
+                onChange={(e) => setComposeData({...composeData, subject: e.target.value})}
+                placeholder="Protocol Handshake: Initial Clinical Sync" 
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
+              />
+           </div>
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Payload Content</label>
+              <textarea 
+                value={composeData.message}
+                onChange={(e) => setComposeData({...composeData, message: e.target.value})}
+                placeholder="Enter clinical or administrative operational data..." 
+                className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[32px] text-[15px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all h-48 custom-scrollbar resize-none"
+              />
+           </div>
+           <div className="flex items-center gap-4 px-4 py-6 bg-blue-50/50 rounded-[28px] border border-blue-100">
+              <FaPaperclip className="text-blue-500" />
+              <p className="text-[11px] font-black text-blue-700 uppercase tracking-widest">Attach Clinical Documentation Nodes</p>
+           </div>
+        </div>
+      </Modal>
+
+      {/* Forward Modal */}
+      <Modal 
+        isOpen={isForwardOpen} 
+        onClose={() => setIsForwardOpen(false)}
+        title="Forward Operational Node"
+        footer={
+          <div className="flex gap-4 justify-end w-full px-2">
+            <Button variant="secondary" onClick={() => setIsForwardOpen(false)}>Abort</Button>
+            <Button variant="accent" onClick={handleForwardSubmit} leftIcon={<FaRegPaperPlane />}>Forward Sequence</Button>
+          </div>
+        }
+      >
+        <div className="space-y-8 p-4 text-left font-sans">
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Target Node Address</label>
+              <div className="relative group">
+                 <FaUserCircle className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 transition-colors" size={16}/>
+                 <input 
+                   type="text" 
+                   value={forwardData.to}
+                   onChange={(e) => setForwardData({...forwardData, to: e.target.value})}
+                   placeholder="recipient@node.com" 
+                   className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all" 
+                 />
+              </div>
+           </div>
+           <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 italic text-[13px] text-slate-400">
+              "Forwarding: {selectedEmail?.subject}"
+           </div>
+        </div>
+      </Modal>
     </div>
   );
 };
-
 
 
 export default EmailMessages;
