@@ -25,13 +25,13 @@ const StatCard = ({ title, value, icon, color, trend, path }) => {
     <Card 
       onClick={() => path && navigate(path)}
       className={cn(
-        "group relative overflow-hidden p-6 sm:p-8 border-none bg-white hover:shadow-glass animate-fade-in text-center sm:text-left flex flex-col items-center sm:items-start transition-all cursor-pointer hover:border-2 hover:border-[#0a3d62]",
+        "group relative overflow-hidden p-6 sm:p-8 border-none bg-white animate-fade-in text-center sm:text-left flex flex-col items-center sm:items-start",
         path ? "cursor-pointer" : "cursor-default"
       )}
     >
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-8 w-full">
-          <div className={`w-14 h-14 flex items-center justify-center rounded-2xl bg-opacity-10 ${color} shadow-inner-soft group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+          <div className={`w-14 h-14 flex items-center justify-center rounded-2xl bg-opacity-10 ${color} shadow-inner-soft`}>
             <span className={`text-2xl ${color.replace('bg-', 'text-')}`}>{icon}</span>
           </div>
           <div className={`hidden sm:block px-3 py-1.5 rounded-xl text-xs font-bold ${trend.startsWith('+') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} shadow-sm border border-white/50 backdrop-blur-sm`}>
@@ -39,11 +39,11 @@ const StatCard = ({ title, value, icon, color, trend, path }) => {
           </div>
         </div>
         <div>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2 opacity-80 group-hover:opacity-100 transition-opacity">{title}</p>
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2 opacity-80">{title}</p>
           <h3 className="text-3xl font-bold text-slate-900 tracking-tight leading-none">{value}</h3>
         </div>
       </div>
-      <div className={`absolute -bottom-16 -right-16 w-48 h-48 bg-opacity-[0.05] ${color} rounded-full blur-[60px] group-hover:scale-150 transition-transform duration-1000`}></div>
+      <div className={`absolute -bottom-16 -right-16 w-48 h-48 bg-opacity-[0.05] ${color} rounded-full blur-[60px]`}></div>
     </Card>
   );
 };
@@ -52,7 +52,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   return (
-    <div className="space-y-8 p-6 md:p-8 animate-fade-in custom-scrollbar">
+    <div className="space-y-8 animate-fade-in custom-scrollbar">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Clinic Overview</h1>
@@ -131,7 +131,7 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-clinicPrimary border-2 border-transparent transition-all" onClick={() => navigate('/analytics')}>
+        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer border-2 border-transparent" onClick={() => navigate('/analytics')}>
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest leading-none">Appointment Trends</h3>
@@ -163,7 +163,7 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer hover:border-amber-500 border-2 border-transparent transition-all" onClick={() => navigate('/analytics')}>
+        <Card className="p-8 pb-4 border-none shadow-premium bg-white group cursor-pointer border-2 border-transparent" onClick={() => navigate('/analytics')}>
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest leading-none">Revenue Analysis</h3>
