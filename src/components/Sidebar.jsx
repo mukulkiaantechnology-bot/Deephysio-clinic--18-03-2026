@@ -36,8 +36,6 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       subItems: [
         { name: 'Patient List', path: '/patients' },
         { name: 'Add Patient', path: '/patients/add' },
-        { name: 'Patient Profile', path: '/patients/profile' },
-        { name: 'Visit History', path: '/patients/history' },
         { name: 'Referrals', path: '/patients/referrals' },
         { name: 'Insurance', path: '/patients/insurance' },
         { name: 'Clients / Insurers', path: '/clients' },
@@ -79,7 +77,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       ]
     },
     { 
-      name: 'Forms & Intake', 
+      name: 'Forms', 
       icon: <FaWpforms className="text-slate-400" />, 
       path: '/forms',
       subItems: [

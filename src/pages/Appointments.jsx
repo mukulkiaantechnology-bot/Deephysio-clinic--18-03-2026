@@ -57,58 +57,58 @@ const Appointments = () => {
   };
 
   return (
-    <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans">
-      <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8 p-6 sm:p-10 border-none shadow-premium bg-white relative overflow-hidden group">
+    <div className="max-w-[1300px] w-full mx-auto space-y-4 sm:space-y-6 px-4 sm:px-5 lg:px-6 animate-fade-in custom-scrollbar font-sans pb-10">
+      <Card hover={false} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 border-none shadow-sm bg-white relative overflow-hidden group">
         <div className="relative z-10 text-center lg:text-left">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Clinical Scheduler</h1>
-          <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">Orchestrate patient visits, practitioner availability, and treatement node synchronization.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Clinical Scheduler</h1>
+          <p className="text-slate-500 font-medium mt-1 text-[11px] sm:text-[13px]">Orchestrate patient visits, practitioner availability, and treatement node synchronization.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 w-full lg:w-auto">
-          <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 shadow-inner-soft">
-             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day View</button>
-             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
-             <button className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${viewMode === 'month' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
+          <div className="flex bg-slate-50 p-1 lg:p-1.5 rounded-xl border border-slate-100 shadow-inner-soft">
+             <button className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-none ${viewMode === 'day' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day View</button>
+             <button className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-none ${viewMode === 'week' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
+             <button className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-none ${viewMode === 'month' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
           </div>
           <Button 
             variant="accent" 
             size="lg"
-            className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest"
+            className="flex-1 sm:flex-none rounded-xl h-12 shadow-none transition-none text-[10px] sm:text-[11px] font-black uppercase tracking-widest"
             onClick={() => navigate('/appointments/book')}
             leftIcon={<FaCalendarPlus size={14}/>}
           >
             New Booking
           </Button>
         </div>
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px]"></div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-3 space-y-8">
-           <Card className="p-8 border-none shadow-premium bg-white relative overflow-hidden">
-             <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
+           <Card hover={false} className="p-4 sm:p-6 border-none shadow-sm bg-white relative overflow-hidden">
+             <h3 className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 sm:mb-6 flex items-center gap-2.5 sm:gap-3">
                 <div className="w-1.5 h-6 bg-clinicPrimary rounded-full"></div> Practitioner Node
              </h3>
-             <div className="space-y-4 relative z-10">
+             <div className="space-y-2 sm:space-y-3 relative z-10">
                <button 
                 onClick={() => setSelectedPractitioner('All Practitioners')}
-                className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group active:scale-95 ${selectedPractitioner === 'All Practitioners' ? 'bg-clinicPrimary text-white border-clinicPrimary shadow-google' : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-white hover:border-clinicPrimary'}`}
+                className={`w-full text-left p-3 sm:p-4 rounded-xl border transition-none flex items-center justify-between cursor-pointer ${selectedPractitioner === 'All Practitioners' ? 'bg-clinicPrimary/10 text-clinicPrimary border-clinicPrimary/30 shadow-none' : 'bg-slate-50 border-slate-100 text-slate-600'}`}
                >
-                 <span className="text-[13px] font-bold">All Practitioners</span>
-                 <FaUserMd size={12} className={selectedPractitioner === 'All Practitioners' ? 'text-white' : 'text-slate-300'}/>
+                 <span className="text-[11px] sm:text-[12px] font-bold uppercase tracking-widest">All Practitioners</span>
+                 <FaUserMd size={12} className={selectedPractitioner === 'All Practitioners' ? 'text-clinicPrimary' : 'text-slate-300'}/>
                </button>
                {practitioners.map(dr => (
                  <button 
                   key={dr.id}
                   onClick={() => setSelectedPractitioner(dr.name)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all group active:scale-95 ${selectedPractitioner === dr.name ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-white hover:border-clinicPrimary'}`}
+                  className={`w-full text-left p-2.5 sm:p-3 rounded-xl border transition-none cursor-pointer ${selectedPractitioner === dr.name ? 'bg-slate-900 border-slate-900 shadow-none' : 'bg-slate-50 border-slate-100 hover:bg-slate-100/50'}`}
                  >
-                   <div className="flex items-center gap-4">
-                     <div className={`w-10 h-10 rounded-xl ${dr.color} shadow-lg flex items-center justify-center text-white transform group-hover:rotate-6 transition-transform`}>
+                   <div className="flex items-center gap-3">
+                     <div className={`w-8 h-8 rounded-lg ${dr.color} shadow-sm flex items-center justify-center text-white text-[10px] font-black`}>
                         {dr.name.split('. ')[1][0]}
                      </div>
                      <div>
-                        <p className="text-[13px] font-bold leading-none">{dr.name}</p>
-                        <p className={`text-[9px] mt-1.5 font-medium uppercase tracking-widest ${selectedPractitioner === dr.name ? 'text-slate-400' : 'text-slate-400'}`}>{dr.role}</p>
+                        <p className={`text-[11px] sm:text-[12px] font-bold leading-none ${selectedPractitioner === dr.name ? 'text-white' : 'text-slate-700'}`}>{dr.name}</p>
+                        <p className={`text-[8px] sm:text-[9px] mt-1 font-black uppercase tracking-widest ${selectedPractitioner === dr.name ? 'text-slate-400' : 'text-slate-400'}`}>{dr.role}</p>
                      </div>
                    </div>
                  </button>
@@ -117,44 +117,44 @@ const Appointments = () => {
              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-clinicPrimary/5 rounded-full blur-3xl"></div>
            </Card>
 
-           <Card className="p-8 border-none shadow-premium bg-white">
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Queue Status</h3>
-              <div className="space-y-6">
+           <Card hover={false} className="p-4 sm:p-6 border-none shadow-sm bg-white">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Queue Status</h3>
+              <div className="space-y-3 sm:space-y-4">
                  {[
                    { label: 'Verified Arrived', count: 12, color: 'text-emerald-500' },
                    { label: 'Pending Processing', count: 3, color: 'text-amber-500' },
                    { label: 'Next Call Node', count: 'Room 4', color: 'text-clinicPrimary' }
                  ].map((stat, i) => (
-                   <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white transition-all cursor-pointer group">
-                      <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-900 transition-colors uppercase tracking-tight">{stat.label}</span>
-                      <span className={`text-[13px] font-black ${stat.color}`}>{stat.count}</span>
+                   <div key={i} className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-50 transition-none cursor-default">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-tight">{stat.label}</span>
+                      <span className={`text-[11px] sm:text-[12px] font-black ${stat.color}`}>{stat.count}</span>
                    </div>
                  ))}
               </div>
            </Card>
         </div>
 
-        <div className="lg:col-span-9">
-           <Card className="p-0 overflow-hidden border-none shadow-premium bg-white">
-             <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/30 border-b border-slate-50 gap-6">
-                <div className="flex items-center gap-6">
-                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => handleDateChange(-1)}>
+        <div className="lg:col-span-3">
+           <Card hover={false} className="p-0 overflow-hidden border-none shadow-sm bg-white">
+             <div className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/30 border-b border-slate-50 gap-4">
+                <div className="flex items-center gap-4">
+                   <button className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 cursor-pointer transition-none" onClick={() => handleDateChange(-1)}>
                       <FaChevronLeft size={10} className="mx-auto"/>
                    </button>
                    <div className="text-center">
-                      <h2 className="text-lg font-bold text-slate-900 tracking-tight">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h2>
-                      <p className="text-[10px] font-black text-clinicPrimary uppercase tracking-[0.3em] mt-1">Daily Protocol</p>
+                      <h2 className="text-[13px] sm:text-[15px] font-bold text-slate-900 tracking-tight">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h2>
+                      <p className="text-[9px] font-black text-clinicPrimary uppercase tracking-[0.3em] mt-0.5">Daily Protocol</p>
                    </div>
-                   <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary transition-all active:scale-90" onClick={() => handleDateChange(1)}>
+                   <button className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 cursor-pointer transition-none" onClick={() => handleDateChange(1)}>
                       <FaChevronRight size={10} className="mx-auto"/>
                    </button>
                 </div>
-                <div className="relative group w-full md:max-w-[300px] bg-white rounded-2xl border border-slate-100 shadow-inner-soft transition-all focus-within:ring-4 focus-within:ring-clinicPrimary/5">
-                   <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-clinicPrimary" size={12}/>
+                <div className="relative w-full md:max-w-[280px] bg-white rounded-xl border border-slate-100 shadow-none transition-none focus-within:ring-4 focus-within:ring-clinicPrimary/5">
+                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={12}/>
                    <input 
                     type="text" 
                     placeholder="Filter by subject..." 
-                    className="w-full pl-12 pr-6 py-3.5 bg-transparent text-[13px] font-bold text-slate-600 outline-none"
+                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-transparent text-[11px] sm:text-[12px] font-bold text-slate-600 outline-none"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                    />
@@ -171,56 +171,62 @@ const Appointments = () => {
                     (searchTerm === '' || a.patient.toLowerCase().includes(searchTerm.toLowerCase()))
                   );
                   return (
-                    <div key={index} className="flex border-b border-slate-50 last:border-none group/slot">
-                       <div className="w-24 sm:w-32 p-8 border-r border-slate-50 bg-slate-50/20 flex flex-col items-center justify-center">
-                          <span className="text-[13px] font-bold text-slate-900 group-hover/slot:text-clinicPrimary transition-colors">{slot.split(' ')[0]}</span>
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{slot.split(' ')[1]}</span>
+                    <div key={index} className="flex border-b border-slate-50 last:border-none">
+                       <div className="w-20 sm:w-24 p-4 sm:p-6 border-r border-slate-50 bg-slate-50/20 flex flex-col items-center justify-center shrink-0">
+                          <span className="text-[11px] sm:text-[12px] font-bold text-slate-900 group-hover/slot:text-clinicPrimary">{slot.split(' ')[0]}</span>
+                          <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{slot.split(' ')[1]}</span>
                        </div>
-                       <div className="flex-1 p-4 relative group/node">
+                       <div className="flex-1 p-2.5 sm:p-3 relative group/node">
                           {appointment ? (
                              <div 
-                              className={`p-6 rounded-[24px] border border-clinicPrimary/10 shadow-premium transition-all cursor-pointer hover:-translate-y-1 active:scale-95 group/booking relative overflow-hidden ${
-                                appointment.status === 'Confirmed' ? 'bg-emerald-50/40 hover:bg-emerald-50' : 
-                                appointment.status === 'Arrived' ? 'bg-blue-50/40 hover:bg-blue-50' : 
+                              className={`p-4 sm:p-5 rounded-xl border border-clinicPrimary/10 transition-colors cursor-pointer relative overflow-hidden ${
+                                appointment.status === 'Confirmed' ? 'bg-emerald-50/40 hover:bg-emerald-50/80 select-none' : 
+                                appointment.status === 'Arrived' ? 'bg-blue-50/40 hover:bg-blue-50/80 select-none' : 
                                 'bg-white hover:bg-slate-50'
                               }`}
                               onClick={() => { setSelectedAppt(appointment); setIsDetailModalOpen(true); }}
                              >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                                    <div>
-                                      <div className="flex items-center gap-3 mb-2">
-                                         <p className="text-[15px] font-bold text-slate-900">{appointment.patient}</p>
-                                         <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
-                                           appointment.status === 'Confirmed' ? 'bg-emerald-500 text-white border-emerald-500 shadow-soft' : 
-                                           appointment.status === 'Arrived' ? 'bg-blue-500 text-white border-blue-500 shadow-soft' : 
-                                           'bg-slate-900 text-white border-slate-900 shadow-soft'
-                                         }`}>
+                                      <div className="flex items-center gap-2.5 sm:gap-3 mb-1.5 sm:mb-2">
+                                         <p className="text-[13px] sm:text-[14px] font-bold text-slate-900">{appointment.patient}</p>
+                                         <button className={`px-2 py-0.5 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-widest border transition-colors ${
+                                           appointment.status === 'Confirmed' ? 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-none' : 
+                                           appointment.status === 'Arrived' ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500 shadow-none' : 
+                                           'bg-slate-900 hover:bg-slate-800 text-white border-slate-900 shadow-none'
+                                         }`} onClick={(e) => e.stopPropagation()}>
                                             {appointment.status}
-                                         </span>
+                                         </button>
                                       </div>
-                                      <p className="text-[12px] font-medium text-slate-500 flex items-center gap-2">
+                                      <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 flex items-center gap-1.5 sm:gap-2">
                                          <FaClock size={10} className="text-slate-300"/> {appointment.type} • {appointment.practitioner}
                                       </p>
                                    </div>
+<<<<<<< HEAD
                                    <div className="flex gap-2 opacity-0 group-hover/booking:opacity-100 transition-opacity">
                                        <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${appointment.patientId}`); }}>
                                          <FaUserMd size={14} className="mx-auto"/>
+=======
+                                   <div className="flex gap-2">
+                                       <button className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-clinicPrimary hover:border-clinicPrimary transition-colors cursor-pointer shadow-none" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
+                                         <FaUserMd size={12} className="mx-auto"/>
+>>>>>>> 7ce614598f73d2c708d6feb34e4fdebf60b89f02
                                       </button>
-                                      <button className="w-9 h-9 rounded-xl bg-clinicPrimary text-white shadow-soft transition-all hover:shadow-google active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
-                                         <FaCheckCircle size={14} className="mx-auto"/>
+                                      <button className="w-8 h-8 rounded-lg bg-clinicPrimary text-white shadow-none transition-colors hover:bg-clinicPrimaryDark cursor-pointer" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
+                                         <FaCheckCircle size={12} className="mx-auto"/>
                                       </button>
                                    </div>
                                 </div>
                              </div>
                           ) : (
                              <button 
-                              className="w-full h-full min-h-[80px] rounded-[24px] border-2 border-dashed border-slate-100 hover:border-clinicPrimary/40 hover:bg-clinicPrimary/5 transition-all text-[11px] font-black text-slate-300 hover:text-clinicPrimary uppercase tracking-[0.2em] flex items-center justify-center group/add active:scale-[0.99]"
+                              className="w-full h-full py-4 sm:py-5 min-h-[50px] rounded-xl border border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-clinicPrimary/40 transition-colors text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.1em] flex items-center justify-center cursor-pointer select-none"
                               onClick={() => {
                                 setNewBooking({ ...newBooking, time: slot, practitioner: selectedPractitioner !== 'All Practitioners' ? selectedPractitioner : 'Dr. Sarah Wilson' });
                                 setIsBookModalOpen(true);
                               }}
                              >
-                                <FaPlus size={14} className="mr-3 transform group-hover/add:rotate-90 transition-transform"/> Available Slot Node
+                                <FaPlus size={10} className="mr-2"/> Available Slot Node
                              </button>
                           )}
                        </div>
