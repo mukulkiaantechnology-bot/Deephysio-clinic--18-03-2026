@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FaUser, FaPhone, FaEnvelope, FaMapMarkerAlt, FaVenusMars, FaBirthdayCake, FaSave, FaIdCard, FaHistory, FaArrowLeft, FaPlus, FaCloudUploadAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -7,6 +7,9 @@ import Card from '../components/ui/Card';
 const AddPatient = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const bioAvatarRef = useRef(null);
+  const identityNodeRef = useRef(null);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -59,7 +62,18 @@ const AddPatient = () => {
   };
 
   const handleAttach = (type) => {
-    alert(`Node Sync: Attaching ${type} file to subject identity...`);
+    if (type === 'Bio-Avatar') {
+      bioAvatarRef.current?.click();
+    } else if (type === 'Identity Node') {
+      identityNodeRef.current?.click();
+    }
+  };
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, [type]: file }));
+    }
   };
 
   return (
@@ -212,14 +226,32 @@ const AddPatient = () => {
         </div>
 
         <div className="lg:col-span-4 space-y-10">
+          <input 
+            type="file" 
+            ref={bioAvatarRef} 
+            className="hidden" 
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, 'bioAvatar')}
+          />
+          <input 
+            type="file" 
+            ref={identityNodeRef} 
+            className="hidden" 
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileChange(e, 'identityNode')}
+          />
           <Card className="p-0 overflow-hidden shadow-premium border-none bg-white group">
             <div className="bg-slate-900 h-56 flex flex-col items-center justify-center text-white relative overflow-hidden cursor-pointer group/upload" onClick={() => handleAttach('Bio-Avatar')}>
               <div className="absolute inset-0 bg-clinicPrimary opacity-0 group-hover/upload:opacity-5 transition-opacity duration-700"></div>
               <div className="w-20 h-20 bg-white/5 rounded-[32px] border border-white/10 flex items-center justify-center mb-6 shadow-glass group-hover/upload:scale-110 group-hover/upload:rotate-3 transition-transform duration-500">
                 <FaCloudUploadAlt size={32} className="text-clinicPrimary" />
               </div>
-              <h4 className="text-[11px] font-black uppercase tracking-[0.3em] leading-none mb-3">Upload Bio-Avatar</h4>
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Supports JPG, PNG Node</p>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.3em] leading-none mb-3">
+                {formData.bioAvatar ? 'Avatar Selected' : 'Upload Bio-Avatar'}
+              </h4>
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[80%] text-center">
+                {formData.bioAvatar ? formData.bioAvatar.name : 'Supports JPG, PNG Node'}
+              </p>
             </div>
             <div className="p-8 space-y-4 bg-slate-50/30">
               <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-premium transition-all cursor-pointer group/attach" onClick={() => handleAttach('Identity Node')}>
@@ -228,7 +260,9 @@ const AddPatient = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-[10px] font-bold text-slate-900 uppercase tracking-tight leading-none mb-1">Identity Verification</p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Passport / ID Node</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate w-40">
+                    {formData.identityNode ? formData.identityNode.name : 'Passport / ID Node'}
+                  </p>
                 </div>
                 <FaPlus size={10} className="text-slate-200 group-hover/attach:text-clinicPrimary" />
               </div>
