@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FaSyncAlt, FaCog, FaCheckCircle, FaExclamationTriangle, FaChevronRight, FaPlus, FaGoogle, FaEnvelope, FaStripe, FaPaypal, FaChartBar, FaShieldAlt, FaHistory, FaCheck, FaTimes, FaLink, FaDatabase, FaLock, FaSync } from 'react-icons/fa';
+import { FaSyncAlt, FaCog, FaCheckCircle, FaExclamationTriangle, FaChevronRight, FaPlus, FaGoogle, FaEnvelope, FaStripe, FaPaypal, FaChartBar, FaShieldAlt, FaHistory, FaCheck, FaTimes, FaLink, FaDatabase, FaLock, FaSync, FaBrain } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';

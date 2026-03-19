@@ -8,13 +8,17 @@ import Appointments from './pages/Appointments';
 import BookAppointment from './pages/BookAppointment';
 import Waitlist from './pages/Waitlist';
 import Availability from './pages/Availability';
+import AddTimeBlock from './pages/AddTimeBlock';
 import BookingSettings from './pages/BookingSettings';
 import Patients from './pages/Patients';
 import AddPatient from './pages/AddPatient';
 import PatientProfile from './pages/PatientProfile';
 import VisitHistory from './pages/VisitHistory';
 import Referrals from './pages/Referrals';
+import AddReferral from './pages/AddReferral';
 import Insurance from './pages/Insurance';
+import AddInsurance from './pages/AddInsurance';
+import LinkProvider from './pages/LinkProvider';
 import ClinicalNotes from './pages/ClinicalNotes';
 import NewNote from './pages/NewNote';
 import NoteTemplates from './pages/NoteTemplates';
@@ -56,6 +60,7 @@ import SecuritySettings from './pages/SecuritySettings';
 const DataBackup = lazy(() => import('./pages/DataBackup'));
 const ClinicManual = lazy(() => import('./pages/ClinicManual'));
 const ClientsInsurers = lazy(() => import('./pages/ClientsInsurers'));
+import RegisterClient from './pages/RegisterClient';
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in duration-500">
@@ -123,6 +128,7 @@ function App() {
               <Route path="appointments/book" element={<BookAppointment />} />
               <Route path="appointments/waitlist" element={<Waitlist />} />
               <Route path="appointments/availability" element={<Availability />} />
+              <Route path="appointments/availability/add" element={<AddTimeBlock />} />
               <Route path="appointments/settings" element={<BookingSettings />} />
 
               {/* Patients - 6 Pages */}
@@ -131,7 +137,11 @@ function App() {
               <Route path="patients/profile" element={<PatientProfile />} />
               <Route path="patients/history" element={<VisitHistory />} />
               <Route path="patients/referrals" element={<Referrals />} />
+              <Route path="patients/referrals/add" element={<AddReferral />} />
               <Route path="patients/insurance" element={<Insurance />} />
+              <Route path="patients/insurance/link" element={<LinkProvider />} />
+              <Route path="patients/insurance/add" element={<AddInsurance />} />
+              <Route path="patients/insurance/edit" element={<AddInsurance />} />
 
               {/* Clinical Notes - 4 Pages */}
               <Route path="notes" element={<ClinicalNotes />} />
@@ -185,8 +195,9 @@ function App() {
               <Route path="integrations/xero" element={hasAccess('Integrations') ? <IntegrationService /> : <Navigate to="/" />} />
               <Route path="integrations/manual" element={<ClinicManual />} />
 
-              {/* Clients & Insurers - 1 Page */}
+              {/* Clients & Insurers - 2 Pages */}
               <Route path="clients" element={hasAccess('Patients') ? <ClientsInsurers /> : <Navigate to="/" />} />
+              <Route path="clients/register" element={hasAccess('Patients') ? <RegisterClient /> : <Navigate to="/" />} />
 
               {/* Settings - 7 Pages */}
               <Route path="settings" element={<Settings />} />

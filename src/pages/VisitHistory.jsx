@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { FaHistory, FaCalendarAlt, FaUserMd, FaFileAlt, FaChevronRight, FaFilter, FaSearch, FaDownload, FaClinicMedical, FaClock, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaHistory, FaCalendarAlt, FaUserMd, FaFileAlt, FaChevronRight, FaFilter, FaSearch, FaDownload, FaClinicMedical, FaClock, FaCheckCircle, FaTimesCircle, FaTrashAlt } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 
 const VisitHistory = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   
-  const visits = [
+  const [visits, setVisits] = useState([
     { id: 'VH-901', date: '15 Mar 2026', time: '10:30 AM', practitioner: 'Dr. Sarah Wilson', service: 'Physio Evolution', clinic: 'Main Clinic Node', status: 'Verified' },
     { id: 'VH-842', date: '28 Feb 2026', time: '02:00 PM', practitioner: 'Dr. Michael Chen', service: 'Bio-Metric Massage', clinic: 'Main Clinic Node', status: 'Verified' },
     { id: 'VH-711', date: '10 Feb 2026', time: '11:15 AM', practitioner: 'Dr. Sarah Wilson', service: 'Initial Assessment', clinic: 'North Partition', status: 'Verified' },
     { id: 'VH-605', date: '20 Jan 2026', time: '09:00 AM', practitioner: 'Dr. John Miller', service: 'ACL Rehabilitation', clinic: 'West Branch Node', status: 'Revoked' },
-  ];
+  ]);
 
   const filteredVisits = visits.filter(v => 
     v.practitioner.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -20,11 +22,25 @@ const VisitHistory = () => {
   );
 
   const handleExport = () => {
-    alert('Chronology Export: Generating encrypted medical history ledger (CSV)...');
+    const csvContent = "data:text/csv;charset=utf-8,ID,Date,Time,Practitioner,Service,Clinic,Status\n" 
+      + visits.map(v => `${v.id},${v.date},${v.time},${v.practitioner},${v.service},${v.clinic},${v.status}`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "visit_history.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleViewNote = (id) => {
-    alert(`Accessing Secured Clinical Note for ID: ${id}. Decrypting protocol...`);
+    navigate('/notes');
+  };
+
+  const handleDeleteVisit = (id) => {
+    if (window.confirm(`Are you sure you want to delete the temporal node ${id}?`)) {
+      setVisits(visits.filter(v => v.id !== id));
+    }
   };
 
   return (
@@ -60,9 +76,6 @@ const VisitHistory = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="p-5 border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google hover:bg-white transition-all bg-slate-50 shadow-soft active:scale-90" onClick={() => alert('Search Parameters: Initializing advanced chronology filter nodes...')}>
-            <FaFilter size={16}/>
-          </button>
         </div>
 
         <div className="overflow-x-auto custom-scrollbar">
@@ -116,11 +129,11 @@ const VisitHistory = () => {
                   </td>
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-3">
-                       <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-9" title="Review Node Note" onClick={(e) => { e.stopPropagation(); handleViewNote(visit.id); }}>
+                       <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-95" title="Review Node Note" onClick={(e) => { e.stopPropagation(); handleViewNote(visit.id); }}>
                           <FaFileAlt size={14}/>
                        </button>
-                       <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all flex items-center justify-center active:scale-9" onClick={(e) => { e.stopPropagation(); alert(`Context Menu: Modify, Move or Delete Visit Chronology Node ${visit.id}.`); }}>
-                          <FaEllipsisV size={14}/>
+                       <button className="w-10 h-10 rounded-xl bg-white border border-rose-100 text-rose-300 hover:text-rose-500 hover:bg-rose-50 hover:shadow-google transition-all flex items-center justify-center active:scale-95" title="Delete Visit Node" onClick={(e) => { e.stopPropagation(); handleDeleteVisit(visit.id); }}>
+                          <FaTrashAlt size={14}/>
                        </button>
                     </div>
                   </td>
@@ -153,11 +166,5 @@ const VisitHistory = () => {
     </div>
   );
 };
-
-const FaEllipsisV = ({ className, size, onClick }) => (
-  <svg className={className} width={size || 14} height={size || 14} viewBox="0 0 24 24" fill="currentColor" onClick={onClick}>
-    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-  </svg>
-);
 
 export default VisitHistory;
