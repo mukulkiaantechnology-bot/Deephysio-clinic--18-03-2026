@@ -44,12 +44,25 @@ const PaymentReminders = () => {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase tracking-tighter">Automated Payment Reminders</h1>
           <p className="text-slate-500 font-medium mt-1">Automate the collection of overdue invoices with professional scheduling.</p>
         </div>
-        <button 
-          onClick={() => navigate('/billing/reminders/add')}
-          className="flex items-center gap-3 px-8 py-4 bg-clinicDark text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:shadow-google hover:-translate-y-1 transition-all active:scale-95 shadow-lg"
-        >
-          <FaPlus size={12}/> Add Reminder Rule
-        </button>
+        <div className="flex flex-wrap gap-4">
+          <button 
+             onClick={() => {
+                 const allPaused = reminders.every(r => r.isPaused);
+                 const updated = reminders.map(r => ({ ...r, isPaused: !allPaused }));
+                 setReminders(updated);
+                 localStorage.setItem('deephysio_reminders', JSON.stringify(updated));
+             }}
+             className="flex items-center gap-3 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 transition-all active:scale-95 shadow-sm"
+          >
+            {reminders.every(r => r.isPaused) ? 'Resume All Rules' : 'Pause All Rules'}
+          </button>
+          <button 
+            onClick={() => navigate('/billing/reminders/add')}
+            className="flex items-center gap-3 px-8 py-4 bg-clinicDark text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:shadow-google hover:-translate-y-1 transition-all active:scale-95 shadow-lg"
+          >
+            <FaPlus size={12}/> Add Reminder Rule
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -86,7 +99,7 @@ const PaymentReminders = () => {
             <input 
               type="text" 
               placeholder="Search by patient name or invoice ID..." 
-              className="w-full px-8 py-4 bg-transparent text-[13px] font-bold text-slate-600 outline-none placeholder:text-slate-300 transition-all" 
+              className="w-full px-6 py-4 bg-transparent text-[13px] font-bold text-slate-600 outline-none placeholder:text-slate-300 transition-all font-sans" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

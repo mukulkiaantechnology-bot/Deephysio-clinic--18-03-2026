@@ -112,7 +112,12 @@ const PricingServices = () => {
                              </div>
                           </td>
                           <td className="px-8 py-6 text-right">
-                             <button className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest border-b-2 border-transparent hover:border-clinicPrimary transition-all">Edit Price</button>
+                             <button 
+                                onClick={(e) => { e.stopPropagation(); navigate(`/billing/pricing/edit/${service.id}`); }}
+                                className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest border-b-2 border-transparent hover:border-clinicPrimary transition-all"
+                             >
+                                Edit Price
+                             </button>
                           </td>
                        </tr>
                     )) : (

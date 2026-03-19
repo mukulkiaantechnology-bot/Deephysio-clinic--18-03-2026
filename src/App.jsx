@@ -21,6 +21,14 @@ import AddInsurance from './pages/AddInsurance';
 import LinkProvider from './pages/LinkProvider';
 import ClinicalNotes from './pages/ClinicalNotes';
 import NewNote from './pages/NewNote';
+import SOAPNotePage from './pages/SOAPNotePage';
+import RMDQAssessment from './pages/RMDQAssessment';
+import IntakeAssessment from './pages/IntakeAssessment';
+import HomeExercises from './pages/HomeExercises';
+import TreatmentPlan from './pages/TreatmentPlan';
+import PatientSurvey from './pages/PatientSurvey';
+import NewClaimPage from './pages/NewClaimPage';
+import DischargeSummary from './pages/DischargeSummary';
 import NoteTemplates from './pages/NoteTemplates';
 import Attachments from './pages/Attachments';
 import Communication from './pages/Communication';
@@ -143,8 +151,8 @@ function App() {
               {/* Patients - 6 Pages */}
               <Route path="patients" element={<Patients />} />
               <Route path="patients/add" element={<AddPatient />} />
-              <Route path="patients/profile" element={<PatientProfile />} />
-              <Route path="patients/history" element={<VisitHistory />} />
+              <Route path="patients/profile/:id" element={<PatientProfile />} />
+              <Route path="patients/history/:id" element={<VisitHistory />} />
               <Route path="patients/referrals" element={<Referrals />} />
               <Route path="patients/referrals/add" element={<AddReferral />} />
               <Route path="patients/insurance" element={<Insurance />} />
@@ -155,6 +163,13 @@ function App() {
               {/* Clinical Notes - 4 Pages */}
               <Route path="notes" element={<ClinicalNotes />} />
               <Route path="notes/new" element={<NewNote />} />
+              <Route path="/notes/soap/:id" element={<SOAPNotePage />} />
+            <Route path="/notes/rmdq/:id" element={<RMDQAssessment />} />
+            <Route path="/notes/intake/:id" element={<IntakeAssessment />} />
+            <Route path="/notes/hep/:id" element={<HomeExercises />} />
+            <Route path="/notes/plan/:id" element={<TreatmentPlan />} />
+            <Route path="/notes/survey/:id" element={<PatientSurvey />} />
+            <Route path="/notes/discharge/:id" element={<DischargeSummary />} />
               <Route path="notes/view/:id" element={<ViewNote />} />
               <Route path="notes/templates" element={<NoteTemplates />} />
               <Route path="notes/templates/new" element={<CreateTemplate />} />
@@ -175,6 +190,7 @@ function App() {
               <Route path="billing/payments/record" element={hasAccess('Billing & Payments') ? <RecordPaymentPage /> : <Navigate to="/" />} />
               <Route path="billing/payments/view/:id" element={hasAccess('Billing & Payments') ? <InvoiceDetailPage /> : <Navigate to="/" />} />
               <Route path="billing/claims" element={hasAccess('Billing & Payments') ? <InsuranceClaims /> : <Navigate to="/" />} />
+              <Route path="billing/claims/new" element={hasAccess('Billing & Payments') ? <NewClaimPage /> : <Navigate to="/" />} />
               <Route path="billing/claims/batch" element={hasAccess('Billing & Payments') ? <SubmitBatchPage /> : <Navigate to="/" />} />
               <Route path="billing/claims/view/:id" element={hasAccess('Billing & Payments') ? <ClaimDetailPage /> : <Navigate to="/" />} />
               <Route path="billing/reminders" element={hasAccess('Billing & Payments') ? <PaymentReminders /> : <Navigate to="/" />} />

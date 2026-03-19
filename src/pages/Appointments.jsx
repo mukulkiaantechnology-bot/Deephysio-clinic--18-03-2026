@@ -24,9 +24,9 @@ const Appointments = () => {
   ];
 
   const [appointments, setAppointments] = useState([
-    { id: 101, patient: 'James Wilson', date: '2026-03-18', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
-    { id: 102, patient: 'Alice Johnson', date: '2026-03-18', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
-    { id: 103, patient: 'Robert Fox', date: '2026-03-18', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
+    { id: 101, patient: 'James Wilson', patientId: 'PID-102', date: '2026-03-18', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
+    { id: 102, patient: 'Alice Johnson', patientId: 'PID-101', date: '2026-03-18', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
+    { id: 103, patient: 'Robert Fox', patientId: 'PID-103', date: '2026-03-18', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
   ]);
 
   const [newBooking, setNewBooking] = useState({
@@ -203,7 +203,7 @@ const Appointments = () => {
                                       </p>
                                    </div>
                                    <div className="flex gap-2 opacity-0 group-hover/booking:opacity-100 transition-opacity">
-                                       <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
+                                       <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${appointment.patientId}`); }}>
                                          <FaUserMd size={14} className="mx-auto"/>
                                       </button>
                                       <button className="w-9 h-9 rounded-xl bg-clinicPrimary text-white shadow-soft transition-all hover:shadow-google active:scale-90" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>

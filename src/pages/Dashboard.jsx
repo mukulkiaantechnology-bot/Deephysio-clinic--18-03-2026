@@ -214,15 +214,15 @@ const Dashboard = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {[
-                  { name: 'John Doe', time: '10:30 AM', dr: 'Dr. Sarah Wilson', status: 'Confirmed' },
-                  { name: 'Emma Watson', time: '11:45 AM', dr: 'Dr. Michael Chen', status: 'Pending' },
-                  { name: 'Robert Fox', time: '02:15 PM', dr: 'Dr. Sarah Wilson', status: 'Arrived' },
-                  { name: 'Linda Grey', time: '04:00 PM', dr: 'Dr. Michael Chen', status: 'Confirmed' }
+                  { name: 'Alice Johnson', id: 'PID-101', time: '10:30 AM', dr: 'Dr. Sarah Wilson', status: 'Confirmed' },
+                  { name: 'James Wilson', id: 'PID-102', time: '11:45 AM', dr: 'Dr. Michael Chen', status: 'Pending' },
+                  { name: 'Robert Fox', id: 'PID-103', time: '02:15 PM', dr: 'Dr. Sarah Wilson', status: 'Arrived' },
+                  { name: 'Linda Grey', id: 'PID-104', time: '04:00 PM', dr: 'Dr. Michael Chen', status: 'Confirmed' }
                 ].map((row, i) => (
                   <tr 
                     key={i} 
                     className="hover:bg-slate-50/50 transition-all group/row cursor-pointer"
-                    onClick={() => navigate('/appointments')}
+                    onClick={() => navigate(`/patients/profile/${row.id}`)}
                   >
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">

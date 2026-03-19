@@ -77,6 +77,12 @@ const InsuranceClaims = () => {
             Export XL
           </button>
           <button 
+            onClick={() => navigate('/billing/claims/new')}
+            className="flex items-center gap-3 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-black text-clinicPrimary uppercase tracking-widest hover:bg-clinicPrimary/5 hover:border-clinicPrimary hover:shadow-google transition-all active:scale-95 shadow-lg"
+          >
+            <FaPlus size={14}/> Add Claim
+          </button>
+          <button 
             onClick={() => navigate('/billing/claims/batch')}
             className="flex items-center gap-3 px-8 py-4 bg-clinicPrimary text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:shadow-google hover:-translate-y-1 transition-all active:scale-95 shadow-lg"
           >

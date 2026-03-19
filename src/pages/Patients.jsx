@@ -140,7 +140,7 @@ const Patients = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {currentPatients.length > 0 ? currentPatients.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => navigate('/patients/profile')}>
+                <tr key={p.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => navigate(`/patients/profile/${p.id}`)}>
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-clinicPrimary/10 to-clinicPrimary/5 text-clinicPrimary flex items-center justify-center font-bold text-sm shadow-soft border border-clinicPrimary/10 group-hover:scale-110 transition-transform">
@@ -195,7 +195,7 @@ const Patients = () => {
                       <button 
                         className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary hover:bg-clinicPrimary/5 transition-all flex items-center justify-center active:scale-90" 
                         title="Audit Patient Profile"
-                        onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${p.id}`); }}
                       >
                         <FaEllipsisV size={14}/>
                       </button>
