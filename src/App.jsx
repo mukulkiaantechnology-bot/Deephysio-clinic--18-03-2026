@@ -67,6 +67,9 @@ import RecordPaymentPage from './pages/RecordPaymentPage';
 import InvoiceDetailPage from './pages/InvoiceDetailPage';
 import SubmitBatchPage from './pages/SubmitBatchPage';
 import ClaimDetailPage from './pages/ClaimDetailPage';
+import AddReminderRulePage from './pages/AddReminderRulePage';
+import AddServicePage from './pages/AddServicePage';
+import EditServicePage from './pages/EditServicePage';
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in duration-500">
@@ -175,7 +178,10 @@ function App() {
               <Route path="billing/claims/batch" element={hasAccess('Billing & Payments') ? <SubmitBatchPage /> : <Navigate to="/" />} />
               <Route path="billing/claims/view/:id" element={hasAccess('Billing & Payments') ? <ClaimDetailPage /> : <Navigate to="/" />} />
               <Route path="billing/reminders" element={hasAccess('Billing & Payments') ? <PaymentReminders /> : <Navigate to="/" />} />
+              <Route path="billing/reminders/add" element={hasAccess('Billing & Payments') ? <AddReminderRulePage /> : <Navigate to="/" />} />
               <Route path="billing/pricing" element={hasAccess('Billing & Payments') ? <PricingServices /> : <Navigate to="/" />} />
+              <Route path="billing/pricing/add" element={hasAccess('Billing & Payments') ? <AddServicePage /> : <Navigate to="/" />} />
+              <Route path="billing/pricing/edit/:id" element={hasAccess('Billing & Payments') ? <EditServicePage /> : <Navigate to="/" />} />
 
               {/* Forms & Intake - 5 Pages */}
               <Route path="forms" element={hasAccess('Forms') ? <FormBuilder /> : <Navigate to="/" />} />
