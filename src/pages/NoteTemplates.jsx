@@ -1,49 +1,99 @@
 import React, { useState, useEffect } from 'react';
-import { FaMagic, FaCopy, FaEdit, FaTrash, FaPlus, FaSearch, FaFileMedical } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaMagic, FaCopy, FaEdit, FaTrash, FaPlus, FaSearch, FaFileMedical, FaCheckCircle } from 'react-icons/fa';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 
 const INITIAL_TEMPLATES = [
-  { id: 1, name: 'Standard SOAP Note', category: 'Physiotherapy', description: 'Subjective, Objective, Assessment, Plan' },
-  { id: 2, name: 'Initial Assessment', category: 'Clinical', description: 'Comprehensive first visit record' },
-  { id: 3, name: 'Post-Op Follow-up', category: 'Rehabilitation', description: 'Specialized for post-surgical progress' },
-  { id: 4, name: 'Wellness Check', category: 'Prevention', description: 'General health and maintenance record' },
-  { id: 5, name: 'Sports Massage Report', category: 'Manual Therapy', description: 'Focus on muscular findings and treatment' },
-  { id: 6, name: 'Discharge Summary', category: 'Final', description: 'Conclusive report for GP and Patient' },
+  { 
+    id: 1, 
+    name: 'Standard SOAP Note', 
+    category: 'Physiotherapy', 
+    description: 'Subjective, Objective, Assessment, Plan',
+    sections: [
+      { id: 101, title: 'Subjective', placeholder: 'Knee pain, onset, VAS 0-10...' },
+      { id: 102, title: 'Objective', placeholder: 'ROM flexion/extension, palpation...' },
+      { id: 103, title: 'Assessment', placeholder: 'Clinical diagnosis, progress...' },
+      { id: 104, title: 'Plan', placeholder: 'Treatment, HEP, next visit...' }
+    ]
+  },
+  { 
+    id: 2, 
+    name: 'Initial Assessment', 
+    category: 'Clinical', 
+    description: 'Comprehensive first visit record',
+    sections: [
+      { id: 201, title: 'Medical History', placeholder: 'Past surgeries, conditions...' },
+      { id: 202, title: 'Goal Setting', placeholder: 'Patient goals, expected outcomes...' },
+      { id: 203, title: 'Physical Exam', placeholder: 'Specific clinical tests...' }
+    ]
+  },
+  { 
+    id: 3, 
+    name: 'Post-Op Follow-up', 
+    category: 'Rehabilitation', 
+    description: 'Specialized for post-surgical progress',
+    sections: [
+      { id: 301, title: 'Surgical Status', placeholder: 'Wound healing, protocol stage...' },
+      { id: 302, title: 'Mobility', placeholder: 'Aids used, gait pattern...' }
+    ]
+  },
+  { id: 4, name: 'Wellness Check', category: 'Prevention', description: 'General health and maintenance record', sections: [{ id: 401, title: 'General Vitals', placeholder: 'HR, BP, etc.' }] },
+  { id: 5, name: 'Sports Massage Report', category: 'Manual Therapy', description: 'Focus on muscular findings and treatment', sections: [{ id: 501, title: 'Soft Tissue State', placeholder: 'Tension, trigger points...' }] },
+  { id: 6, name: 'Discharge Summary', category: 'Final', description: 'Conclusive report for GP and Patient', sections: [{ id: 601, title: 'Outcome Measures', placeholder: 'Final scores, recommendations...' }] },
 ];
 
 const NoteTemplates = () => {
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({ name: '', category: '', description: '' });
+  const [isSmartDocsEnabled, setIsSmartDocsEnabled] = useState(false);
 
   useEffect(() => {
     const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
-    if (savedTemplates.length > 0) {
-      setTemplates([...savedTemplates, ...INITIAL_TEMPLATES]);
-    } else {
-      setTemplates(INITIAL_TEMPLATES);
-    }
+    
+    // Deduplicate and ensure INITIAL_TEMPLATES always have their latest logic/sections
+    const merged = [...savedTemplates];
+    INITIAL_TEMPLATES.forEach(initial => {
+      const existingIndex = merged.findIndex(t => t.id === initial.id);
+      if (existingIndex > -1) {
+        // Update existing initial template with new sections if missing
+        merged[existingIndex] = { ...initial, ...merged[existingIndex], sections: initial.sections };
+      } else {
+        merged.push(initial);
+      }
+    });
+
+    setTemplates(merged);
   }, []);
 
-  const handleCreateTemplate = () => {
-    if (!formData.name || !formData.category || !formData.description) return;
-
-    const newTemplate = {
-      id: Date.now(),
-      ...formData
-    };
-
-    const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
-    const updatedSaved = [newTemplate, ...savedTemplates];
-    localStorage.setItem('deephysio_note_templates', JSON.stringify(updatedSaved));
-    
-    setTemplates([newTemplate, ...templates]);
-    setIsModalOpen(false);
-    setFormData({ name: '', category: '', description: '' });
+  const handleResetTemplates = () => {
+    localStorage.removeItem('deephysio_note_templates');
+    setTemplates(INITIAL_TEMPLATES);
+    alert('Templates factory reset successful. All premium details restored!');
   };
 
+  const handleToggleSmartDocs = () => {
+    setIsSmartDocsEnabled(!isSmartDocsEnabled);
+  };
+
+  const handleCopyTemplate = (template) => {
+    const newTemplate = { ...template, id: Date.now(), name: `${template.name} (Copy)` };
+    const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
+    const updated = [newTemplate, ...savedTemplates];
+    localStorage.setItem('deephysio_note_templates', JSON.stringify(updated));
+    setTemplates([newTemplate, ...templates]);
+  };
+
+  const handleDeleteTemplate = (id) => {
+    if (!window.confirm('Are you sure you want to delete this template?')) return;
+    const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
+    const updated = savedTemplates.filter(t => t.id !== id);
+    localStorage.setItem('deephysio_note_templates', JSON.stringify(updated));
+    setTemplates(templates.filter(t => t.id !== id));
+  };  
+  
   const filteredTemplates = templates.filter(t => 
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,8 +108,8 @@ const NoteTemplates = () => {
           <p className="text-base font-bold text-gray-400 mt-1 uppercase tracking-widest">Standardize your clinical documentation workflow.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
-          className="btn-primary flex items-center gap-2 text-base uppercase tracking-widest shadow-lg "
+          onClick={() => navigate('/notes/templates/new')}
+          className="btn-primary flex items-center gap-2 text-base uppercase tracking-widest shadow-lg active:scale-95 transition-all"
         >
           <FaPlus size={10}/> New Template
         </button>
@@ -86,13 +136,19 @@ const NoteTemplates = () => {
                      <span className="px-2 py-0.5 bg-clinicLight rounded text-base font-black text-clinicPrimary uppercase tracking-widest">{template.category}</span>
                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert(`Editing ${template.name}...`); }}
+                          onClick={(e) => { e.stopPropagation(); navigate('/notes/templates/new', { state: { template } }); }}
                           className="p-1.5 text-gray-300 hover:text-clinicPrimary"
                         >
                           <FaEdit size={12}/>
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert(`Creating a copy of ${template.name}...`); }}
+                          onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(template.id); }}
+                          className="p-1.5 text-gray-300 hover:text-red-500"
+                        >
+                          <FaTrash size={12}/>
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleCopyTemplate(template); }}
                           className="p-1.5 text-gray-300 hover:text-clinicSecondary"
                         >
                           <FaCopy size={12}/>
@@ -101,13 +157,7 @@ const NoteTemplates = () => {
                   </div>
                   <h3 className="text-base font-black text-gray-900 leading-none mb-2">{template.name}</h3>
                   <p className="text-base font-medium text-gray-500 leading-relaxed uppercase tracking-tighter mb-6">{template.description}</p>
-                  <button 
-                    onClick={() => alert(`Previewing template: ${template.name}`)}
-                    className="w-full py-2 bg-white border border-gray-100 rounded-lg text-base font-black text-gray-500 uppercase tracking-widest hover:border-clinicPrimary hover:text-clinicPrimary transition-all"
-                  >
-                    Preview Template
-                  </button>
-               </div>
+                </div>
             ))}
          </div>
       </div>
@@ -123,63 +173,15 @@ const NoteTemplates = () => {
                <p className="text-base font-bold text-slate-400 uppercase tracking-widest leading-relaxed max-w-lg">Our AI analyzes your consultation patterns and suggests the perfect template for each treatment type.</p>
             </div>
             <button 
-              onClick={() => alert('Smart Template Suggester enabled!')}
-              className="px-6 py-3 bg-white text-clinicDark rounded-xl text-base font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-transform"
+              onClick={handleToggleSmartDocs}
+              className={`px-6 py-3 rounded-xl text-base font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all flex items-center gap-2 ${isSmartDocsEnabled ? 'bg-emerald-500 text-white shadow-emerald-500/30' : 'bg-white text-clinicDark'}`}
             >
-              Enable Smart Docs
+              {isSmartDocsEnabled ? <><FaCheckCircle size={14} /> Smart Docs Active</> : 'Enable Smart Docs'}
             </button>
          </div>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Create New Note Template"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={handleCreateTemplate}>Create Template</Button>
-          </div>
-        }
-      >
-        <div className="space-y-6 p-4">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Template Name</label>
-            <input 
-              type="text" 
-              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-clinicPrimary transition-all"
-              placeholder="e.g., Progress Follow-up"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Category</label>
-            <select 
-              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-clinicPrimary transition-all appearance-none cursor-pointer"
-              value={formData.category}
-              onChange={(e) => setFormData({...formData, category: e.target.value})}
-            >
-              <option value="">Select Category</option>
-              <option value="Physiotherapy">Physiotherapy</option>
-              <option value="Clinical">Clinical</option>
-              <option value="Rehabilitation">Rehabilitation</option>
-              <option value="Prevention">Prevention</option>
-              <option value="Manual Therapy">Manual Therapy</option>
-              <option value="Final">Final</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Description</label>
-            <textarea 
-              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-clinicPrimary transition-all h-32 resize-none"
-              placeholder="List the key components of this template..."
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-            ></textarea>
-          </div>
-        </div>
-      </Modal>
+      {/* Preview Modal Removed per request */}
     </div>
   );
 };

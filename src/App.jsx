@@ -62,6 +62,7 @@ const ClinicManual = lazy(() => import('./pages/ClinicManual'));
 const ClientsInsurers = lazy(() => import('./pages/ClientsInsurers'));
 import RegisterClient from './pages/RegisterClient';
 import ViewNote from './pages/ViewNote';
+import CreateTemplate from './pages/CreateTemplate';
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in duration-500">
@@ -149,6 +150,7 @@ function App() {
               <Route path="notes/new" element={<NewNote />} />
               <Route path="notes/view/:id" element={<ViewNote />} />
               <Route path="notes/templates" element={<NoteTemplates />} />
+              <Route path="notes/templates/new" element={<CreateTemplate />} />
               <Route path="notes/attachments" element={<Attachments />} />
 
               {/* Communication - 5 Pages */}
