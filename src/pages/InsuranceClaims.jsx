@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
-import { FaFileInvoiceDollar, FaCheckCircle, FaExclamationTriangle, FaSearch, FaFilter, FaPlus, FaCloudUploadAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaFileInvoiceDollar, FaSearch, FaHistory, FaPlus, FaCloudUploadAlt } from 'react-icons/fa';
 
 const InsuranceClaims = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [claims, setClaims] = useState([
-    { id: 1, patient: 'Alice Johnson', provider: 'BUPA', code: 'C-20093', date: 'Mar 15, 2026', amount: '$450.00', status: 'Submitted' },
-    { id: 2, patient: 'Bob Smith', provider: 'AXA', code: 'C-20094', date: 'Mar 14, 2026', amount: '$120.00', status: 'Approved' },
-    { id: 3, patient: 'Charlie Brown', provider: 'Vitality', code: 'C-20095', date: 'Mar 12, 2026', amount: '$300.00', status: 'Rejected' },
-    { id: 4, patient: 'Diana Prince', provider: 'BUPA', code: 'C-20096', date: 'Mar 10, 2026', amount: '$85.00', status: 'Approved' },
-  ]);
+  
+  const INITIAL_CLAIMS = [
+    { id: 1, patient: 'Alice Johnson', provider: 'BUPA', code: 'C-20093', date: 'Mar 15, 2026', amount: '$450.00', status: 'Submitted', notes: ['Initial electronic submission successful.'] },
+    { id: 2, patient: 'Bob Smith', provider: 'AXA', code: 'C-20094', date: 'Mar 14, 2026', amount: '$120.00', status: 'Approved', notes: ['Reimbursement verified by provider portal.'] },
+    { id: 3, patient: 'Charlie Brown', provider: 'Vitality', code: 'C-20095', date: 'Mar 12, 2026', amount: '$300.00', status: 'Rejected', notes: ['Missing primary practitioner ID.', 'Sent for manual review.'] },
+    { id: 4, patient: 'Diana Prince', provider: 'BUPA', code: 'C-20096', date: 'Mar 10, 2026', amount: '$85.00', status: 'Approved', notes: [] },
+  ];
+
+  const [claims, setClaims] = useState([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('deephysio_claims') || '[]');
+    if (saved.length > 0) {
+      setClaims(saved);
+    } else {
+      setClaims(INITIAL_CLAIMS);
+      localStorage.setItem('deephysio_claims', JSON.stringify(INITIAL_CLAIMS));
+    }
+  }, []);
+
+  const stats = {
+    submitted: claims.filter(c => c.status === 'Submitted').length,
+    approved: claims.filter(c => c.status === 'Approved').reduce((acc, c) => acc + parseFloat(c.amount.replace('$', '')), 0).toLocaleString(),
+    rejected: claims.filter(c => c.status === 'Rejected').length
+  };
 
   const filteredClaims = claims.filter(claim => {
     const matchesSearch = claim.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -28,10 +49,16 @@ const InsuranceClaims = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "insurance_claims_export.csv");
+    link.setAttribute("download", `insurance_claims_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleResetClaims = () => {
+    localStorage.removeItem('deephysio_claims');
+    setClaims(INITIAL_CLAIMS);
+    alert('Insurance database factory reset successful.');
   };
 
   return (
@@ -40,6 +67,7 @@ const InsuranceClaims = () => {
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Insurance Claims</h1>
           <p className="text-slate-500 font-medium mt-1">Track and manage reimbursement claims with secondary clinical providers.</p>
+          <button onClick={handleResetClaims} className="text-[9px] font-black text-clinicPrimary uppercase tracking-tighter mt-2 opacity-30 hover:opacity-100 transition-opacity">Reset Claims Database</button>
         </div>
         <div className="flex flex-wrap gap-4">
           <button 
@@ -49,7 +77,7 @@ const InsuranceClaims = () => {
             Export XL
           </button>
           <button 
-            onClick={() => alert('Batch processing initialized for 24 pending claims... Connection established with central clearing house.')}
+            onClick={() => navigate('/billing/claims/batch')}
             className="flex items-center gap-3 px-8 py-4 bg-clinicPrimary text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:shadow-google hover:-translate-y-1 transition-all active:scale-95 shadow-lg"
           >
             <FaCloudUploadAlt size={16}/> Submit Batch
@@ -59,11 +87,11 @@ const InsuranceClaims = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
-          { label: 'Submitted Today', value: '12', color: 'blue' },
-          { label: 'Approved (MTD)', value: '$8,420', color: 'emerald' },
-          { label: 'Rejections', value: '04', color: 'rose' }
+          { label: 'Submitted This Period', value: stats.submitted, color: '#3b82f6' },
+          { label: 'Approved (MTD)', value: `$${stats.approved}`, color: '#10b981' },
+          { label: 'Rejections / Disputes', value: stats.rejected.toString().padStart(2, '0'), color: '#f43f5e' }
         ].map((stat, i) => (
-          <div key={i} className={`p-8 bg-white rounded-3xl shadow-premium border-b-4 border-b-${stat.color === 'emerald' ? 'emerald' : stat.color === 'blue' ? 'blue' : 'rose'}-500 hover:-translate-y-1 transition-all`}>
+          <div key={i} className={`p-8 bg-white rounded-3xl shadow-premium border-b-4 hover:-translate-y-1 transition-all`} style={{ borderBottomColor: stat.color }}>
              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</p>
              <p className="text-3xl font-bold text-slate-900 mt-4 tracking-tighter">{stat.value}</p>
           </div>
@@ -77,7 +105,7 @@ const InsuranceClaims = () => {
             <input 
               type="text" 
               placeholder="Search claims by patient, provider or ID..." 
-              className="w-full pl-14 pr-6 py-4 bg-transparent text-[13px] font-bold text-slate-600 outline-none placeholder:text-slate-300" 
+              className="w-full pl-14 pr-6 py-4 bg-transparent text-[13px] font-bold text-slate-600 outline-none placeholder:text-slate-300 transition-all" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -108,7 +136,7 @@ const InsuranceClaims = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredClaims.length > 0 ? filteredClaims.map(claim => (
-                <tr key={claim.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => alert(`Accessing protocol details for ${claim.code}`)}>
+                <tr key={claim.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => navigate(`/billing/claims/view/${claim.id}`)}>
                   <td className="px-8 py-6">
                     <div className="flex flex-col">
                        <p className="text-[15px] font-bold text-slate-900 leading-none tracking-tight group-hover:text-clinicPrimary transition-colors">{claim.patient}</p>
@@ -129,7 +157,10 @@ const InsuranceClaims = () => {
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 group-hover:text-clinicPrimary group-hover:border-clinicPrimary hover:shadow-google transition-all flex items-center justify-center">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); navigate(`/billing/claims/view/${claim.id}`); }}
+                      className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 group-hover:text-clinicPrimary group-hover:border-clinicPrimary hover:shadow-google transition-all flex items-center justify-center ml-auto"
+                    >
                        <FaPlus size={12}/>
                     </button>
                   </td>
