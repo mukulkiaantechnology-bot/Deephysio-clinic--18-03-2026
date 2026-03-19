@@ -202,15 +202,9 @@ const Appointments = () => {
                                          <FaClock size={10} className="text-slate-300"/> {appointment.type} • {appointment.practitioner}
                                       </p>
                                    </div>
-<<<<<<< HEAD
-                                   <div className="flex gap-2 opacity-0 group-hover/booking:opacity-100 transition-opacity">
-                                       <button className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary shadow-soft transition-all active:scale-90" onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${appointment.patientId}`); }}>
-                                         <FaUserMd size={14} className="mx-auto"/>
-=======
                                    <div className="flex gap-2">
-                                       <button className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-clinicPrimary hover:border-clinicPrimary transition-colors cursor-pointer shadow-none" onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}>
-                                         <FaUserMd size={12} className="mx-auto"/>
->>>>>>> 7ce614598f73d2c708d6feb34e4fdebf60b89f02
+                                       <button className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-clinicPrimary hover:border-clinicPrimary transition-colors cursor-pointer shadow-none" onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${appointment.patientId}`); }}>
+                                          <FaUserMd size={12} className="mx-auto"/>
                                       </button>
                                       <button className="w-8 h-8 rounded-lg bg-clinicPrimary text-white shadow-none transition-colors hover:bg-clinicPrimaryDark cursor-pointer" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
                                          <FaCheckCircle size={12} className="mx-auto"/>

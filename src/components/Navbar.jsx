@@ -3,9 +3,19 @@ import { useNavigate } from 'react-router-dom';
 
 import { FaSearch, FaBell, FaEnvelope, FaChevronDown, FaBars, FaEnvelopeOpenText, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
-const Navbar = ({ toggleSidebar, onLogout }) => {
+const Navbar = ({ toggleSidebar, onLogout, userRole }) => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState(null);
+
+  const roleDisplay = {
+    admin: { name: 'Admin', role: 'Administrator', initial: 'A', color: 'from-slate-800 to-slate-900' },
+    therapist: { name: 'Dr. Sarah Wilson', role: 'Therapist', initial: 'SW', color: 'from-clinicPrimary to-clinicPrimary-dark' },
+    receptionist: { name: 'Emma Wilson', role: 'Receptionist', initial: 'EW', color: 'from-emerald-500 to-emerald-600' },
+    billing: { name: 'John Doe', role: 'Billing Staff', initial: 'JD', color: 'from-indigo-500 to-indigo-600' }
+  };
+
+  const currentProfile = roleDisplay[userRole || 'admin'] || roleDisplay.admin;
+
   const togglePanel = (panel) => {
     setActivePanel(activePanel === panel ? null : panel);
   };
@@ -88,11 +98,11 @@ const Navbar = ({ toggleSidebar, onLogout }) => {
         <div className="relative group/profile">
           <div className="flex items-center gap-4 cursor-pointer group p-1.5 rounded-2xl hover:bg-white hover:shadow-premium transition-all">
             <div className="text-right hidden md:block">
-              <p className="text-sm font-bold text-slate-900 leading-none">Kiaan Paras</p>
-              <p className="text-[10px] font-bold text-clinicPrimary uppercase tracking-widest mt-1.5">Lead Practitioner</p>
+              <p className="text-sm font-bold text-slate-900 leading-none">{currentProfile.name}</p>
+              <p className="text-[10px] font-bold text-clinicPrimary uppercase tracking-widest mt-1.5">{currentProfile.role}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark flex items-center justify-center font-bold text-white text-base shadow-lg group-hover:rotate-3 transition-all ring-2 ring-white ring-offset-2 ring-offset-slate-50">
-              KP
+            <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${currentProfile.color} flex items-center justify-center font-bold text-white text-base shadow-lg group-hover:rotate-3 transition-all ring-2 ring-white ring-offset-2 ring-offset-slate-50`}>
+              {currentProfile.initial}
             </div>
           </div>
 

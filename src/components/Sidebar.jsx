@@ -151,6 +151,15 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
   const allowedMenus = roleMenuAccess[userRole] || roleMenuAccess['admin'];
   const filteredMenuItems = menuItems.filter(item => allowedMenus.includes(item.name));
 
+  const roleDisplay = {
+    admin: { name: 'Admin', role: 'Administrator', initial: 'A', color: 'from-slate-800 to-slate-900' },
+    therapist: { name: 'Dr. Sarah Wilson', role: 'Therapist', initial: 'SW', color: 'from-clinicPrimary to-clinicPrimary-dark' },
+    receptionist: { name: 'Emma Wilson', role: 'Receptionist', initial: 'EW', color: 'from-emerald-500 to-emerald-600' },
+    billing: { name: 'John Doe', role: 'Billing Staff', initial: 'JD', color: 'from-indigo-500 to-indigo-600' }
+  };
+
+  const currentProfile = roleDisplay[userRole || 'admin'] || roleDisplay.admin;
+
   // Auto-expand parent menu if a sub-item is active
   useEffect(() => {
     const currentPath = location.pathname;
@@ -307,14 +316,14 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
         isOpen ? "h-auto opacity-100" : "h-0 opacity-0 overflow-hidden"
       )}>
         <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-110 transition-transform">
-            KP
+          <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${currentProfile.color} flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-110 transition-all duration-300`}>
+            {currentProfile.initial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate text-white uppercase tracking-tight">Kiaan Paras</p>
+            <p className="text-sm font-bold truncate text-white uppercase tracking-tight">{currentProfile.name}</p>
             <div className="flex items-center gap-2 mt-1">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Practitioner</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">{currentProfile.role}</p>
             </div>
           </div>
           <button

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FaGoogle, FaStripe, FaPaypal, FaMicrosoft, FaCheckCircle, FaExclamationTriangle, FaHistory, FaPlus, FaLink, FaDatabase, FaShieldAlt } from 'react-icons/fa';
+import { FaGoogle, FaStripe, FaPaypal, FaMicrosoft, FaCheckCircle, FaExclamationTriangle, FaHistory, FaPlus, FaLink, FaDatabase, FaShieldAlt, FaChevronRight } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import Modal from '../components/ui/Modal';
 
 const Integrations = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

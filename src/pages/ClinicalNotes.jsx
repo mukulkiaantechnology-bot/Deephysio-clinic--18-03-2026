@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   FaPlus, FaHistory, FaSearch, FaFileMedical, FaChevronRight, 
   FaStickyNote, FaClipboardList, FaStethoscope, FaFlask, FaChartLine,
-  FaFileInvoice, FaNotesMedical, FaCheckCircle
+  FaFileInvoice, FaNotesMedical, FaCheckCircle, FaRunning
 } from 'react-icons/fa';
 
 import Button from '../components/ui/Button';
