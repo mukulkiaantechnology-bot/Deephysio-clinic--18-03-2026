@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaPlus, FaHistory, FaSearch, FaFileMedical, FaChevronRight, FaStickyNote, FaClipboardList, FaStethoscope } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Modal from '../components/ui/Modal';
 
 const INITIAL_NOTES = [
   { id: 1, patientName: 'James Wilson', type: 'Physio Note', date: '2026-03-14', time: '10:30 AM', content: 'Demonstrated significant improvement in knee stability during weight-bearing exercises. Assessment confirms 12% increase in flexion gradient...', category: 'Physio' },
@@ -13,7 +13,7 @@ const INITIAL_NOTES = [
 ];
 
 const ClinicalNotes = () => {
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [selectedNote, setSelectedNote] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,19 +40,17 @@ const ClinicalNotes = () => {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      if (isNoteModalOpen) return;
       if (e.key === 'ArrowDown') {
         setActiveIndex(prev => Math.min(prev + 1, currentNotes.length - 1));
       } else if (e.key === 'ArrowUp') {
         setActiveIndex(prev => Math.max(prev - 1, 0));
       } else if (e.key === 'Enter' && activeIndex !== -1) {
-        setSelectedNote(currentNotes[activeIndex]);
-        setIsNoteModalOpen(true);
+        navigate(`/notes/view/${currentNotes[activeIndex].id}`);
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [currentNotes, activeIndex, isNoteModalOpen]);
+  }, [currentNotes, activeIndex, navigate]);
 
   const handleExportXL = () => {
     const csvRows = [
@@ -104,7 +102,7 @@ const ClinicalNotes = () => {
             variant="accent" 
             size="lg"
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-lg active:scale-95 transition-all"
-            onClick={() => { setSelectedNote(null); setNoteText(''); setIsNoteModalOpen(true); }}
+            onClick={() => navigate('/notes/new')}
             leftIcon={<FaStickyNote size={12}/>}
           >
             New Note
@@ -112,79 +110,6 @@ const ClinicalNotes = () => {
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
-
-      <Modal 
-        isOpen={isNoteModalOpen} 
-        onClose={() => setIsNoteModalOpen(false)}
-        title={selectedNote ? `Review: ${selectedNote.patientName}` : "New Clinical Observation"}
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => { setIsNoteModalOpen(false); }}>Discard Draft</Button>
-            <Button variant="accent" onClick={() => {
-              if (!noteText) return;
-              const newNote = {
-                id: Date.now(),
-                patientName: document.getElementById('patient-select')?.value || 'James Wilson',
-                date: new Date().toISOString().split('T')[0],
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                content: noteText,
-                category: 'Physio Note'
-              };
-              const existingNotes = JSON.parse(localStorage.getItem('deephysio_clinical_notes') || '[]');
-              const updatedNotes = [newNote, ...existingNotes];
-              localStorage.setItem('deephysio_clinical_notes', JSON.stringify(updatedNotes));
-              setNotes([...updatedNotes, ...INITIAL_NOTES]);
-              setIsNoteModalOpen(false);
-              setNoteText('');
-            }} leftIcon={<FaPlus />}>Finalize & Save</Button>
-          </div>
-        }
-      >
-        <div className="space-y-8 p-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Patient Subject</label>
-              <select id="patient-select" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer">
-                {selectedNote ? <option>{selectedNote.patientName}</option> : (
-                  <>
-                    <option value="James Wilson">James Wilson (PID-102)</option>
-                    <option value="Emily Brown">Emily Brown (PID-205)</option>
-                    <option value="Alice Johnson">Alice Johnson (PID-101)</option>
-                  </>
-                )}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Attending Clinician</label>
-              <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-400 outline-none" value="Dr. Sarah Smith (Senior Physio)" readOnly />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">Primary Clinical Content</label>
-            <textarea 
-              ref={textareaRef}
-              className="w-full p-5 bg-slate-50 border border-slate-200 rounded-3xl text-[13px] font-medium text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all h-48 custom-scrollbar placeholder:text-slate-300" 
-              placeholder="Describe clinical findings, diagnostic impressions, and treatment progress..."
-              value={selectedNote ? selectedNote.content : noteText}
-              onChange={(e) => setNoteText(e.target.value)}
-            ></textarea>
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-4 block leading-none">Quick Integration Tokens</label>
-            <div className="flex flex-wrap gap-2.5">
-              {['ROM Evaluation', 'Mobilization Stage', 'Pain Scale (1-10)', 'Home Care Plan', 'Gait Analysis'].map(tag => (
-                <span 
-                  key={tag} 
-                  onClick={() => addToken(tag)}
-                  className="px-4 py-2 bg-white border border-slate-100 text-clinicPrimary rounded-xl text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:bg-clinicPrimary hover:text-white hover:shadow-google hover:-translate-y-0.5 transition-all shadow-sm active:scale-95"
-                >
-                  + {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Modal>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-8 space-y-8">
@@ -212,7 +137,7 @@ const ClinicalNotes = () => {
                 <div 
                   key={note.id} 
                   className={`p-6 sm:p-10 hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer flex items-center justify-between border-l-4 gap-4 ${activeIndex === index ? 'bg-slate-50 border-clinicPrimary' : 'border-transparent'}`}
-                  onClick={() => { setSelectedNote(note); setIsNoteModalOpen(true); }}
+                  onClick={() => navigate(`/notes/view/${note.id}`)}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
@@ -234,6 +159,11 @@ const ClinicalNotes = () => {
                     </div>
                   </div>
                   <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/notes/view/${note.id}`);
+                    }}
+                    title="Review Clinical Note"
                     className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-white hover:bg-clinicPrimary hover:shadow-google hover:scale-110 transition-all flex items-center justify-center flex-shrink-0 active:scale-95 ${activeIndex === index ? 'bg-clinicPrimary text-white shadow-google scale-110' : ''}`}
                   >
                     <FaChevronRight size={12} />
@@ -303,7 +233,7 @@ const ClinicalNotes = () => {
               {['Initial Assessment', 'Physio Evolution', 'Discharge Summary', 'Critical Care Note'].map((template) => (
                 <button 
                   key={template} 
-                  onClick={() => setIsNoteModalOpen(true)}
+                  onClick={() => navigate('/notes/new')}
                   className="w-full text-left p-5 rounded-2xl border border-slate-100 bg-slate-50/40 hover:bg-white hover:border-clinicPrimary hover:shadow-google transition-all duration-300 group flex items-center justify-between active:scale-95"
                 >
                   <div>
