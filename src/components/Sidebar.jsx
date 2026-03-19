@@ -59,8 +59,10 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       icon: <FaComments className="text-cyan-400" />, 
       path: '/communication',
       subItems: [
-        { name: 'WhatsApp Chat', path: '/communication' },
+        { name: 'SMS Chat', path: '/communication/sms' },
         { name: 'Email Messages', path: '/communication/email' },
+        { name: 'Bulk Messaging', path: '/communication/bulk' },
+        { name: 'Telehealth', path: '/communication/telehealth' },
         { name: 'Templates', path: '/communication/templates' },
       ]
     },
@@ -142,10 +144,10 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
   ];
 
   const roleMenuAccess = {
-    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing & Payments', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
+    admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
     therapist: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Forms', 'Communication'],
     receptionist: ['Dashboard', 'Appointments', 'Patients', 'Forms', 'Communication'],
-    billing: ['Dashboard', 'Patients', 'Billing & Payments', 'Analytics']
+    billing: ['Dashboard', 'Patients', 'Billing', 'Analytics']
   };
 
   const allowedMenus = roleMenuAccess[userRole] || roleMenuAccess['admin'];

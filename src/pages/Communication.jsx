@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaPlus, FaSearch, FaChevronRight, FaPhoneAlt, FaEnvelope, FaVideo, FaCommentAlt, FaPaperPlane, FaWhatsapp, FaInfoCircle, FaRegClock } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
 const Communication = () => {
-  const [activeTab, setActiveTab] = useState('whatsapp');
+  const [activeTab, setActiveTab] = useState('sms');
   const [isCommModalOpen, setIsCommModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeThreadId, setActiveThreadId] = useState(1);
   const [messageText, setMessageText] = useState('');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
-  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const [callType, setCallType] = useState('audio'); // 'audio' or 'video'
-  const [callStatus, setCallStatus] = useState('Calling'); // 'Calling', 'Connecting', 'Connected'
-  const [callTime, setCallTime] = useState(0);
 
   const [conversations, setConversations] = useState([
     { id: 1, name: 'James Wilson', initial: 'JW', lastMsg: 'Protocol evaluated.', time: '10:45 AM', status: 'active', unread: false },
@@ -27,42 +23,6 @@ const Communication = () => {
     { id: 1, sender: 'James Wilson', initial: 'JW', text: "Subject: Protocol Authentication. Just confirming tomorrow's evaluation window at 10:00 AM clinical time. Is the station authenticated?", time: '10:42 AM', isMe: false },
     { id: 2, sender: 'You', initial: 'KP', text: "Access Granted James. Protocol window 10:00-11:00 is authenticated. Your progression data has been synchronized for validation.", time: '10:45 AM', isMe: true },
   ]);
-
-  useEffect(() => {
-    let timer;
-    if (isCallModalOpen) {
-      if (callStatus === 'Calling') {
-        timer = setTimeout(() => setCallStatus('Connecting'), 1500);
-      } else if (callStatus === 'Connecting') {
-        timer = setTimeout(() => setCallStatus('Connected'), 2000);
-      } else if (callStatus === 'Connected') {
-        timer = setInterval(() => setCallTime(prev => prev + 1), 1000);
-      }
-    }
-    return () => {
-      clearTimeout(timer);
-      clearInterval(timer);
-    };
-  }, [isCallModalOpen, callStatus]);
-
-  const startCall = (type) => {
-    setCallType(type);
-    setCallStatus('Calling');
-    setCallTime(0);
-    setIsCallModalOpen(true);
-  };
-
-  const endCall = () => {
-    setIsCallModalOpen(false);
-    setCallStatus('Calling');
-    setCallTime(0);
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
@@ -102,8 +62,10 @@ const Communication = () => {
         </div>
         <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 relative z-10 shadow-inner-soft">
           {[
+            { id: 'sms', icon: <FaCommentAlt />, label: 'SMS' },
             { id: 'whatsapp', icon: <FaWhatsapp />, label: 'WhatsApp' },
-            { id: 'email', icon: <FaEnvelope />, label: 'Email' }
+            { id: 'email', icon: <FaEnvelope />, label: 'Email' },
+            { id: 'telehealth', icon: <FaVideo />, label: 'Telehealth' }
           ].map(tab => (
             <button 
               key={tab.id}
@@ -229,9 +191,9 @@ const Communication = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={() => startCall('audio')} variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all active:scale-95"><FaPhoneAlt size={16}/></Button>
-              <Button onClick={() => startCall('video')} variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all active:scale-95"><FaVideo size={16}/></Button>
-              <Button onClick={() => alert('Viewing patient communication insights...')} variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all active:scale-95"><FaInfoCircle size={16}/></Button>
+              <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaPhoneAlt size={16}/></Button>
+              <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaVideo size={16}/></Button>
+              <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaInfoCircle size={16}/></Button>
             </div>
           </div>
 
@@ -285,84 +247,6 @@ const Communication = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[60px] pointer-events-none opacity-50"></div>
         </Card>
       </div>
-
-      <Modal
-        isOpen={isCallModalOpen}
-        onClose={endCall}
-        title={`${callType === 'video' ? 'Video' : 'Audio'} Call: ${activeThread.name}`}
-        footer={
-          <div className="flex justify-center w-full">
-            <Button variant="accent" className="bg-rose-500 hover:bg-rose-600 rounded-2xl px-12 py-4 h-auto shadow-lg shadow-rose-200" onClick={endCall}>End Call Session</Button>
-          </div>
-        }
-      >
-        <div className="flex flex-col items-center justify-center p-8 space-y-8 min-h-[400px]">
-          <div className="relative">
-            <div className={`w-32 h-32 rounded-[40px] bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark flex items-center justify-center text-white text-4xl font-bold shadow-2xl relative z-10 ${callStatus === 'Calling' ? 'animate-bounce' : ''}`}>
-              {activeThread.initial}
-            </div>
-            {callStatus === 'Calling' && (
-              <>
-                <div className="absolute top-0 left-0 w-32 h-32 bg-clinicPrimary/20 rounded-[40px] animate-ping"></div>
-                <div className="absolute top-0 left-0 w-32 h-32 bg-clinicPrimary/10 rounded-[40px] animate-pulse scale-110"></div>
-              </>
-            )}
-            {callStatus === 'Connected' && callType === 'audio' && (
-              <div className="absolute -inset-4 bg-clinicPrimary/5 rounded-[48px] animate-pulse"></div>
-            )}
-          </div>
-
-          <div className="text-center space-y-2">
-            <p className="text-2xl font-black text-slate-900 tracking-tight">{activeThread.name}</p>
-            <div className="flex flex-col items-center">
-              <p className={`text-base font-bold uppercase tracking-widest ${callStatus === 'Connected' ? 'text-emerald-500' : 'text-slate-400'}`}>
-                {callStatus === 'Connected' ? formatTime(callTime) : callStatus}
-              </p>
-              {callStatus !== 'Connected' && <div className="flex gap-1 mt-2">
-                <div className="w-1.5 h-1.5 bg-clinicPrimary rounded-full animate-bounce delay-100"></div>
-                <div className="w-1.5 h-1.5 bg-clinicPrimary rounded-full animate-bounce delay-200"></div>
-                <div className="w-1.5 h-1.5 bg-clinicPrimary rounded-full animate-bounce delay-300"></div>
-              </div>}
-            </div>
-          </div>
-
-          {callType === 'video' && callStatus === 'Connected' ? (
-            <div className="w-full aspect-video bg-slate-900 rounded-3xl overflow-hidden relative shadow-2xl border-4 border-white">
-              <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                <FaVideo size={64} className="animate-pulse" />
-              </div>
-              <div className="absolute bottom-6 right-6 w-32 h-24 bg-slate-800 rounded-2xl border-2 border-white/20 shadow-lg flex items-center justify-center text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                You
-              </div>
-              <div className="absolute top-6 left-6 px-4 py-2 bg-black/40 backdrop-blur-md rounded-xl text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></div>
-                Live 1080p
-              </div>
-            </div>
-          ) : callType === 'audio' && callStatus === 'Connected' ? (
-            <div className="flex items-center gap-12 py-8">
-               <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-clinicPrimary hover:bg-white hover:shadow-premium transition-all cursor-pointer border border-slate-100">
-                    <FaPlus size={18} />
-                  </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add</p>
-               </div>
-               <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-clinicPrimary/10 text-clinicPrimary flex items-center justify-center shadow-soft border border-clinicPrimary/20">
-                    <FaPhoneAlt size={18} />
-                  </div>
-                  <p className="text-[10px] font-bold text-clinicPrimary uppercase tracking-widest">Audio</p>
-               </div>
-               <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-clinicPrimary hover:bg-white hover:shadow-premium transition-all cursor-pointer border border-slate-100">
-                    <FaPlus size={18} className="rotate-45" />
-                  </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hold</p>
-               </div>
-            </div>
-          ) : null}
-        </div>
-      </Modal>
     </div>
   );
 };
