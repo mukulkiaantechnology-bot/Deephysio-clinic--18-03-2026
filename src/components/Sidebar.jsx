@@ -59,10 +59,8 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       icon: <FaComments className="text-cyan-400" />, 
       path: '/communication',
       subItems: [
-        { name: 'SMS Chat', path: '/communication/sms' },
+        { name: 'WhatsApp Chat', path: '/communication' },
         { name: 'Email Messages', path: '/communication/email' },
-        { name: 'Bulk Messaging', path: '/communication/bulk' },
-        { name: 'Telehealth', path: '/communication/telehealth' },
         { name: 'Templates', path: '/communication/templates' },
       ]
     },

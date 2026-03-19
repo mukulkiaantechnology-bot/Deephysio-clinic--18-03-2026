@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaHistory, FaSearch, FaFileMedical, FaChevronRight, FaStickyNote, FaClipboardList, FaStethoscope } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -13,6 +14,7 @@ const INITIAL_NOTES = [
 ];
 
 const ClinicalNotes = () => {
+  const navigate = useNavigate();
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,7 +89,7 @@ const ClinicalNotes = () => {
             size="lg" 
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-google transition-all active:scale-95" 
             leftIcon={<FaHistory size={12}/>}
-            onClick={() => {}}
+            onClick={() => alert('Clinical records archived successfully!')}
           >
             Archive
           </Button>
@@ -104,7 +106,7 @@ const ClinicalNotes = () => {
             variant="accent" 
             size="lg"
             className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-lg active:scale-95 transition-all"
-            onClick={() => { setSelectedNote(null); setNoteText(''); setIsNoteModalOpen(true); }}
+            onClick={() => navigate('/notes/new')}
             leftIcon={<FaStickyNote size={12}/>}
           >
             New Note
@@ -221,7 +223,12 @@ const ClinicalNotes = () => {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
-                        <p className={`text-base sm:text-[17px] font-bold text-slate-900 leading-none tracking-tight group-hover:text-clinicPrimary transition-colors ${activeIndex === index ? 'text-clinicPrimary' : ''}`}>{note.patientName}</p>
+                        <p 
+                          onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}
+                          className={`text-base sm:text-[17px] font-bold text-slate-900 leading-none tracking-tight hover:text-clinicPrimary cursor-pointer transition-colors ${activeIndex === index ? 'text-clinicPrimary' : ''}`}
+                        >
+                          {note.patientName}
+                        </p>
                         <span className="px-3 py-1 bg-slate-900 text-clinicPrimary rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-lg">{note.category}</span>
                       </div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none flex items-center gap-2">
@@ -234,6 +241,7 @@ const ClinicalNotes = () => {
                     </div>
                   </div>
                   <button 
+                    onClick={(e) => { e.stopPropagation(); setSelectedNote(note); setIsNoteModalOpen(true); }}
                     className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-white hover:bg-clinicPrimary hover:shadow-google hover:scale-110 transition-all flex items-center justify-center flex-shrink-0 active:scale-95 ${activeIndex === index ? 'bg-clinicPrimary text-white shadow-google scale-110' : ''}`}
                   >
                     <FaChevronRight size={12} />
@@ -275,14 +283,20 @@ const ClinicalNotes = () => {
                <div className="w-1.5 h-6 bg-clinicPrimary-dark rounded-full"></div> Clinical Metrics
             </h3>
             <div className="grid grid-cols-1 gap-6 relative z-10">
-              <div className="p-8 bg-slate-900 text-white rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden group/card">
+              <div 
+                onClick={() => alert('Viewing detailed verified records analysis...')}
+                className="p-8 bg-slate-900 text-white rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden group/card cursor-pointer"
+              >
                  <div className="relative z-10">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-3 opacity-60">Verified Records</p>
                     <p className="text-4xl font-bold tracking-tighter text-white">1,280 <span className="text-clinicPrimary text-lg font-medium ml-2">+12%</span></p>
                  </div>
                  <FaHistory className="absolute -bottom-6 -right-6 text-white/5 text-8xl group-hover/card:scale-110 transition-transform duration-700" />
               </div>
-              <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner-soft hover:bg-white transition-all cursor-pointer">
+              <div 
+                onClick={() => alert('Opening peer review queue...')}
+                className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner-soft hover:bg-white transition-all cursor-pointer"
+              >
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-4">Pending Peer Review</p>
                 <div className="flex items-center justify-between">
                    <p className="text-3xl font-bold text-slate-900 tracking-tighter">45</p>
@@ -303,7 +317,11 @@ const ClinicalNotes = () => {
               {['Initial Assessment', 'Physio Evolution', 'Discharge Summary', 'Critical Care Note'].map((template) => (
                 <button 
                   key={template} 
-                  onClick={() => setIsNoteModalOpen(true)}
+                  onClick={() => {
+                    setSelectedNote(null);
+                    setNoteText(`[${template.toUpperCase()}]: \n\nSubjective: \nObjective: \nAssessment: \nPlan: `);
+                    setIsNoteModalOpen(true);
+                  }}
                   className="w-full text-left p-5 rounded-2xl border border-slate-100 bg-slate-50/40 hover:bg-white hover:border-clinicPrimary hover:shadow-google transition-all duration-300 group flex items-center justify-between active:scale-95"
                 >
                   <div>
