@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChartBar, FaCalendarCheck, FaUserPlus, FaUsers, FaArrowUp, FaArrowDown, FaCalendarAlt, FaBullseye, FaLayerGroup, FaHistory, FaFilter, FaDownload, FaMicroscope, FaBrain, FaSync } from 'react-icons/fa';
+import { FaChartBar, FaCalendarCheck, FaUserPlus, FaUsers, FaArrowUp, FaArrowDown, FaCalendarAlt, FaBullseye, FaLayerGroup, FaHistory, FaFilter, FaDownload, FaMicroscope, FaBrain, FaSync, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, Cell
@@ -21,21 +21,51 @@ const PatientGrowth = () => {
   const [timeRange, setTimeRange] = useState('6months');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [toast, setToast] = useState({ message: '', visible: false, type: 'success' });
+  const [activeFilters, setActiveFilters] = useState({ organic: true, referral: true, repeat: true });
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ message: msg, visible: true, type });
+    setTimeout(() => setToast({ message: '', visible: false, type: 'success' }), 3000);
+  };
 
   const handleAction = (action) => {
-    alert(`Growth Intelligence: Initiating "${action}" for Patient Acquisition Node. System diagnostic verified.`);
+    showToast(`Initiating "${action}" for Patient Acquisition Node.`);
   };
 
   const runDiagnosticSync = () => {
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
-      alert('Growth Synchronized: 1,204 new patient nodes verified against clinical acquisition logic.');
+      showToast('Growth Synchronized: 1,204 new patient nodes verified against clinical acquisition logic.');
     }, 2000);
   };
 
+  const toggleFilter = (key) => {
+    setActiveFilters(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleAuthorize = () => {
+    setIsAuthorizing(true);
+    setTimeout(() => {
+      setIsAuthorizing(false);
+      showToast('Re-engagement logic authorized for 24 high-risk nodes.');
+    }, 1500);
+  };
+
   return (
-    <div className="space-y-10 p-6 md:p-10 animate-fade-in custom-scrollbar font-sans">
+    <div className="space-y-10 p-6 md:p-10 animate-fade-in custom-scrollbar font-sans relative">
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" />
+            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Growth & Retention Lab</h1>
@@ -57,7 +87,7 @@ const PatientGrowth = () => {
           { label: 'Retention Rate', value: '72%', delta: 'Target 80%', icon: <FaBullseye />, color: 'indigo', p: 72 },
           { label: 'Avg Life Value', value: '£1,850', delta: '+4% Δ', icon: <FaLayerGroup />, color: 'amber', sub: 'Aggregated Yield' }
         ].map((stat, i) => (
-          <Card key={i} className="p-8 border-none shadow-premium bg-white group hover:-translate-y-1 transition-all rounded-[32px] cursor-pointer" onClick={() => handleAction('Specific Growth Metric Audit')}>
+          <Card key={i} className="p-8 border-none shadow-premium bg-white group hover:-translate-y-1 transition-all rounded-[32px] cursor-pointer" onClick={() => handleAction(`${stat.label} Metric Audit`)}>
              <div className="flex justify-between items-start mb-6">
                 <div className={`w-12 h-12 rounded-2xl bg-${stat.color}-50 text-${stat.color}-500 flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform`}>
                    {React.cloneElement(stat.icon, { size: 20 })}
@@ -88,11 +118,11 @@ const PatientGrowth = () => {
               </div>
               <div className="flex items-center gap-6 bg-slate-50/50 p-5 rounded-[32px] border border-slate-100 shadow-inner-soft">
                  {[
-                   { label: 'Organic', color: '#3B82F6' },
-                   { label: 'Referral', color: '#F59E0B' },
-                   { label: 'Repeat', color: '#8B5CF6' }
+                   { id: 'organic', label: 'Organic', color: '#3B82F6' },
+                   { id: 'referral', label: 'Referral', color: '#F59E0B' },
+                   { id: 'repeat', label: 'Repeat', color: '#8B5CF6' }
                  ].map(source => (
-                   <div key={source.label} className="flex items-center gap-3 cursor-pointer group/node" onClick={() => handleAction(`Filter acquisition: ${source.label}`)}>
+                   <div key={source.id} className={`flex items-center gap-3 cursor-pointer group/node transition-opacity ${activeFilters[source.id] ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`} onClick={() => toggleFilter(source.id)}>
                       <div className="w-3 h-3 rounded-full group-hover/node:scale-150 transition-transform shadow-lg" style={{ backgroundColor: source.color }}></div>
                       <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">{source.label}</span>
                    </div>
@@ -110,9 +140,9 @@ const PatientGrowth = () => {
                     cursor={{ stroke: '#3B82F6', strokeWidth: 2, strokeDasharray: '5 5' }}
                     contentStyle={{ borderRadius: '32px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', background: 'rgba(255, 255, 255, 0.98)', backdropFilter: 'blur(10px)', padding: '24px' }}
                   />
-                  <Area type="monotone" dataKey="organic" stackId="1" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Organic Acquisition: ${data.organic}`)} />
-                  <Area type="monotone" dataKey="referral" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Referral Acquisition: ${data.referral}`)} />
-                  <Area type="monotone" dataKey="repeat" stackId="1" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Repeat Acquisition: ${data.repeat}`)} />
+                  {activeFilters.organic && <Area type="monotone" dataKey="organic" stackId="1" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Organic Point: ${data.organic}`)} />}
+                  {activeFilters.referral && <Area type="monotone" dataKey="referral" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Referral Point: ${data.referral}`)} />}
+                  {activeFilters.repeat && <Area type="monotone" dataKey="repeat" stackId="1" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.08} strokeWidth={4} activeDot={{ r: 8, strokeWidth: 0 }} className="cursor-pointer" onClick={(data) => handleAction(`Repeat Point: ${data.repeat}`)} />}
                 </AreaChart>
               </ResponsiveContainer>
            </div>
@@ -145,7 +175,7 @@ const PatientGrowth = () => {
               <p className="text-[14px] font-bold text-slate-300 leading-relaxed italic opacity-80">
                  "Automated re-engagement protocols are currently targeting 24 high-risk patient nodes."
               </p>
-              <Button variant="accent" className="w-full mt-6 h-12 rounded-2xl opacity-0 group-hover:opacity-100 transition-all font-black uppercase tracking-widest text-[10px]" onClick={() => handleAction('Execute Re-engagement Logic')}>Authorize Protocol</Button>
+              <Button variant="accent" isLoading={isAuthorizing} className="w-full mt-6 h-12 rounded-2xl opacity-0 group-hover:opacity-100 transition-all font-black uppercase tracking-widest text-[10px]" onClick={handleAuthorize}>{isAuthorizing ? 'Authorizing...' : 'Authorize Protocol'}</Button>
            </div>
            <div className="absolute -top-20 -left-20 w-40 h-40 bg-clinicPrimary/10 rounded-full blur-[60px] pointer-events-none group-hover:bg-clinicPrimary/20 transition-all duration-1000"></div>
         </Card>
@@ -158,7 +188,7 @@ const PatientGrowth = () => {
         footer={
           <div className="flex gap-4 justify-end w-full px-2">
             <Button variant="secondary" onClick={() => setIsAuditModalOpen(false)}>Close Registry</Button>
-            <Button variant="accent" onClick={() => handleAction('Historical Data Download')} leftIcon={<FaDownload />}>Export Historical Ledger</Button>
+            <Button variant="accent" onClick={() => handleAction('Historical Data Download Export')} leftIcon={<FaDownload />}>Export Historical Ledger</Button>
           </div>
         }
       >
