@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { FaFileInvoiceDollar, FaCheckCircle, FaClock, FaExclamationCircle, FaSearch, FaFilter, FaDownload, FaPlus, FaArrowRight } from 'react-icons/fa';
-import Button, { cn } from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaFileInvoiceDollar, FaSearch, FaDownload, FaPlus, FaArrowRight, FaExclamationCircle } from 'react-icons/fa';
 
 const Payments = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [transactions, setTransactions] = useState([
-    { id: 'INV-001', patient: 'Alice Johnson', date: 'Mar 16, 2026', amount: '$85.00', status: 'Paid', method: 'Visa •• 4242' },
-    { id: 'INV-002', patient: 'Bob Smith', date: 'Mar 15, 2026', amount: '$120.00', status: 'Pending', method: 'Direct Deposit' },
-    { id: 'INV-003', patient: 'Charlie Brown', date: 'Mar 14, 2026', amount: '$65.00', status: 'Paid', method: 'Cash' },
-    { id: 'INV-004', patient: 'Diana Prince', date: 'Mar 14, 2026', amount: '$95.00', status: 'Failed', method: 'Mastercard •• 8888' },
-  ]);
+  
+  const INITIAL_TRANSACTIONS = [
+    { id: 'INV-001', patient: 'Alice Johnson', date: 'Mar 16, 2026', amount: '$85.00', status: 'Paid', method: 'Visa •• 4242', description: 'General Consultation & Physiotherapy Session' },
+    { id: 'INV-002', patient: 'Bob Smith', date: 'Mar 15, 2026', amount: '$120.00', status: 'Pending', method: 'Direct Deposit', description: 'Advanced Neural Assessment' },
+    { id: 'INV-003', patient: 'Charlie Brown', date: 'Mar 14, 2026', amount: '$65.00', status: 'Paid', method: 'Cash', description: 'Follow-up Treatment' },
+    { id: 'INV-004', patient: 'Diana Prince', date: 'Mar 14, 2026', amount: '$95.00', status: 'Failed', method: 'Mastercard •• 8888', description: 'Sports Injury Therapy' },
+  ];
+
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('deephysio_payments') || '[]');
+    if (saved.length > 0) {
+      setTransactions(saved);
+    } else {
+      setTransactions(INITIAL_TRANSACTIONS);
+      localStorage.setItem('deephysio_payments', JSON.stringify(INITIAL_TRANSACTIONS));
+    }
+  }, []);
+
+  const stats = {
+    outstanding: transactions.filter(t => t.status !== 'Paid').reduce((acc, t) => acc + parseFloat(t.amount.replace('$', '')), 0).toLocaleString(),
+    collected: transactions.filter(t => t.status === 'Paid').reduce((acc, t) => acc + parseFloat(t.amount.replace('$', '')), 0).toLocaleString()
+  };
 
   const filteredTransactions = transactions.filter(t => {
     const matchesSearch = t.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -35,6 +53,19 @@ const Payments = () => {
     document.body.removeChild(link);
   };
 
+  const handleDeletePayment = (id) => {
+    if (!window.confirm('Erase this financial transaction? Records will be permanently deleted.')) return;
+    const updated = transactions.filter(t => t.id !== id);
+    setTransactions(updated);
+    localStorage.setItem('deephysio_payments', JSON.stringify(updated));
+  };
+
+  const handleResetLedger = () => {
+    localStorage.removeItem('deephysio_payments');
+    setTransactions(INITIAL_TRANSACTIONS);
+    alert('Ledger factory reset successful. Default data restored.');
+  };
+
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Paid': return 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-sm';
@@ -50,6 +81,7 @@ const Payments = () => {
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Payments & Billing</h1>
           <p className="text-slate-500 font-medium mt-1">Track clinic revenue, insurance reimbursements, and patient invoicing history.</p>
+          <button onClick={handleResetLedger} className="text-[9px] font-black text-clinicPrimary uppercase tracking-tighter mt-2 opacity-30 hover:opacity-100 transition-opacity">Reset Payment Ledger</button>
         </div>
         <div className="flex flex-wrap gap-4">
           <button 
@@ -59,7 +91,7 @@ const Payments = () => {
             <FaDownload size={14}/> Export CSV
           </button>
           <button 
-            onClick={() => alert('Secure Payment Interface: Initializing PCI-DSS protocol...')}
+            onClick={() => navigate('/billing/payments/record')}
             className="flex items-center gap-3 px-8 py-4 bg-clinicPrimary text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:shadow-google hover:-translate-y-1 transition-all active:scale-95 shadow-lg"
           >
             <FaPlus size={14}/> Record Payment
@@ -71,7 +103,7 @@ const Payments = () => {
         <div className="p-8 bg-gradient-to-br from-clinicPrimary to-[#2EA7B8] text-white rounded-[32px] border-none shadow-premium relative overflow-hidden group">
           <div className="relative z-10">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-4">Total Outstanding</p>
-            <h2 className="text-4xl font-bold leading-none tracking-tighter">$4,240.50</h2>
+            <h2 className="text-4xl font-bold leading-none tracking-tighter">${stats.outstanding}</h2>
             <div className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase bg-white/15 w-fit px-4 py-2 rounded-xl backdrop-blur-md border border-white/10">
               <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
               12 Overdue Items
@@ -82,7 +114,7 @@ const Payments = () => {
         
         <div className="p-8 bg-white rounded-[32px] shadow-premium border border-slate-50 hover:-translate-y-1 transition-all">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Collected (MTD)</p>
-          <h2 className="text-3xl font-bold text-slate-900 leading-none tracking-tighter">$18,850.00</h2>
+          <h2 className="text-3xl font-bold text-slate-900 leading-none tracking-tighter">${stats.collected}</h2>
           <p className="mt-6 text-[11px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2">
             <span className="p-1 bg-emerald-50 rounded-lg">↑ 12.4%</span> vs last month
           </p>
@@ -135,7 +167,7 @@ const Payments = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredTransactions.length > 0 ? filteredTransactions.map(t => (
-                <tr key={t.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => alert(`Reviewing Invoice: ${t.id}`)}>
+                <tr key={t.id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => navigate(`/billing/payments/view/${t.id}`)}>
                   <td className="px-8 py-6 font-black text-clinicPrimary group-hover:scale-105 origin-left transition-transform text-sm">{t.id}</td>
                   <td className="px-8 py-6">
                     <div className="flex flex-col">
@@ -151,9 +183,20 @@ const Payments = () => {
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 group-hover:text-clinicPrimary group-hover:border-clinicPrimary hover:shadow-google transition-all flex items-center justify-center ml-auto">
-                       <FaArrowRight size={12}/>
-                    </button>
+                    <div className="flex items-center gap-2 justify-end">
+                       <button 
+                          onClick={(e) => { e.stopPropagation(); handleDeletePayment(t.id); }}
+                          className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-300 hover:text-rose-500 hover:border-rose-200 transition-all flex items-center justify-center"
+                       >
+                          <FaExclamationCircle size={10}/>
+                       </button>
+                       <button 
+                          onClick={(e) => { e.stopPropagation(); navigate(`/billing/payments/view/${t.id}`); }}
+                          className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-300 group-hover:text-clinicPrimary group-hover:border-clinicPrimary hover:shadow-google transition-all flex items-center justify-center"
+                       >
+                          <FaArrowRight size={12}/>
+                       </button>
+                    </div>
                   </td>
                 </tr>
               )) : (

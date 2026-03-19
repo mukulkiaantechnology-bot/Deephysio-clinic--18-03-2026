@@ -63,6 +63,10 @@ const ClientsInsurers = lazy(() => import('./pages/ClientsInsurers'));
 import RegisterClient from './pages/RegisterClient';
 import ViewNote from './pages/ViewNote';
 import CreateTemplate from './pages/CreateTemplate';
+import RecordPaymentPage from './pages/RecordPaymentPage';
+import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import SubmitBatchPage from './pages/SubmitBatchPage';
+import ClaimDetailPage from './pages/ClaimDetailPage';
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in duration-500">
@@ -165,7 +169,11 @@ function App() {
               <Route path="billing" element={hasAccess('Billing & Payments') ? <Billing /> : <Navigate to="/" />} />
               <Route path="billing/new" element={hasAccess('Billing & Payments') ? <NewInvoice /> : <Navigate to="/" />} />
               <Route path="billing/payments" element={hasAccess('Billing & Payments') ? <Payments /> : <Navigate to="/" />} />
+              <Route path="billing/payments/record" element={hasAccess('Billing & Payments') ? <RecordPaymentPage /> : <Navigate to="/" />} />
+              <Route path="billing/payments/view/:id" element={hasAccess('Billing & Payments') ? <InvoiceDetailPage /> : <Navigate to="/" />} />
               <Route path="billing/claims" element={hasAccess('Billing & Payments') ? <InsuranceClaims /> : <Navigate to="/" />} />
+              <Route path="billing/claims/batch" element={hasAccess('Billing & Payments') ? <SubmitBatchPage /> : <Navigate to="/" />} />
+              <Route path="billing/claims/view/:id" element={hasAccess('Billing & Payments') ? <ClaimDetailPage /> : <Navigate to="/" />} />
               <Route path="billing/reminders" element={hasAccess('Billing & Payments') ? <PaymentReminders /> : <Navigate to="/" />} />
               <Route path="billing/pricing" element={hasAccess('Billing & Payments') ? <PricingServices /> : <Navigate to="/" />} />
 
