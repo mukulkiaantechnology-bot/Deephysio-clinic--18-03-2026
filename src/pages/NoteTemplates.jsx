@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaMagic, FaCopy, FaEdit, FaTrash, FaPlus, FaSearch, FaFileMedical, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import Modal from '../components/ui/Modal';
@@ -113,13 +113,13 @@ const NoteTemplates = () => {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700 relative">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 relative">
       {/* Toast */}
       {toast.visible && (
         <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
-          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
-            <FaCheckCircle className="text-clinicPrimary shrink-0" />
-            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          <div className="bg-slate-900 text-white px-6 py-3 rounded-xl shadow-lg border border-white/10 flex items-center gap-3">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" size={14} />
+            <span className="text-[10px] font-black uppercase tracking-widest">{toast.message}</span>
           </div>
         </div>
       )}
@@ -130,96 +130,96 @@ const NoteTemplates = () => {
         onClose={() => setDeleteConfirm(null)}
         title="Delete Template"
         footer={
-          <div className="flex gap-4 justify-end w-full px-2">
+          <div className="flex gap-2 justify-end w-full px-2">
             <Button variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
-            <Button variant="danger" onClick={() => handleDeleteTemplate(deleteConfirm?.id)} leftIcon={<FaTrash size={12}/>}>Delete</Button>
+            <Button variant="danger" onClick={() => handleDeleteTemplate(deleteConfirm?.id)} leftIcon={<FaTrash size={10}/>}>Delete</Button>
           </div>
         }
       >
-        <div className="p-6 text-center font-sans">
-          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaExclamationTriangle className="text-rose-400 text-2xl" />
+        <div className="p-5 text-center font-sans">
+          <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <FaExclamationTriangle className="text-rose-400 text-xl" />
           </div>
-          <p className="text-[15px] font-black text-slate-900 uppercase tracking-tighter">Delete "{deleteConfirm?.name}"?</p>
-          <p className="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-widest">This action cannot be undone.</p>
+          <p className="text-[14px] font-black text-slate-900 tracking-tight">Delete "{deleteConfirm?.name}"?</p>
+          <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">This action cannot be undone.</p>
         </div>
       </Modal>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-black text-gray-900 tracking-tighter uppercase leading-none">Note Templates</h1>
-          <p className="text-base font-bold text-gray-400 mt-1 uppercase tracking-widest">Standardize your clinical documentation workflow.</p>
+          <h1 className="text-lg font-black text-gray-900 tracking-tighter uppercase leading-none">Note Templates</h1>
+          <p className="text-[11px] font-bold text-gray-400 mt-1.5 uppercase tracking-widest">Standardize your clinical documentation workflow.</p>
         </div>
         <button 
           onClick={() => navigate('/notes/templates/new')}
-          className="btn-primary flex items-center gap-2 text-base uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+          className="bg-clinicPrimary text-white rounded-lg h-10 px-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-clinicPrimary-dark transition-colors"
         >
           <FaPlus size={10}/> New Template
         </button>
       </div>
 
-      <div className="card-clinic p-0 overflow-hidden border-none shadow-xl bg-white mb-8">
-         <div className="p-4 border-b border-gray-50 flex items-center justify-between gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6 sm:mb-8">
+         <div className="p-3 sm:p-4 border-b border-gray-100 flex items-center justify-between gap-4 bg-slate-50/50">
             <div className="relative flex-1">
-               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={12}/>
+               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={12}/>
                <input 
                 type="text" 
                 placeholder="Search templates by name or category..." 
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent rounded-lg text-base font-semibold outline-none focus:bg-white focus:border-clinicPrimary transition-all" 
+                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-[12px] font-medium outline-none focus:border-clinicPrimary transition-colors placeholder:text-slate-400" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                />
             </div>
          </div>
          
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-y divide-gray-50">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             {filteredTemplates.map(template => (
-               <div key={template.id} className="p-6 hover:bg-gray-50 transition-colors group">
-                  <div className="flex justify-between items-start mb-4">
-                     <span className="px-2 py-0.5 bg-clinicLight rounded text-base font-black text-clinicPrimary uppercase tracking-widest">{template.category}</span>
+               <div key={template.id} className="p-4 sm:p-5 hover:bg-gray-50 transition-colors group">
+                  <div className="flex justify-between items-start mb-3">
+                     <span className="px-2 py-0.5 bg-clinicPrimary/10 rounded text-[9px] font-black text-clinicPrimary uppercase tracking-widest">{template.category}</span>
                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={(e) => { e.stopPropagation(); navigate('/notes/templates/new', { state: { template } }); }}
-                          className="p-1.5 text-gray-300 hover:text-clinicPrimary"
+                          className="p-1 text-gray-400 hover:text-clinicPrimary transition-colors"
                         >
                           <FaEdit size={12}/>
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); setDeleteConfirm(template); }}
-                          className="p-1.5 text-gray-300 hover:text-red-500"
+                          className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                         >
                           <FaTrash size={12}/>
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleCopyTemplate(template); }}
-                          className="p-1.5 text-gray-300 hover:text-clinicSecondary"
+                          className="p-1 text-gray-400 hover:text-clinicSecondary transition-colors"
                         >
                           <FaCopy size={12}/>
                         </button>
                      </div>
                   </div>
-                  <h3 className="text-base font-black text-gray-900 leading-none mb-2">{template.name}</h3>
-                  <p className="text-base font-medium text-gray-500 leading-relaxed uppercase tracking-tighter mb-6">{template.description}</p>
+                  <h3 className="text-sm font-black text-gray-900 leading-none mb-1.5">{template.name}</h3>
+                  <p className="text-[11px] font-medium text-gray-500 leading-relaxed uppercase tracking-widest mb-4 line-clamp-2">{template.description}</p>
                 </div>
             ))}
          </div>
       </div>
 
-      <div className="card-clinic p-8 bg-clinicDark text-white border-none shadow-2xl relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-clinicPrimary/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-         <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-            <div className="w-20 h-20 rounded-2xl bg-clinicPrimary flex items-center justify-center text-white shadow-xl rotate-3">
-               <FaMagic size={32}/>
+      <div className="rounded-xl p-5 sm:p-6 bg-slate-900 text-white border border-slate-800 shadow-sm relative overflow-hidden">
+         <div className="absolute top-0 right-0 w-32 h-32 bg-clinicPrimary/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+         <div className="flex flex-col md:flex-row items-center gap-5 sm:gap-6 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-clinicPrimary flex items-center justify-center text-white shadow-sm rotate-3 shrink-0">
+               <FaMagic size={20}/>
             </div>
             <div className="flex-1 text-center md:text-left">
-               <h3 className="text-lg font-black uppercase tracking-widest mb-2 leading-none">Smart Template Suggester</h3>
-               <p className="text-base font-bold text-slate-400 uppercase tracking-widest leading-relaxed max-w-lg">Our AI analyzes your consultation patterns and suggests the perfect template for each treatment type.</p>
+               <h3 className="text-[12px] font-black uppercase tracking-widest mb-1 leading-none">Smart Template Suggester</h3>
+               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed max-w-lg">Our AI analyzes your consultation patterns and suggests the perfect template for each treatment type.</p>
             </div>
             <button 
               onClick={handleToggleSmartDocs}
-              className={`px-6 py-3 rounded-xl text-base font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all flex items-center gap-2 ${isSmartDocsEnabled ? 'bg-emerald-500 text-white shadow-emerald-500/30' : 'bg-white text-clinicDark'}`}
+              className={`px-4 py-2 h-8 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-2 shrink-0 ${isSmartDocsEnabled ? 'bg-emerald-500 text-white' : 'bg-white text-slate-900 hover:bg-slate-50'}`}
             >
-              {isSmartDocsEnabled ? <><FaCheckCircle size={14} /> Smart Docs Active</> : 'Enable Smart Docs'}
+              {isSmartDocsEnabled ? <><FaCheckCircle size={10} /> Active</> : 'Enable Smart Docs'}
             </button>
          </div>
       </div>

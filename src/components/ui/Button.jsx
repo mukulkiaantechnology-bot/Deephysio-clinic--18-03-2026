@@ -17,24 +17,24 @@ const Button = ({
   ...props 
 }) => {
   const variants = {
-    primary: 'bg-clinicDark text-white hover:bg-clinicPrimary hover:shadow-glass active:scale-95 shadow-google',
-    secondary: 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-google active:scale-95',
-    accent: 'bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark text-white shadow-google hover:shadow-glass hover:-translate-y-0.5 active:scale-95',
-    ghost: 'bg-transparent text-slate-500 hover:bg-slate-100 hover:text-clinicPrimary active:scale-90',
-    danger: 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-600 hover:text-white shadow-google active:scale-95'
+    primary: 'bg-slate-900 text-white hover:bg-clinicPrimary shadow-sm',
+    secondary: 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm',
+    accent: 'bg-clinicPrimary text-white shadow-sm hover:bg-clinicPrimary-dark',
+    ghost: 'bg-transparent text-slate-500 hover:bg-slate-100 hover:text-clinicPrimary',
+    danger: 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-600 hover:text-white shadow-sm'
   };
 
   const sizes = {
-    sm: 'px-4 py-1.5 text-xs',
-    md: 'px-6 py-2.5 text-sm',
-    lg: 'px-8 py-3.5 text-base',
-    icon: 'p-2.5'
+    sm: 'px-3 py-1 text-[10px]',
+    md: 'px-4 py-1.5 text-[11px]',
+    lg: 'px-5 py-2 text-[12px]',
+    icon: 'p-1.5'
   };
 
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-xl font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group whitespace-nowrap border-2 border-transparent hover:border-[#0a3d62]',
+        'inline-flex items-center justify-center rounded-lg font-bold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed group whitespace-nowrap border border-transparent',
         variants[variant],
         sizes[size],
         className

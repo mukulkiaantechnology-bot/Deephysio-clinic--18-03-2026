@@ -5,9 +5,9 @@ const Card = ({ className, children, glass = false, hover = true, ...props }) =>
   return (
     <div 
       className={cn(
-        'rounded-2xl p-6 transition-all duration-300 border border-transparent',
-        glass ? 'glass-card' : 'bg-white shadow-premium',
-        hover && 'hover:shadow-glass hover:-translate-y-1 hover:border-[#0a3d62] hover:border-2',
+        'rounded-xl p-3 sm:p-4 transition-colors duration-200 border border-transparent',
+        glass ? 'glass-card' : 'bg-white shadow-sm',
+        hover && 'hover:border-clinicPrimary/30',
         className
       )}
       {...props}

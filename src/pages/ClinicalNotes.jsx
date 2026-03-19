@@ -74,92 +74,92 @@ const ClinicalNotes = () => {
   };
 
   return (
-    <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans">
-      <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8 p-6 sm:p-10 border-none shadow-premium bg-white relative overflow-hidden group">
+    <div className="space-y-4 sm:space-y-6 p-4 md:p-6 lg:p-8 animate-fade-in custom-scrollbar font-sans">
+      <Card hover={false} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 border border-slate-100 shadow-none bg-white relative overflow-hidden group">
         <div className="relative z-10 text-center lg:text-left">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Clinical Records</h1>
-          <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">Capture observations, plans, and assessments effectively with high-fidelity nodes.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">Clinical Records</h1>
+          <p className="text-slate-500 font-medium mt-1.5 text-[11px] sm:text-[12px]">Capture observations, plans, and assessments effectively with high-fidelity nodes.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 relative z-10 w-full lg:w-auto mt-4 lg:mt-0">
           <Button 
             variant="secondary" 
-            size="lg" 
-            className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-google transition-all active:scale-95" 
-            leftIcon={<FaHistory size={12}/>}
+            size="md" 
+            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none transition-colors" 
+            leftIcon={<FaHistory size={10}/>}
             onClick={() => alert('Clinical records archived successfully!')}
           >
             Archive
           </Button>
           <Button 
             variant="secondary" 
-            size="lg" 
-            className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 border-none shadow-premium hover:shadow-google text-emerald-600 transition-all active:scale-95" 
-            leftIcon={<FaFileMedical size={12}/>}
+            size="md" 
+            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none text-emerald-600 transition-colors bg-emerald-50 hover:bg-emerald-100 border-none" 
+            leftIcon={<FaFileMedical size={10}/>}
             onClick={handleExportXL}
           >
             Export XL
           </Button>
           <Button 
             variant="accent" 
-            size="lg"
-            className="flex-1 sm:flex-none rounded-2xl h-12 sm:h-14 px-4 sm:px-8 shadow-lg active:scale-95 transition-all"
+            size="md"
+            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none transition-colors"
             onClick={() => navigate('/notes/new')}
-            leftIcon={<FaStickyNote size={12}/>}
+            leftIcon={<FaStickyNote size={10}/>}
           >
             New Note
           </Button>
         </div>
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-clinicPrimary/5 rounded-full blur-2xl group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-8 space-y-8">
-          <Card className="p-0 overflow-hidden border-none shadow-premium bg-white">
-            <div className="p-6 sm:p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/20 gap-6">
-              <h3 className="text-[11px] sm:text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3">
-                 <FaClipboardList size={14} className="text-clinicPrimary" /> Clinical Journal Node
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+          <Card hover={false} className="p-0 overflow-hidden border border-slate-100 shadow-none bg-white">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/50 gap-4">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                 <FaClipboardList size={12} className="text-clinicPrimary" /> Clinical Journal Node
               </h3>
-              <div className="relative group w-full md:max-w-md bg-white rounded-2xl border border-slate-100 shadow-inner-soft transition-all focus-within:ring-4 focus-within:ring-clinicPrimary/5">
-                <span className="absolute inset-y-0 left-4 flex items-center text-slate-300 group-focus-within:text-clinicPrimary transition-colors">
-                  <FaSearch size={14}/>
+              <div className="relative group w-full md:max-w-xs bg-white rounded-lg border border-slate-200 transition-colors focus-within:border-clinicPrimary focus-within:ring-2 focus-within:ring-clinicPrimary/10">
+                <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 group-focus-within:text-clinicPrimary transition-colors">
+                  <FaSearch size={12}/>
                 </span>
                 <input
                   type="text"
                   placeholder="Filter records (Use ↑↓ arrows)..."
-                  className="block w-full pl-12 pr-6 py-4 bg-transparent rounded-2xl text-[13px] font-bold text-slate-600 outline-none placeholder:text-slate-300"
+                  className="block w-full pl-9 pr-4 py-2 bg-transparent rounded-lg text-[11px] font-bold text-slate-700 outline-none placeholder:text-slate-400"
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); setActiveIndex(-1); }}
                 />
               </div>
             </div>
             
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {currentNotes.length > 0 ? currentNotes.map((note, index) => (
                 <div 
                   key={note.id} 
-                  className={`p-6 sm:p-10 hover:bg-slate-50/50 transition-all duration-300 group cursor-pointer flex items-center justify-between border-l-4 gap-4 ${activeIndex === index ? 'bg-slate-50 border-clinicPrimary' : 'border-transparent'}`}
+                  className={`p-4 sm:p-5 hover:bg-slate-50 transition-colors duration-200 group cursor-pointer flex items-center justify-between border-l-2 gap-3 ${activeIndex === index ? 'bg-slate-50 border-clinicPrimary' : 'border-transparent'}`}
                   onClick={() => navigate(`/notes/view/${note.id}`)}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
-                    <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white shadow-premium text-clinicPrimary flex items-center justify-center group-hover:bg-clinicPrimary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border border-slate-50 flex-shrink-0 ${activeIndex === index ? 'bg-clinicPrimary text-white rotate-3 scale-110' : ''}`}>
-                      <FaFileMedical size={24} />
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white shadow-sm text-clinicPrimary flex items-center justify-center border border-slate-100 flex-shrink-0 transition-colors ${activeIndex === index ? 'bg-clinicPrimary text-white' : 'group-hover:bg-slate-100/50'}`}>
+                      <FaFileMedical size={16} />
                     </div>
                     <div>
-                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5">
                         <p 
                           onClick={(e) => { e.stopPropagation(); navigate('/patients/profile'); }}
-                          className={`text-base sm:text-[17px] font-bold text-slate-900 leading-none tracking-tight hover:text-clinicPrimary cursor-pointer transition-colors ${activeIndex === index ? 'text-clinicPrimary' : ''}`}
+                          className={`text-sm sm:text-[15px] font-bold text-slate-900 leading-none tracking-tight hover:text-clinicPrimary cursor-pointer transition-colors ${activeIndex === index ? 'text-clinicPrimary' : ''}`}
                         >
                           {note.patientName}
                         </p>
-                        <span className="px-3 py-1 bg-slate-900 text-clinicPrimary rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-lg">{note.category}</span>
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-black uppercase tracking-widest">{note.category}</span>
                       </div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm"></span>
                         {note.date}, {note.time}
                       </p>
-                      <p className="text-[12px] sm:text-[13px] text-slate-500 mt-4 leading-relaxed font-medium line-clamp-2 opacity-80 max-w-2xl group-hover:opacity-100 transition-opacity italic">
+                      <p className="text-[11px] sm:text-[12px] text-slate-500 mt-2 leading-relaxed font-medium line-clamp-2 max-w-xl group-hover:text-slate-700 transition-colors">
                         "{note.content}"
                       </p>
                     </div>
@@ -170,23 +170,23 @@ const ClinicalNotes = () => {
                       navigate(`/notes/view/${note.id}`);
                     }}
                     title="Review Clinical Note"
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-white hover:bg-clinicPrimary hover:shadow-google hover:scale-110 transition-all flex items-center justify-center flex-shrink-0 active:scale-95 ${activeIndex === index ? 'bg-clinicPrimary text-white shadow-google scale-110' : ''}`}
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary hover:bg-slate-50 transition-colors flex items-center justify-center flex-shrink-0 ${activeIndex === index ? 'text-clinicPrimary border-clinicPrimary' : ''}`}
                   >
-                    <FaChevronRight size={12} />
+                    <FaChevronRight size={10} />
                   </button>
                 </div>
               )) : (
-                <div className="p-20 text-center text-slate-400 font-bold uppercase tracking-widest">No matching clinical records found</div>
+                <div className="p-12 text-center text-[11px] text-slate-400 font-bold uppercase tracking-widest">No matching clinical records found</div>
               )}
             </div>
-            <div className="p-8 bg-slate-50/30 border-t border-slate-50 flex items-center justify-between gap-4">
-               <div className="flex gap-3">
+            <div className="p-4 sm:p-5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between gap-4">
+               <div className="flex gap-2">
                  <Button 
                    variant="secondary" 
                    size="icon" 
                    onClick={() => { setCurrentPage(prev => Math.max(prev - 1, 1)); setActiveIndex(-1); }}
                    disabled={currentPage === 1}
-                   className="rounded-2xl border border-slate-100 bg-white shadow-premium h-12 w-12 active:scale-95"
+                   className="rounded-lg border border-slate-200 bg-white shadow-sm h-8 w-8 text-slate-500 hover:text-clinicPrimary transition-colors"
                  >
                    <FaChevronRight className="rotate-180" size={10} />
                  </Button>
@@ -195,70 +195,70 @@ const ClinicalNotes = () => {
                    size="icon" 
                    onClick={() => { setCurrentPage(prev => Math.min(prev + 1, totalPages)); setActiveIndex(-1); }}
                    disabled={currentPage === totalPages}
-                   className="rounded-2xl border border-slate-100 bg-white shadow-premium h-12 w-12 active:scale-95"
+                   className="rounded-lg border border-slate-200 bg-white shadow-sm h-8 w-8 text-slate-500 hover:text-clinicPrimary transition-colors"
                  >
                    <FaChevronRight size={10} />
                  </Button>
                </div>
-               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Listing Node {currentPage} of {totalPages || 1}</p>
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Listing Node {currentPage} of {totalPages || 1}</p>
             </div>
           </Card>
         </div>
 
-        <div className="lg:col-span-4 space-y-10">
-          <Card className="p-10 border-none shadow-premium bg-white group overflow-hidden relative">
-            <h3 className="text-[11px] font-bold mb-8 text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-clinicPrimary-dark rounded-full"></div> Clinical Metrics
+        <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+          <Card hover={false} className="p-5 sm:p-6 border border-slate-100 shadow-none bg-white group overflow-hidden relative">
+            <h3 className="text-[10px] font-bold mb-5 text-slate-400 uppercase tracking-widest flex items-center gap-2">
+               <div className="w-1.5 h-4 bg-clinicPrimary-dark rounded-full"></div> Clinical Metrics
             </h3>
-            <div className="grid grid-cols-1 gap-6 relative z-10">
+            <div className="grid grid-cols-1 gap-4 relative z-10">
               <div 
                 onClick={() => alert('Viewing detailed verified records analysis...')}
-                className="p-8 bg-slate-900 text-white rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden group/card cursor-pointer"
+                className="p-5 bg-slate-900 text-white rounded-xl border border-white/5 shadow-sm relative overflow-hidden cursor-pointer"
               >
                  <div className="relative z-10">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-3 opacity-60">Verified Records</p>
-                    <p className="text-4xl font-bold tracking-tighter text-white">1,280 <span className="text-clinicPrimary text-lg font-medium ml-2">+12%</span></p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-2 opacity-60">Verified Records</p>
+                    <p className="text-2xl font-black tracking-tighter text-white">1,280 <span className="text-clinicPrimary text-xs font-bold ml-1.5">+12%</span></p>
                  </div>
-                 <FaHistory className="absolute -bottom-6 -right-6 text-white/5 text-8xl group-hover/card:scale-110 transition-transform duration-700" />
+                 <FaHistory className="absolute -bottom-4 -right-4 text-white/5 text-6xl" />
               </div>
               <div 
                 onClick={() => alert('Opening peer review queue...')}
-                className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner-soft hover:bg-white transition-all cursor-pointer"
+                className="p-5 bg-slate-50 rounded-xl border border-slate-100 shadow-none hover:bg-slate-100/50 transition-colors cursor-pointer"
               >
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-4">Pending Peer Review</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-3">Pending Peer Review</p>
                 <div className="flex items-center justify-between">
-                   <p className="text-3xl font-bold text-slate-900 tracking-tighter">45</p>
-                   <div className="w-16 h-2 bg-white rounded-full overflow-hidden border border-slate-100 shadow-inner">
+                   <p className="text-2xl font-black text-slate-900 tracking-tighter">45</p>
+                   <div className="w-12 h-1.5 bg-white rounded-full overflow-hidden border border-slate-200">
                       <div className="bg-amber-400 h-full w-2/3 rounded-full"></div>
                    </div>
                 </div>
               </div>
             </div>
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px]"></div>
+            <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-2xl"></div>
           </Card>
 
-          <Card className="p-10 border-none shadow-premium bg-white relative overflow-hidden">
-            <h3 className="text-[11px] font-bold mb-8 text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div> Protocol Blueprints
+          <Card hover={false} className="p-5 sm:p-6 border border-slate-100 shadow-none bg-white relative overflow-hidden">
+            <h3 className="text-[10px] font-bold mb-5 text-slate-400 uppercase tracking-widest flex items-center gap-2">
+               <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div> Protocol Blueprints
             </h3>
-            <div className="space-y-4 relative z-10">
+            <div className="space-y-3 relative z-10">
               {['Initial Assessment', 'Physio Evolution', 'Discharge Summary', 'Critical Care Note'].map((template) => (
                 <button 
                   key={template} 
                   onClick={() => navigate('/notes/new')}
-                  className="w-full text-left p-5 rounded-2xl border border-slate-100 bg-slate-50/40 hover:bg-white hover:border-clinicPrimary hover:shadow-google transition-all duration-300 group flex items-center justify-between active:scale-95"
+                  className="w-full text-left p-3 sm:p-4 rounded-lg border border-slate-100 bg-slate-50 hover:bg-white hover:border-clinicPrimary hover:shadow-sm transition-colors group flex items-center justify-between"
                 >
                   <div>
-                    <p className="text-[13px] font-bold text-slate-800 group-hover:text-clinicPrimary uppercase tracking-tight transition-colors">{template}</p>
-                    <p className="text-[9px] text-slate-400 mt-2 uppercase tracking-widest font-black opacity-60">Verified Node Template</p>
+                    <p className="text-[11px] font-bold text-slate-800 group-hover:text-clinicPrimary uppercase tracking-tight transition-colors">{template}</p>
+                    <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-black opacity-60">Verified Node Template</p>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-white shadow-soft flex items-center justify-center text-clinicPrimary opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-                     <FaStethoscope size={12} />
+                  <div className="w-8 h-8 rounded-md bg-white border border-slate-100 shadow-sm flex items-center justify-center text-clinicPrimary opacity-0 group-hover:opacity-100 transition-opacity">
+                     <FaStethoscope size={10} />
                   </div>
                 </button>
               ))}
             </div>
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/5 rounded-full blur-[40px]"></div>
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
           </Card>
         </div>
       </div>

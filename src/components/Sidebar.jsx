@@ -180,11 +180,11 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
   return (
     <aside className={cn(
       "fixed inset-y-0 left-0 z-10 md:relative md:translate-x-0 transition-all duration-500 ease-in-out bg-[#0f172a] text-slate-300 overflow-hidden flex flex-col shadow-2xl border-r border-slate-800/50",
-      isOpen ? "translate-x-0 w-64" : "-translate-x-full md:w-20"
+      isOpen ? "translate-x-0 w-60" : "-translate-x-full md:w-16"
     )}>
       {/* Header / Logo Section */}
-      <div className="flex items-center justify-between px-6 py-8 border-b border-slate-800/50 bg-gradient-to-b from-slate-900/50 to-transparent shrink-0">
-        <div className={`flex items-center gap-4 ${isOpen ? 'opacity-100 scale-100' : 'md:opacity-0 w-0 scale-90'} transition-all duration-300`}>
+      <div className="flex items-center justify-between px-4 py-5 border-b border-slate-800/50 bg-gradient-to-b from-slate-900/50 to-transparent shrink-0">
+        <div className={`flex items-center gap-3 ${isOpen ? 'opacity-100 scale-100' : 'md:opacity-0 w-0 scale-90'} transition-all duration-300`}>
           <div className="w-10 h-10 bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark rounded-xl flex items-center justify-center shadow-lg  rotate-3 group-hover:rotate-0 transition-transform">
             <FaHeartbeat className="text-white text-xl" />
           </div>
@@ -199,7 +199,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar">
         {filteredMenuItems.map((item) => {
           const hasSubItems = item.subItems && item.subItems.length > 0;
           const isExpanded = expandedMenu === item.name;
@@ -214,21 +214,21 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
                     handleToggleMenu(item.name, item.path);
                   }}
                   className={cn(
-                    "w-full flex items-center px-4 py-3 rounded-xl transition-all duration-300 group relative",
+                    "w-full flex items-center px-3 py-2 rounded-lg transition-colors duration-200 group relative",
                     isActive 
                       ? "bg-clinicPrimary/10 text-white" 
                       : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
                   )}
                 >
                   <span className={cn(
-                    "text-xl transition-all duration-300", 
-                    isOpen ? "mr-4" : "mx-auto scale-110",
+                    "text-lg transition-transform duration-300", 
+                    isOpen ? "mr-3" : "mx-auto scale-110",
                     isActive ? "text-clinicPrimary" : "group-hover:text-clinicPrimary"
                   )}>
                     {item.icon}
                   </span>
                   <span className={cn(
-                    "font-semibold whitespace-nowrap transition-all duration-300 flex-1 text-left text-sm",
+                    "font-medium whitespace-nowrap transition-all duration-300 flex-1 text-left text-xs",
                     isOpen ? "opacity-100 translate-x-0" : "opacity-0 w-0 absolute -translate-x-4"
                   )}>
                     {item.name}
@@ -245,22 +245,22 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
                   to={item.path}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center px-4 py-3 rounded-xl transition-all duration-300 group relative",
+                      "flex items-center px-3 py-2 rounded-lg transition-colors duration-200 group relative",
                       isActive 
-                        ? "bg-slate-800 text-white shadow-lg" 
+                        ? "bg-slate-800 text-white shadow-none" 
                         : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
                     )
                   }
                 >
                   <span className={cn(
-                    "text-xl transition-all duration-300", 
-                    isOpen ? "mr-4" : "mx-auto scale-110",
+                    "text-lg transition-transform duration-300", 
+                    isOpen ? "mr-3" : "mx-auto scale-110",
                     isActive ? "text-clinicPrimary" : "group-hover:text-clinicPrimary"
                   )}>
                     {item.icon}
                   </span>
                   <span className={cn(
-                    "font-semibold whitespace-nowrap transition-all duration-300 text-sm",
+                    "font-medium whitespace-nowrap transition-all duration-300 text-xs",
                     isOpen ? "opacity-100 translate-x-0" : "opacity-0 w-0 absolute -translate-x-4"
                   )}>
                     {item.name}
@@ -273,14 +273,14 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
 
               {/* Submenu Items */}
               {hasSubItems && isExpanded && isOpen && (
-                <div className="ml-11 space-y-1 mt-2 mb-4 border-l-2 border-slate-800/50 pl-2 animate-in slide-in-from-top-2 duration-300 text-[13px]">
+                <div className="ml-8 space-y-0.5 mt-1 mb-2 border-l-2 border-slate-800/50 pl-2 animate-in slide-in-from-top-2 duration-300 text-[11px]">
                   {item.subItems.map((sub) => (
                     <NavLink
                       key={sub.name}
                       to={sub.path}
                       className={({ isActive }) =>
                         cn(
-                          "block px-4 py-2 rounded-lg font-medium transition-all duration-200 relative group/sub",
+                          "block px-3 py-1.5 rounded-md font-medium transition-colors duration-200 relative group/sub",
                           isActive 
                             ? "text-clinicPrimary bg-clinicPrimary/5" 
                             : "text-slate-500 hover:text-slate-300 hover:bg-slate-800/30"
@@ -305,18 +305,18 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
 
       {/* Footer / Profile Section */}
       <div className={cn(
-        "p-6 border-t border-slate-800/50 bg-gradient-to-t from-slate-900/50 to-transparent transition-all duration-500 shrink-0",
+        "p-4 border-t border-slate-800/50 bg-gradient-to-t from-slate-900/50 to-transparent transition-all duration-500 shrink-0",
         isOpen ? "h-auto opacity-100" : "h-0 opacity-0 overflow-hidden"
       )}>
-        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-110 transition-transform">
+        <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark flex items-center justify-center font-bold text-white shadow-none">
             KP
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate text-white uppercase tracking-tight">Kiaan Paras</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Practitioner</p>
+            <p className="text-xs font-bold truncate text-white uppercase tracking-tight">Kiaan Paras</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">Practitioner</p>
             </div>
           </div>
           <button
