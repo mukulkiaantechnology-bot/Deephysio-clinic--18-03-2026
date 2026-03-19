@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaComments, FaSearch, FaPaperPlane, FaUserCircle, FaCheckDouble, FaPlus, FaPhoneAlt, FaVideo, FaInfoCircle, FaEllipsisV, FaRegSmile, FaPaperclip, FaHistory, FaCheck, FaTimes, FaCircle } from 'react-icons/fa';
+import { FaComments, FaSearch, FaPaperPlane, FaUserCircle, FaCheckDouble, FaPlus, FaPhoneAlt, FaInfoCircle, FaEllipsisV, FaRegSmile, FaPaperclip, FaHistory, FaCheck, FaTimes, FaCircle } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 
@@ -145,7 +145,6 @@ const SMSChat = () => {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => handleAction('Voice Call Initiation')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90"><FaPhoneAlt size={16}/></button>
-            <button onClick={() => handleAction('Video Session Handshake')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90"><FaVideo size={16}/></button>
             <button onClick={() => handleAction('Operational Details Audit')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90"><FaEllipsisV size={16}/></button>
           </div>
         </div>

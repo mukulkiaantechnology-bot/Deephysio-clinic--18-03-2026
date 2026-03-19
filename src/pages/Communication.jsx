@@ -192,7 +192,6 @@ const Communication = () => {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaPhoneAlt size={16}/></Button>
-              <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaVideo size={16}/></Button>
               <Button variant="secondary" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 border-none shadow-premium hover:shadow-glass hover:text-clinicPrimary transition-all"><FaInfoCircle size={16}/></Button>
             </div>
           </div>
