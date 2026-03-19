@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { 
   FaUser, FaFileInvoice, FaPrint, FaEnvelope, FaSms, FaTrashAlt, 
   FaExclamationTriangle, FaRedo, FaCalendarPlus, FaEdit, 
@@ -27,10 +28,11 @@ const AppointmentActionPopup = ({ isOpen, onClose, position, onAction, appointme
 
   return (
     <AnimatePresence>
-      <div 
-        className="fixed inset-0 z-[100]" 
-        onClick={onClose}
-      >
+      {createPortal(
+        <div 
+          className="fixed inset-0 z-[1000]" 
+          onClick={onClose}
+        >
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -100,7 +102,9 @@ const AppointmentActionPopup = ({ isOpen, onClose, position, onAction, appointme
              <button onClick={onClose} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors">Close Menu</button>
           </div>
         </motion.div>
-      </div>
+        </div>,
+        document.body
+      )}
     </AnimatePresence>
   );
 };

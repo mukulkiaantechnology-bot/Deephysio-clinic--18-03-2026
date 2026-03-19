@@ -179,7 +179,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
 
   return (
     <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 md:relative md:translate-x-0 transition-all duration-500 ease-in-out bg-[#0f172a] text-slate-300 overflow-hidden flex flex-col shadow-2xl border-r border-slate-800/50",
+      "fixed inset-y-0 left-0 z-10 md:relative md:translate-x-0 transition-all duration-500 ease-in-out bg-[#0f172a] text-slate-300 overflow-hidden flex flex-col shadow-2xl border-r border-slate-800/50",
       isOpen ? "translate-x-0 w-64" : "-translate-x-full md:w-20"
     )}>
       {/* Header / Logo Section */}
