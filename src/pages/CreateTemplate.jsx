@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft, FaSave, FaPlus, FaTrash, FaCogs, FaCheckCircle } from 'react-icons/fa';
+import { FaArrowLeft, FaSave, FaPlus, FaTrash, FaCogs, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 
@@ -18,32 +18,52 @@ const CreateTemplate = () => {
     editingTemplate?.sections || [{ id: 1, title: 'Section 1', placeholder: 'Enter details...' }]
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [toast, setToast] = useState({ message: '', visible: false });
 
   const categories = ['Physiotherapy', 'Clinical', 'Rehabilitation', 'Prevention', 'Manual Therapy', 'Final'];
 
+  const showToast = (msg) => {
+    setToast({ message: msg, visible: true });
+    setTimeout(() => setToast({ message: '', visible: false }), 2500);
+  };
+
   const handleSave = () => {
-    if (!formData.name) return alert('Template Name is required.');
+    if (!formData.name.trim()) {
+      setNameError('Template Name is required.');
+      return;
+    }
+    setNameError('');
     setIsSaving(true);
     setTimeout(() => {
       const existing = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
       
       if (editingTemplate) {
-        // Update existing
         const updated = existing.map(t => t.id === editingTemplate.id ? { ...t, ...formData, sections } : t);
         localStorage.setItem('deephysio_note_templates', JSON.stringify(updated));
       } else {
-        // Create new
         const newTemplate = { id: Date.now(), ...formData, sections };
         localStorage.setItem('deephysio_note_templates', JSON.stringify([newTemplate, ...existing]));
       }
       
       setIsSaving(false);
-      navigate('/notes/templates');
+      showToast(editingTemplate ? 'Template updated successfully!' : 'Template created successfully!');
+      setTimeout(() => navigate('/notes/templates'), 1400);
     }, 1000);
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in p-6 md:p-10 font-sans custom-scrollbar">
+    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in p-6 md:p-10 font-sans relative">
+      {/* Toast */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" />
+            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <button 
@@ -65,7 +85,7 @@ const CreateTemplate = () => {
         <Button 
           variant="accent" 
           onClick={handleSave} 
-          disabled={isSaving}
+          isLoading={isSaving}
           className="rounded-xl px-8 h-14 text-[11px] font-black uppercase tracking-widest shadow-google" 
           leftIcon={isSaving ? <FaCogs className="animate-spin" /> : <FaSave />}
         >
@@ -79,15 +99,20 @@ const CreateTemplate = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
            <div className="space-y-4">
               <label className="text-[11px] font-black text-clinicPrimary uppercase tracking-[0.3em] flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Template Name
+                 <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Template Name *
               </label>
               <input 
                  type="text" 
                  placeholder="e.g., Extended Neuro Assessment"
-                 className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300"
+                 className={`w-full p-5 bg-slate-50 border rounded-2xl text-[14px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 transition-all placeholder:text-slate-300 ${nameError ? 'border-rose-300 bg-rose-50/30' : 'border-slate-100 focus:border-clinicPrimary'}`}
                  value={formData.name}
-                 onChange={e => setFormData({...formData, name: e.target.value})}
+                 onChange={e => { setFormData({...formData, name: e.target.value}); setNameError(''); }}
               />
+              {nameError && (
+                <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
+                  <FaExclamationTriangle size={10}/> {nameError}
+                </p>
+              )}
            </div>
            <div className="space-y-4">
               <label className="text-[11px] font-black text-clinicPrimary uppercase tracking-[0.3em] flex items-center gap-2">
@@ -129,8 +154,17 @@ const CreateTemplate = () => {
            </Button>
         </div>
 
+        {sections.length === 0 && (
+          <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-3xl">
+            <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">No blocks yet. Click "Add Block" above.</p>
+          </div>
+        )}
+
         {sections.map((sec, i) => (
            <Card key={sec.id} className="p-6 border-none shadow-soft hover:shadow-premium transition-all bg-white flex flex-col md:flex-row gap-6 relative group">
+              <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-clinicPrimary/5 flex items-center justify-center text-[11px] font-black text-clinicPrimary self-start md:self-center">
+                {i + 1}
+              </div>
               <div className="flex-1 space-y-2">
                  <input 
                     type="text" 
@@ -139,7 +173,7 @@ const CreateTemplate = () => {
                     value={sec.title}
                     onChange={e => {
                        const newSecs = [...sections];
-                       newSecs[i].title = e.target.value;
+                       newSecs[i] = { ...newSecs[i], title: e.target.value };
                        setSections(newSecs);
                     }}
                  />
@@ -150,14 +184,14 @@ const CreateTemplate = () => {
                     value={sec.placeholder}
                     onChange={e => {
                        const newSecs = [...sections];
-                       newSecs[i].placeholder = e.target.value;
+                       newSecs[i] = { ...newSecs[i], placeholder: e.target.value };
                        setSections(newSecs);
                     }}
                  />
               </div>
               <button 
                  onClick={() => setSections(sections.filter(s => s.id !== sec.id))}
-                 className="w-12 h-12 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all md:self-center opacity-0 group-hover:opacity-100 shrink-0"
+                 className="w-12 h-12 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all md:self-center opacity-0 group-hover:opacity-100 shrink-0 active:scale-90"
               >
                  <FaTrash size={14} />
               </button>

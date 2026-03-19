@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaMagic, FaCopy, FaEdit, FaTrash, FaPlus, FaSearch, FaFileMedical, FaCheckCircle } from 'react-icons/fa';
+import { FaMagic, FaCopy, FaEdit, FaTrash, FaPlus, FaSearch, FaFileMedical, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
+
 
 const INITIAL_TEMPLATES = [
   { 
@@ -49,6 +50,13 @@ const NoteTemplates = () => {
   const [previewTemplate, setPreviewTemplate] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSmartDocsEnabled, setIsSmartDocsEnabled] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // holds template to delete
+  const [toast, setToast] = useState({ message: '', visible: false });
+
+  const showToast = (msg) => {
+    setToast({ message: msg, visible: true });
+    setTimeout(() => setToast({ message: '', visible: false }), 3000);
+  };
 
   useEffect(() => {
     const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
@@ -71,8 +79,9 @@ const NoteTemplates = () => {
   const handleResetTemplates = () => {
     localStorage.removeItem('deephysio_note_templates');
     setTemplates(INITIAL_TEMPLATES);
-    alert('Templates factory reset successful. All premium details restored!');
+    showToast('Templates factory reset successful!');
   };
+
 
   const handleToggleSmartDocs = () => {
     setIsSmartDocsEnabled(!isSmartDocsEnabled);
@@ -84,15 +93,18 @@ const NoteTemplates = () => {
     const updated = [newTemplate, ...savedTemplates];
     localStorage.setItem('deephysio_note_templates', JSON.stringify(updated));
     setTemplates([newTemplate, ...templates]);
+    showToast(`"${template.name}" copied successfully!`);
   };
 
   const handleDeleteTemplate = (id) => {
-    if (!window.confirm('Are you sure you want to delete this template?')) return;
     const savedTemplates = JSON.parse(localStorage.getItem('deephysio_note_templates') || '[]');
     const updated = savedTemplates.filter(t => t.id !== id);
     localStorage.setItem('deephysio_note_templates', JSON.stringify(updated));
     setTemplates(templates.filter(t => t.id !== id));
+    setDeleteConfirm(null);
+    showToast('Template deleted successfully.');
   };  
+
   
   const filteredTemplates = templates.filter(t => 
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,7 +113,38 @@ const NoteTemplates = () => {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700">
+    <div className="space-y-6 animate-in fade-in duration-700 relative">
+      {/* Toast */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" />
+            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Template"
+        footer={
+          <div className="flex gap-4 justify-end w-full px-2">
+            <Button variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+            <Button variant="danger" onClick={() => handleDeleteTemplate(deleteConfirm?.id)} leftIcon={<FaTrash size={12}/>}>Delete</Button>
+          </div>
+        }
+      >
+        <div className="p-6 text-center font-sans">
+          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaExclamationTriangle className="text-rose-400 text-2xl" />
+          </div>
+          <p className="text-[15px] font-black text-slate-900 uppercase tracking-tighter">Delete "{deleteConfirm?.name}"?</p>
+          <p className="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-widest">This action cannot be undone.</p>
+        </div>
+      </Modal>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-black text-gray-900 tracking-tighter uppercase leading-none">Note Templates</h1>
@@ -142,7 +185,7 @@ const NoteTemplates = () => {
                           <FaEdit size={12}/>
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(template.id); }}
+                          onClick={(e) => { e.stopPropagation(); setDeleteConfirm(template); }}
                           className="p-1.5 text-gray-300 hover:text-red-500"
                         >
                           <FaTrash size={12}/>

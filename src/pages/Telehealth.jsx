@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaVideo, FaMicrophone, FaVolumeUp, FaCog, FaPlus, FaUsers, FaClock, FaCheckCircle, FaPhoneSlash, FaMicrophoneSlash, FaVideoSlash, FaExpand, FaCompress, FaClipboardList, FaFileMedicalAlt, FaHistory, FaSync, FaSignal, FaExternalLinkAlt, FaTimes } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaVideo, FaMicrophone, FaVolumeUp, FaVolumeMute, FaCog, FaPlus, FaUsers, FaClock, FaCheckCircle, FaPhoneSlash, FaMicrophoneSlash, FaVideoSlash, FaSignal, FaExternalLinkAlt, FaSync, FaFileMedicalAlt, FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
@@ -8,39 +8,75 @@ const Telehealth = () => {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isVolumeOff, setIsVolumeOff] = useState(false);
   const [activePatient, setActivePatient] = useState(null);
-
-  const queue = [
+  const [isBookOpen, setIsBookOpen] = useState(false);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [toast, setToast] = useState({ message: '', visible: false });
+  const [bookForm, setBookForm] = useState({ patient: '', date: '', time: '', notes: '' });
+  const [queue, setQueue] = useState([
     { id: 'PAT-1021', name: 'Robert Downey Jr.', waitTime: '4m', priority: 'High', status: 'In Waiting' },
     { id: 'PAT-1025', name: 'Sarah Miller', waitTime: '12m', priority: 'Normal', status: 'In Waiting' },
-  ];
+  ]);
 
-  const handleAction = (action) => {
-    alert(`Virtual Care Cluster: Initiating "${action}" for Clinical Session Node. Handshake verified.`);
+  const showToast = (msg) => {
+    setToast({ message: msg, visible: true });
+    setTimeout(() => setToast({ message: '', visible: false }), 3000);
   };
 
   const startSession = (patient) => {
     setActivePatient(patient);
     setIsSessionActive(true);
+    setQueue(prev => prev.filter(p => p.id !== patient.id));
+    showToast(`Session started with ${patient.name}`);
   };
 
   const endSession = () => {
     setIsSessionActive(false);
     setActivePatient(null);
-    alert('Session Terminated: Clinical transmission node closed and synchronized to patient ledger.');
+    showToast('Session terminated and synced to patient ledger');
+  };
+
+  const handleBookSubmit = () => {
+    if (!bookForm.patient || !bookForm.date || !bookForm.time) {
+      showToast('Please fill all required fields');
+      return;
+    }
+    setIsBookOpen(false);
+    setBookForm({ patient: '', date: '', time: '', notes: '' });
+    showToast(`Virtual window booked for ${bookForm.patient}`);
+  };
+
+  const handleOptimize = () => {
+    setIsOptimizing(true);
+    setTimeout(() => {
+      setIsOptimizing(false);
+      showToast('Transmission optimized. Latency reduced to 98ms');
+    }, 2000);
   };
 
   return (
-    <div className="space-y-10 p-6 md:p-10 animate-fade-in font-sans">
+    <div className="space-y-10 p-6 md:p-10 animate-fade-in font-sans relative">
+      {/* Toast */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+          <div className="bg-slate-900 text-white px-8 py-4 rounded-[20px] shadow-2xl border border-white/10 flex items-center gap-4">
+            <FaCheckCircle className="text-clinicPrimary shrink-0" />
+            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Virtual Care Intelligence</h1>
           <p className="text-slate-500 font-bold mt-3 uppercase tracking-widest text-[11px] opacity-80">Conduct secure, encrypted clinical video consultations with real-time diagnostic synchronization.</p>
         </div>
         <div className="flex gap-4 relative z-10 w-full lg:w-auto">
-           <Button variant="secondary" size="lg" className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 border-none shadow-premium hover:shadow-google hover:-translate-y-1 transition-all text-[11px] font-black uppercase tracking-widest" onClick={() => handleAction('Audit Device Integrity')} leftIcon={<FaCog />}>System Audit</Button>
-           <Button variant="accent" size="lg" className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest" onClick={() => handleAction('Schedule Virtual Node')} leftIcon={<FaPlus />}>Book Virtual Window</Button>
+           <Button variant="secondary" size="lg" className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 border-none shadow-premium hover:shadow-google hover:-translate-y-1 transition-all text-[11px] font-black uppercase tracking-widest" onClick={() => setIsAuditOpen(true)} leftIcon={<FaCog />}>System Audit</Button>
+           <Button variant="accent" size="lg" className="flex-1 lg:flex-none rounded-[24px] h-14 px-8 shadow-google active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest" onClick={() => setIsBookOpen(true)} leftIcon={<FaPlus />}>Book Virtual Window</Button>
         </div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
       </Card>
@@ -72,40 +108,60 @@ const Telehealth = () => {
                 </div>
               )}
               
+              {/* Controls */}
               <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 bg-slate-900/60 backdrop-blur-3xl p-5 rounded-[32px] border border-white/5 shadow-premium w-max group-hover:bg-slate-900/80 transition-all duration-500">
-                 <button onClick={() => setIsMuted(!isMuted)} className={`p-4 rounded-2xl transition-all shadow-soft active:scale-95 ${isMuted ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                 <button 
+                   onClick={() => { setIsMuted(!isMuted); showToast(isMuted ? 'Microphone on' : 'Microphone muted'); }} 
+                   title={isMuted ? 'Unmute' : 'Mute'}
+                   className={`p-4 rounded-2xl transition-all shadow-soft active:scale-95 ${isMuted ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                 >
                     {isMuted ? <FaMicrophoneSlash size={18}/> : <FaMicrophone size={18}/>}
                  </button>
-                 <button onClick={() => setIsVideoOff(!isVideoOff)} className={`p-4 rounded-2xl transition-all shadow-soft active:scale-95 ${isVideoOff ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                 <button 
+                   onClick={() => { setIsVideoOff(!isVideoOff); showToast(isVideoOff ? 'Camera on' : 'Camera off'); }} 
+                   title={isVideoOff ? 'Turn camera on' : 'Turn camera off'}
+                   className={`p-4 rounded-2xl transition-all shadow-soft active:scale-95 ${isVideoOff ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                 >
                     {isVideoOff ? <FaVideoSlash size={18}/> : <FaVideo size={18}/>}
                  </button>
-                 <button className="p-4 bg-white/10 hover:bg-white/20 rounded-2xl text-white transition-all shadow-soft active:scale-95"><FaVolumeUp size={18}/></button>
+                 <button 
+                   onClick={() => { setIsVolumeOff(!isVolumeOff); showToast(isVolumeOff ? 'Speaker on' : 'Speaker muted'); }} 
+                   title={isVolumeOff ? 'Unmute speaker' : 'Mute speaker'}
+                   className={`p-4 rounded-2xl transition-all shadow-soft active:scale-95 ${isVolumeOff ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                 >
+                    {isVolumeOff ? <FaVolumeMute size={18}/> : <FaVolumeUp size={18}/>}
+                 </button>
                  <div className="w-px h-6 bg-white/10 mx-2"></div>
                  {isSessionActive ? (
-                   <button onClick={endSession} className="px-10 py-4 bg-rose-500 hover:bg-rose-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-google flex items-center gap-3">
+                   <button onClick={endSession} className="px-10 py-4 bg-rose-500 hover:bg-rose-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-google flex items-center gap-3 active:scale-95">
                      <FaPhoneSlash /> Terminate Session
                    </button>
                  ) : (
-                   <button className="p-4 bg-white/10 hover:bg-white/20 rounded-2xl text-white transition-all shadow-soft active:scale-95"><FaCog size={18}/></button>
+                   <button onClick={() => setIsAuditOpen(true)} className="p-4 bg-white/10 hover:bg-white/20 rounded-2xl text-white transition-all shadow-soft active:scale-95" title="Settings">
+                     <FaCog size={18}/>
+                   </button>
                  )}
               </div>
 
-              <div className="absolute top-10 right-10 w-56 aspect-video rounded-3xl bg-slate-800/80 backdrop-blur-xl border border-white/10 shadow-premium flex items-center justify-center group/cam overflow-hidden">
+              {/* Cam overlay */}
+              <div className="absolute top-10 right-10 w-56 aspect-video rounded-3xl bg-slate-800/80 backdrop-blur-xl border border-white/10 shadow-premium flex items-center justify-center overflow-hidden">
                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] relative z-10">Institutional Cam</p>
                  <div className="absolute inset-0 bg-gradient-to-br from-clinicPrimary/5 to-transparent"></div>
               </div>
 
+              {/* Connection badge */}
               <div className="absolute top-10 left-10 p-5 bg-white/10 backdrop-blur-xl rounded-[24px] border border-white/5 flex items-center gap-5 shadow-premium">
                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-lg"></span>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Live Connection</span>
+                    <span className={`w-2.5 h-2.5 rounded-full animate-pulse shadow-lg ${isSessionActive ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">{isSessionActive ? 'Live Connection' : 'Standby'}</span>
                  </div>
                  <div className="w-px h-4 bg-white/10"></div>
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">128ms Latency • Encrypted State</p>
               </div>
            </div>
 
-           <Card className="p-10 bg-white border-none shadow-premium flex items-center justify-between group hover:-translate-y-1 transition-all rounded-[40px] cursor-pointer" onClick={() => handleAction('Review Patient Ledger')}>
+           {/* Next consult card */}
+           <Card className="p-10 bg-white border-none shadow-premium flex items-center justify-between group hover:-translate-y-1 transition-all rounded-[40px] cursor-pointer" onClick={() => showToast('Patient ledger opened')}>
               <div className="flex items-center gap-8">
                  <div className="w-16 h-16 rounded-[24px] bg-blue-50 flex items-center justify-center text-clinicPrimary shadow-soft group-hover:scale-110 transition-transform">
                     <FaFileMedicalAlt size={28}/>
@@ -127,7 +183,7 @@ const Telehealth = () => {
                  <FaClock /> Inbound Cluster Queue
               </h3>
               <div className="space-y-6 relative z-10">
-                 {queue.map(patient => (
+                 {queue.length > 0 ? queue.map(patient => (
                    <div key={patient.id} className="p-6 bg-white/5 border border-white/5 rounded-3xl hover:bg-white/10 transition-all cursor-pointer group/row" onClick={() => startSession(patient)}>
                       <div className="flex justify-between items-start mb-4">
                          <div>
@@ -143,10 +199,9 @@ const Telehealth = () => {
                          <p className="text-[14px] font-black text-white tracking-tighter leading-none">{patient.waitTime} Wait</p>
                       </div>
                    </div>
-                 ))}
-                 {queue.length === 0 && (
-                   <div className="text-center py-10 opacity-40">
-                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">No target nodes in standby.</p>
+                 )) : (
+                   <div className="text-center py-10">
+                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">No patients in queue.</p>
                    </div>
                  )}
               </div>
@@ -177,14 +232,107 @@ const Telehealth = () => {
                     </div>
                  </div>
               </div>
-              <Button variant="secondary" className="w-full h-14 rounded-2xl border-none shadow-premium font-black text-[10px] uppercase tracking-widest group" onClick={() => handleAction('Global Latency Reset')}>
-                 <FaSync className="mr-3 group-hover:rotate-180 transition-transform duration-700" /> Optimize Transmission
+              <Button 
+                variant="secondary" 
+                className="w-full h-14 rounded-2xl border-none shadow-premium font-black text-[10px] uppercase tracking-widest group" 
+                onClick={handleOptimize}
+                isLoading={isOptimizing}
+                leftIcon={<FaSync className="mr-3 group-hover:rotate-180 transition-transform duration-700" />}
+              >
+                {isOptimizing ? 'Optimizing...' : 'Optimize Transmission'}
               </Button>
            </Card>
         </div>
       </div>
+
+      {/* Book Virtual Window Modal */}
+      <Modal
+        isOpen={isBookOpen}
+        onClose={() => setIsBookOpen(false)}
+        title="Book Virtual Window"
+        footer={
+          <div className="flex gap-4 justify-end w-full px-2">
+            <Button variant="secondary" onClick={() => setIsBookOpen(false)}>Cancel</Button>
+            <Button variant="accent" onClick={handleBookSubmit} leftIcon={<FaVideo />}>Confirm Booking</Button>
+          </div>
+        }
+      >
+        <div className="space-y-6 p-4 text-left font-sans">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Patient Name *</label>
+            <input
+              type="text"
+              value={bookForm.patient}
+              onChange={(e) => setBookForm({...bookForm, patient: e.target.value})}
+              placeholder="Enter patient name..."
+              className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Date *</label>
+              <input
+                type="date"
+                value={bookForm.date}
+                onChange={(e) => setBookForm({...bookForm, date: e.target.value})}
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Time *</label>
+              <input
+                type="time"
+                value={bookForm.time}
+                onChange={(e) => setBookForm({...bookForm, time: e.target.value})}
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Notes (Optional)</label>
+            <textarea
+              value={bookForm.notes}
+              onChange={(e) => setBookForm({...bookForm, notes: e.target.value})}
+              placeholder="Session notes or clinical context..."
+              className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[24px] text-[15px] font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all resize-none h-28"
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* System Audit Modal */}
+      <Modal
+        isOpen={isAuditOpen}
+        onClose={() => setIsAuditOpen(false)}
+        title="System Audit — Device Integrity"
+        footer={
+          <div className="flex gap-4 justify-end w-full px-2">
+            <Button variant="secondary" onClick={() => setIsAuditOpen(false)}>Close</Button>
+            <Button variant="accent" onClick={() => { setIsAuditOpen(false); showToast('System audit complete — all nodes verified'); }}>Run Full Audit</Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 p-4 font-sans">
+          {[
+            { label: 'Camera', status: 'Verified', ok: true },
+            { label: 'Microphone', status: 'Verified', ok: true },
+            { label: 'Network', status: 'Stable (128ms)', ok: true },
+            { label: 'Encryption', status: 'AES-256 Active', ok: true },
+            { label: 'HIPAA Compliance', status: 'Compliant', ok: true },
+          ].map(item => (
+            <div key={item.label} className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
+              <span className="text-[13px] font-black text-slate-600 uppercase tracking-widest">{item.label}</span>
+              <div className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-widest ${item.ok ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {item.ok ? <FaCheckCircle /> : <FaExclamationTriangle />}
+                {item.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </div>
   );
 };
 
 export default Telehealth;
+

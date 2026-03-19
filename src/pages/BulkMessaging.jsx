@@ -11,6 +11,13 @@ const BulkMessaging = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const [toast, setToast] = useState({ message: '', visible: false, type: 'success' });
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ message: msg, visible: true, type });
+    setTimeout(() => setToast({ message: '', visible: false, type: 'success' }), 3500);
+  };
 
   const groups = [
     { name: 'All Patients', count: 1240, segment: 'Global Domain' },
@@ -26,24 +33,52 @@ const BulkMessaging = () => {
   ];
 
   const handleAction = (action) => {
-    alert(`Bulk Intelligence: Initiating "${action}" for Clinical Outreach Node. Handshake verified.`);
+    showToast(`${action} initiated successfully.`);
+  };
+
+  const handlePreviewClick = () => {
+    if (!selectedGroup && !message.trim()) {
+      setValidationError('Both Destination Segment and Payload Content are required.');
+      return;
+    }
+    if (!selectedGroup) {
+      setValidationError('Please select a Destination Segment.');
+      return;
+    }
+    if (!message.trim()) {
+      setValidationError('Payload Content cannot be empty.');
+      return;
+    }
+    setValidationError('');
+    setIsPreviewOpen(true);
   };
 
   const runCampaignLaunch = () => {
-    if (!selectedGroup || !message) {
-      alert('Logical Error: Destination Node and Payload required for transmission.');
-      return;
-    }
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
       setIsPreviewOpen(false);
-      alert('Campaign Synchronized: Mass transmission executed across all target clinical nodes.');
+      setSelectedGroup('');
+      setMessage('');
+      showToast('Campaign Transmitted Successfully to all target nodes!');
     }, 2000);
   };
 
   return (
-    <div className="space-y-10 p-6 md:p-10 animate-fade-in font-sans">
+    <div className="space-y-10 p-6 md:p-10 animate-fade-in font-sans relative">
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+          <div className={`px-8 py-4 rounded-[20px] shadow-2xl border flex items-center gap-4 ${
+            toast.type === 'success'
+              ? 'bg-slate-900 text-white border-white/10'
+              : 'bg-rose-600 text-white border-rose-400/20'
+          }`}>
+            <FaCheckCircle className="text-clinicPrimary shrink-0" />
+            <span className="text-xs font-black uppercase tracking-widest">{toast.message}</span>
+          </div>
+        </div>
+      )}
       <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
         <div className="relative z-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Campaign Logic Hub</h1>
@@ -131,13 +166,20 @@ const BulkMessaging = () => {
                       />
                    </div>
 
+                   {/* Validation Error */}
+                   {validationError && (
+                     <div className="flex items-center gap-4 px-6 py-4 bg-rose-50 border border-rose-100 rounded-[20px]">
+                       <FaExclamationTriangle className="text-rose-400 shrink-0" />
+                       <p className="text-[11px] font-black text-rose-600 uppercase tracking-widest">{validationError}</p>
+                     </div>
+                   )}
                    <div className="flex justify-end items-center gap-6 pt-4 border-t border-slate-50">
                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] italic">Pre-transmission validation required</p>
                       <Button 
                         variant="accent" 
                         size="lg"
                         className="rounded-3xl h-16 px-12 shadow-google transition-all active:scale-95 text-[11px] font-black uppercase tracking-[0.2em] group"
-                        onClick={() => setIsPreviewOpen(true)}
+                        onClick={handlePreviewClick}
                         leftIcon={<FaPaperPlane className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
                       >
                          Execute Preview Handshake

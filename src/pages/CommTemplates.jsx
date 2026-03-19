@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaFileAlt, FaPlus, FaSearch, FaSms, FaEnvelope, FaTrash, FaEdit, FaChevronRight, FaFilter, FaHistory, FaCheckCircle, FaExclamationCircle, FaUserCircle, FaMicroscope, FaBrain, FaTag, FaLayerGroup, FaSync } from 'react-icons/fa';
+﻿import React, { useState } from 'react';
+import { FaFileAlt, FaVideo, FaPlus, FaSearch, FaSms, FaEnvelope, FaTrash, FaEdit, FaChevronRight, FaFilter, FaHistory, FaCheckCircle, FaExclamationCircle, FaUserCircle, FaMicroscope, FaBrain, FaTag, FaLayerGroup, FaSync } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
