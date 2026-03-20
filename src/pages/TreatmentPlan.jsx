@@ -43,118 +43,126 @@ const TreatmentPlan = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 p-6 md:p-10 animate-fade-in font-sans custom-scrollbar">
-            {/* Header */}
-            <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group rounded-[40px]">
-                <div className="flex items-center gap-8 relative z-10">
-                    <button 
-                        onClick={() => navigate(-1)}
-                        className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-premium flex items-center justify-center text-slate-300 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90"
-                    >
-                        <FaArrowLeft size={16}/>
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Treatment Plan</h1>
-                        <p className="text-[11px] font-bold text-slate-500 mt-4 uppercase tracking-[0.2em] opacity-80">STRATEGIC GOAL SETTING & REHABILITATION MATRIX</p>
-                    </div>
+        <div className="p-8 max-w-4xl mx-auto space-y-10 animate-fade-in font-sans custom-scrollbar">
+            <div className="flex items-center gap-6">
+                <button onClick={() => navigate(-1)} className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90 shadow-sm">
+                    <FaArrowLeft size={18} />
+                </button>
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Treatment Plan</h1>
+                    <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mt-1.5">Strategic Goal Setting & Rehabilitation Matrix</p>
                 </div>
-                <div className="flex gap-4 relative z-10">
-                    <Button 
-                        variant="accent" 
-                        size="lg" 
-                        className="rounded-[24px] h-14 px-10 shadow-google text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all"
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        leftIcon={<FaSave />}
-                    >
-                        {isSaving ? 'Archiving...' : 'Save Strategy'}
-                    </Button>
-                </div>
-            </Card>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <div className="lg:col-span-8 space-y-10">
+            <Card className="bg-white rounded-[40px] shadow-premium border border-slate-50 overflow-hidden flex flex-col">
+                <div className="p-10 space-y-12">
                     {/* Goals Section */}
-                    <Card className="p-10 border-none shadow-premium bg-white rounded-[32px] space-y-8 relative overflow-hidden">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em] flex items-center gap-4">
-                                <div className="w-1.5 h-6 bg-clinicPrimary rounded-full"></div> Treatment Goals
-                            </h3>
-                            <button onClick={handleAddGoal} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-black text-clinicPrimary uppercase tracking-widest hover:bg-clinicPrimary hover:text-white transition-all">Add Goal</button>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-clinicPrimary rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Therapeutic Targets</h3>
+                            </div>
+                            <button onClick={handleAddGoal} className="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-black text-clinicPrimary uppercase tracking-widest hover:bg-clinicPrimary hover:text-white transition-all shadow-sm flex items-center gap-2">
+                                <FaPlus size={8}/> Add Objective
+                            </button>
                         </div>
                         
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {plan.goals.map((goal, idx) => (
-                                <div key={goal.id} className="p-6 bg-slate-50 rounded-[28px] border border-slate-100 group hover:bg-white hover:shadow-google transition-all flex flex-col md:flex-row gap-6">
+                                <div key={goal.id} className="p-7 bg-slate-50 rounded-[32px] border border-slate-100 group hover:bg-white hover:shadow-google transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden">
                                     <div className="flex-1 space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${goal.type === 'Short-term' ? 'bg-blue-50 text-blue-500' : 'bg-indigo-50 text-indigo-500'}`}>{goal.type} Node</span>
-                                            <input type="text" className="flex-1 bg-transparent border-none text-[14px] font-black text-slate-800 outline-none" placeholder="Goal description..." defaultValue={goal.description} />
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${goal.type === 'Short-term' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'}`}>{goal.type} Node</span>
+                                            </div>
+                                            <textarea className="w-full bg-transparent border-none text-[13px] font-bold text-slate-800 outline-none resize-none p-0 h-12 placeholder:opacity-40" placeholder="Define clinical objective..." defaultValue={goal.description}></textarea>
                                         </div>
                                     </div>
                                     <div className="w-full md:w-48 space-y-2">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Target Date</label>
-                                        <input type="date" className="w-full p-3 bg-white border border-slate-100 rounded-xl text-[12px] font-bold outline-none" defaultValue={goal.targetDate} />
+                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Exceeding Date</label>
+                                        <input type="date" className="w-full p-4 bg-white border border-slate-100 rounded-xl text-[12px] font-bold outline-none shadow-sm" defaultValue={goal.targetDate} />
                                     </div>
-                                    <button className="self-center p-3 text-slate-200 hover:text-rose-500 transition-colors"><FaTrash size={12}/></button>
+                                    <button className="self-center p-3 text-slate-200 hover:text-rose-500 transition-colors bg-white rounded-xl shadow-sm border border-slate-50"><FaTrash size={10}/></button>
                                 </div>
                             ))}
                         </div>
-                    </Card>
+                    </div>
 
-                    {/* Modalities & Methods */}
-                    <Card className="p-10 border-none shadow-premium bg-white rounded-[32px] space-y-8">
-                        <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em] flex items-center gap-4">
-                            <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div> Modalities & Protocols
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {['Manual Therapy', 'Exercise Therapy', 'Dry Needling', 'Shockwave', 'Taping', 'Education', 'Massage', 'Hydrotherapy'].map(m => (
-                                <div key={m} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-clinicPrimary/20 cursor-pointer group transition-all">
-                                    <div className="w-5 h-5 rounded-md border-2 border-slate-200 group-hover:border-clinicPrimary transition-all"></div>
-                                    <span className="text-[11px] font-bold text-slate-600">{m}</span>
+                    {/* Modalities Grid */}
+                    <div className="space-y-6 pt-8 border-t border-slate-50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Intervention Modalities</h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {['Manual Therapy', 'Exercise Node', 'Dry Needling', 'Shockwave', 'Taping', 'Education Matrix', 'Soft Tissue', 'Hydro Protocol'].map(m => (
+                                <div key={m} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-google transition-all cursor-pointer flex items-center gap-3">
+                                    <div className="w-4 h-4 rounded-md border-2 border-slate-200 group-hover:border-clinicPrimary shrink-0"></div>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{m}</span>
                                 </div>
                             ))}
                         </div>
-                    </Card>
-                </div>
+                    </div>
 
-                <div className="lg:col-span-4 space-y-10">
-                    <Card className="p-10 border-none shadow-premium bg-slate-900 text-white rounded-[40px] relative overflow-hidden group">
-                         <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.25em] mb-10">Dosage Control</h4>
-                         <div className="space-y-8">
-                            <div className="p-6 bg-white/5 border border-white/10 rounded-3xl">
-                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-4">Protocol Frequency</label>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xl font-black uppercase">{plan.frequency}</span>
-                                    <FaCalendarCheck className="text-clinicPrimary" size={20}/>
+                    {/* Dosage & Frequency */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slate-50">
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Dosage Matrix</h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Protocol Frequency</span>
+                                        <p className="text-sm font-black text-slate-800 uppercase">{plan.frequency}</p>
+                                    </div>
+                                    <FaCalendarCheck className="text-clinicPrimary" size={18}/>
+                                </div>
+                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Planned Duration</span>
+                                        <p className="text-sm font-black text-slate-800 uppercase">{plan.duration}</p>
+                                    </div>
+                                    <FaClipboardCheck className="text-amber-500" size={18}/>
                                 </div>
                             </div>
-                            <div className="p-6 bg-white/5 border border-white/10 rounded-3xl">
-                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-4">Duration Node</label>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xl font-black uppercase">{plan.duration}</span>
-                                    <FaClipboardCheck className="text-amber-500" size={20}/>
-                                </div>
-                            </div>
-                         </div>
-                         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-clinicPrimary/10 rounded-full blur-3xl"></div>
-                    </Card>
-
-                    <Card className="p-10 border-none shadow-premium bg-white rounded-[40px] border-t-8 border-emerald-500">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-soft"><FaChartLine size={20}/></div>
-                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest leading-none">Expected Outcome</h4>
                         </div>
-                        <textarea className="w-full min-h-[140px] p-5 bg-slate-50 border border-slate-100 rounded-[28px] text-[13px] font-bold text-slate-600 outline-none focus:ring-4 focus:ring-emerald-500/5" defaultValue={plan.prognosis} placeholder="Summarize clinical expectations..."></textarea>
-                    </Card>
-
-                    <div className="p-10 bg-clinicPrimary rounded-[40px] text-white space-y-6 shadow-google">
-                        <FaStethoscope size={32} className="opacity-40" />
-                        <h4 className="text-[11px] font-black uppercase tracking-[0.25em]">Therapist Node</h4>
-                        <p className="text-[14px] font-black tracking-tight leading-relaxed italic opacity-80">"Rehabilitation strategy focused on biomechanical correction and progressive loading."</p>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Clinical Prognosis</h3>
+                            </div>
+                            <textarea className="w-full min-h-[148px] p-6 bg-slate-900 rounded-[32px] text-white text-[13px] font-bold outline-none shadow-premium placeholder:text-slate-500" defaultValue={plan.prognosis} placeholder="Summarize expected outcomes..."></textarea>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 mt-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 bg-clinicPrimary rounded-full animate-pulse shadow-[0_0_8px_rgba(var(--clinic-primary-rgb),0.3)]"></div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rehabilitation node verified</p>
+                    </div>
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <Button 
+                            variant="secondary" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-premium hover:bg-white" 
+                            onClick={() => navigate(-1)}
+                        >
+                            Discard
+                        </Button>
+                        <Button 
+                            variant="accent" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-google active:scale-95 transition-all" 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Synchronizing...' : 'Commit Strategy'}
+                        </Button>
+                    </div>
+                </div>
+            </Card>
         </div>
     );
 };

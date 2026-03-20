@@ -4,6 +4,7 @@ import { FaUserShield, FaBell, FaHospitalAlt, FaLock, FaHistory, FaChevronRight,
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
+import PageHeader from '../components/ui/PageHeader';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -50,38 +51,40 @@ const Settings = () => {
   ];
 
   return (
-    <div className="space-y-10 p-6 md:p-8 animate-fade-in custom-scrollbar font-sans">
-      <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group">
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">System Configuration</h1>
-          <p className="text-slate-500 font-medium mt-1">Orchestrate clinic protocols, security perimeters and global system parameters.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-           <Button 
-             variant="secondary" 
-             size="lg" 
-             className="rounded-2xl h-14 px-8 border-none shadow-premium hover:shadow-google hover:-translate-y-1 transition-all active:scale-95" 
-             leftIcon={<FaHistory />}
-             onClick={() => setShowReleaseNotes(true)}
-           >
-             Release Notes
-           </Button>
-           <Button 
-             variant="accent" 
-             size="lg" 
-             className="rounded-2xl h-14 px-8 shadow-lg active:scale-95 transition-all" 
-             leftIcon={isBackupRunning ? null : <FaSync />}
-             onClick={handleBackup}
-             disabled={isBackupRunning}
-           >
-             {isBackupRunning ? `Backing up... ${backupProgress}%` : 'Manual Backup'}
-           </Button>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-10 px-4 sm:px-6 lg:px-8 py-8 animate-fade-in custom-scrollbar font-sans">
+      <div className="relative">
+        <PageHeader 
+          title="System Configuration"
+          subtitle="Orchestrate clinic protocols, security perimeters and global system parameters."
+          icon={<FaShieldAlt />}
+          actions={
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                variant="secondary" 
+                className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-none border-slate-200" 
+                leftIcon={<FaHistory size={10}/>}
+                onClick={() => setShowReleaseNotes(true)}
+              >
+                Release Notes
+              </Button>
+              <Button 
+                variant="accent" 
+                className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
+                leftIcon={isBackupRunning ? null : <FaSync size={10}/>}
+                onClick={handleBackup}
+                disabled={isBackupRunning}
+              >
+                {isBackupRunning ? `Backing up... ${backupProgress}%` : 'Manual Backup'}
+              </Button>
+            </div>
+          }
+        />
         {isBackupRunning && (
-          <div className="absolute bottom-0 left-0 h-1 bg-clinicPrimary transition-all duration-[400ms]" style={{ width: `${backupProgress}%` }}></div>
+          <div className="absolute -bottom-2 left-0 w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-full bg-clinicPrimary transition-all duration-[400ms] shadow-[0_0_10px_rgba(46,167,184,0.5)]" style={{ width: `${backupProgress}%` }}></div>
+          </div>
         )}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
-      </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">

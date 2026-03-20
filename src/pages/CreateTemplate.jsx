@@ -52,154 +52,180 @@ const CreateTemplate = () => {
     }, 1000);
   };
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in p-4 md:p-6 font-sans relative">
-      {/* Toast */}
-      {toast.visible && (
-        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
-          <div className="bg-slate-900 text-white px-6 py-3 rounded-xl shadow-lg border border-white/10 flex items-center gap-3">
-            <FaCheckCircle className="text-clinicPrimary shrink-0" size={14} />
-            <span className="text-[10px] font-black uppercase tracking-widest">{toast.message}</span>
-          </div>
-        </div>
-      )}
+    return (
+        <div className="p-8 max-w-4xl mx-auto space-y-10 animate-fade-in font-sans custom-scrollbar">
+            {/* Toast */}
+            {toast.visible && (
+                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999]">
+                    <div className="bg-slate-900/95 backdrop-blur-md text-white px-8 py-4 rounded-[24px] shadow-2xl border border-white/10 flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
+                        <div className="w-8 h-8 rounded-full bg-clinicPrimary/20 flex items-center justify-center">
+                            <FaCheckCircle className="text-clinicPrimary" size={14} />
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">{toast.message}</span>
+                    </div>
+                </div>
+            )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <button 
-            type="button"
-            onClick={() => navigate('/notes/templates')}
-            className="w-10 h-10 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-clinicPrimary hover:bg-slate-50 transition-colors shrink-0"
-          >
-            <FaArrowLeft size={12}/>
-          </button>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter leading-none uppercase">
-                {editingTemplate ? 'Edit Template' : 'Template Builder'}
-            </h1>
-            <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">
-                {editingTemplate ? 'Modify existing clinical documentation structure' : 'Design custom clinical documentation structures'}
-            </p>
-          </div>
-        </div>
-        <Button 
-          variant="accent" 
-          onClick={handleSave} 
-          isLoading={isSaving}
-          className="rounded-lg px-6 h-10 text-[10px] font-black uppercase tracking-widest shadow-sm" 
-          leftIcon={isSaving ? <FaCogs size={10} className="animate-spin" /> : <FaSave size={10} />}
-        >
-          {isSaving ? 'Committing...' : 'Commit Protocol'}
-        </Button>
-      </div>
+            <div className="flex items-center gap-6">
+                <button onClick={() => navigate('/notes/templates')} className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90 shadow-sm">
+                    <FaArrowLeft size={18} />
+                </button>
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                        {editingTemplate ? 'Edit Protocol' : 'Protocol Builder'}
+                    </h1>
+                    <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mt-1.5">
+                        {editingTemplate ? 'Synchronize Clinical Documentation Structure' : 'Design Master Clinical Patterns'}
+                    </p>
+                </div>
+            </div>
 
-      <Card hover={false} className="p-5 sm:p-6 border border-slate-100 shadow-none bg-white space-y-5 sm:space-y-6 relative overflow-hidden group">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 relative z-10">
-           <div className="space-y-3">
-              <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Template Name *
-              </label>
-              <input 
-                 type="text" 
-                 placeholder="e.g., Extended Neuro Assessment"
-                 className={`w-full p-3 bg-slate-50 border rounded-lg text-[12px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 transition-colors placeholder:text-slate-400 ${nameError ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-clinicPrimary'}`}
-                 value={formData.name}
-                 onChange={e => { setFormData({...formData, name: e.target.value}); setNameError(''); }}
-              />
-              {nameError && (
-                <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1.5">
-                  <FaExclamationTriangle size={10}/> {nameError}
-                </p>
-              )}
-           </div>
-           <div className="space-y-3">
-              <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Category Node
-              </label>
-              <select 
-                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-colors cursor-pointer appearance-none"
-                 value={formData.category}
-                 onChange={e => setFormData({...formData, category: e.target.value})}
-              >
-                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
-           </div>
-        </div>
-        <div className="space-y-3 relative z-10">
-           <label className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-clinicPrimary"></div> Protocol Description
-           </label>
-           <textarea 
-              placeholder="Briefly describe the purpose of this template instance..."
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-colors placeholder:text-slate-400 min-h-[80px] resize-none"
-              value={formData.description}
-              onChange={e => setFormData({...formData, description: e.target.value})}
-           ></textarea>
-        </div>
-      </Card>
+            <Card className="bg-white rounded-[40px] shadow-premium border border-slate-50 overflow-hidden flex flex-col">
+                <div className="p-10 space-y-12">
+                    {/* Basic Meta */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-clinicPrimary rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Pattern Identity</h3>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Protocol Name (e.g., Neuro Master)"
+                                        className={`w-full p-6 bg-slate-50 border rounded-2xl text-[14px] font-black text-slate-900 outline-none focus:ring-4 focus:ring-clinicPrimary/5 transition-all placeholder:text-slate-300 ${nameError ? 'border-rose-200 bg-rose-50' : 'border-slate-100 focus:border-clinicPrimary'}`}
+                                        value={formData.name}
+                                        onChange={e => { setFormData({...formData, name: e.target.value}); setNameError(''); }}
+                                    />
+                                    {nameError && (
+                                        <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2 ml-2">
+                                            <FaExclamationTriangle size={10}/> {nameError}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-           <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-widest">Documentation Blocks</h3>
-           <Button 
-             variant="secondary" 
-             size="sm" 
-             leftIcon={<FaPlus size={10}/>}
-             onClick={() => setSections([...sections, { id: Date.now(), title: '', placeholder: '' }])}
-             className="text-[10px] uppercase font-black"
-           >
-              Add Block
-           </Button>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Category Vector</h3>
+                            </div>
+                            <div className="relative group">
+                                <select 
+                                    className="w-full p-6 bg-slate-50 border border-slate-100 rounded-2xl text-[14px] font-black text-slate-800 outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-amber-500/5 focus:border-amber-500 transition-all"
+                                    value={formData.category}
+                                    onChange={e => setFormData({...formData, category: e.target.value})}
+                                >
+                                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                </select>
+                                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                    <FaCogs size={14}/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Description Section */}
+                    <div className="space-y-6 pt-8 border-t border-slate-50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Global Instruction Set</h3>
+                        </div>
+                        <textarea 
+                            placeholder="Define the scope and utilization of this clinical pattern..."
+                            className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[32px] text-[13px] font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all min-h-[120px] resize-none shadow-inner-soft"
+                            value={formData.description}
+                            onChange={e => setFormData({...formData, description: e.target.value})}
+                        ></textarea>
+                    </div>
+
+                    {/* Documentation Blocks */}
+                    <div className="space-y-8 pt-8 border-t border-slate-50">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Documentation Grid Nodes</h3>
+                            </div>
+                            <Button 
+                                variant="secondary" 
+                                size="sm" 
+                                onClick={() => setSections([...sections, { id: Date.now(), title: '', placeholder: '' }])}
+                                className="h-10 px-6 rounded-xl text-[9px] font-black uppercase tracking-widest bg-slate-50 border-slate-100 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm"
+                            >
+                                <FaPlus className="mr-2"/> Append Block
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {sections.map((sec, i) => (
+                                <div key={sec.id} className="group p-8 bg-slate-50 rounded-[32px] border border-slate-100 hover:bg-white hover:shadow-google transition-all flex flex-col md:flex-row gap-8 relative overflow-hidden">
+                                    <div className="w-12 h-12 rounded-2xl bg-white shadow-premium flex items-center justify-center text-[12px] font-black text-slate-400 group-hover:text-clinicPrimary transition-colors shrink-0">
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex-1 space-y-4">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Component Identifier (e.g., SOAP Objective)"
+                                            className="w-full bg-transparent border-none text-[16px] font-black text-slate-900 outline-none placeholder:text-slate-200"
+                                            value={sec.title}
+                                            onChange={e => {
+                                                const newSecs = [...sections];
+                                                newSecs[i] = { ...newSecs[i], title: e.target.value };
+                                                setSections(newSecs);
+                                            }}
+                                        />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Input Matrix Ghost Text..."
+                                            className="w-full bg-transparent border-none text-[12px] font-bold text-slate-400 outline-none placeholder:text-slate-200"
+                                            value={sec.placeholder}
+                                            onChange={e => {
+                                                const newSecs = [...sections];
+                                                newSecs[i] = { ...newSecs[i], placeholder: e.target.value };
+                                                setSections(newSecs);
+                                            }}
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={() => setSections(sections.filter(s => s.id !== sec.id))}
+                                        className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-200 hover:text-rose-500 hover:border-rose-100 flex items-center justify-center transition-all md:self-center opacity-0 group-hover:opacity-100 shadow-sm active:scale-90"
+                                    >
+                                        <FaTrash size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 mt-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 bg-clinicPrimary rounded-full animate-pulse shadow-[0_0_8px_rgba(var(--clinic-primary-rgb),0.3)]"></div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol engine state: READY</p>
+                    </div>
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <Button 
+                            variant="secondary" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-premium hover:bg-white" 
+                            onClick={() => navigate('/notes/templates')}
+                        >
+                            Abort Builder
+                        </Button>
+                        <Button 
+                            variant="accent" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-google active:scale-95 transition-all" 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Synchronizing...' : 'Commit Protocol'}
+                        </Button>
+                    </div>
+                </div>
+            </Card>
         </div>
-
-        {sections.length === 0 && (
-          <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-3xl">
-            <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">No blocks yet. Click "Add Block" above.</p>
-          </div>
-        )}
-
-        {sections.map((sec, i) => (
-           <Card key={sec.id} className="p-6 border-none shadow-soft hover:shadow-premium transition-all bg-white flex flex-col md:flex-row gap-6 relative group">
-              <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-clinicPrimary/5 flex items-center justify-center text-[11px] font-black text-clinicPrimary self-start md:self-center">
-                {i + 1}
-              </div>
-              <div className="flex-1 space-y-2">
-                 <input 
-                    type="text" 
-                    placeholder="Block Title (e.g., Objective Assessment)"
-                    className="w-full p-4 border-b-2 border-slate-100 bg-transparent text-[14px] font-black text-slate-900 outline-none focus:border-clinicPrimary transition-colors placeholder:text-slate-300"
-                    value={sec.title}
-                    onChange={e => {
-                       const newSecs = [...sections];
-                       newSecs[i] = { ...newSecs[i], title: e.target.value };
-                       setSections(newSecs);
-                    }}
-                 />
-                 <input 
-                    type="text" 
-                    placeholder="Placeholder Hint..."
-                    className="w-full p-4 bg-transparent text-[12px] font-medium text-slate-500 outline-none placeholder:text-slate-200"
-                    value={sec.placeholder}
-                    onChange={e => {
-                       const newSecs = [...sections];
-                       newSecs[i] = { ...newSecs[i], placeholder: e.target.value };
-                       setSections(newSecs);
-                    }}
-                 />
-              </div>
-              <button 
-                 onClick={() => setSections(sections.filter(s => s.id !== sec.id))}
-                 className="w-12 h-12 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all md:self-center opacity-0 group-hover:opacity-100 shrink-0 active:scale-90"
-              >
-                 <FaTrash size={14} />
-              </button>
-           </Card>
-        ))}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default CreateTemplate;

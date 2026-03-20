@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
-import { FaCalendarAlt, FaClock, FaUser, FaStethoscope, FaChevronRight, FaSave, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { 
+  FaCalendarAlt, FaClock, FaUser, FaStethoscope, FaChevronRight, 
+  FaSave, FaTimes, FaUserPlus, FaCheckCircle, FaInfoCircle, FaUserMd,
+  FaArrowLeft
+} from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import PageHeader from '../components/ui/PageHeader';
 
 const BookAppointment = () => {
-  const [step, setStep] = useState(1);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     patient: '',
     service: '',
@@ -12,97 +20,188 @@ const BookAppointment = () => {
     notes: ''
   });
 
+  const [filteredPractitioners, setFilteredPractitioners] = useState([]);
+
   const services = [
-    { id: 1, name: 'Physiotherapy Consultation', duration: '45 min', price: '$85', icon: <FaStethoscope /> },
-    { id: 2, name: 'Sports Massage', duration: '60 min', price: '$95', icon: <FaStethoscope /> },
-    { id: 3, name: 'Initial Assessment', duration: '30 min', price: '$65', icon: <FaStethoscope /> },
-    { id: 4, name: 'Rehabilitation Session', duration: '45 min', price: '$80', icon: <FaStethoscope /> },
+    { id: 1, name: 'Physiotherapy Consultation', duration: '45 min', price: '$85', icon: <FaStethoscope />, specialties: ['physio', 'assessment'] },
+    { id: 2, name: 'Sports Massage', duration: '60 min', price: '$95', icon: <FaStethoscope />, specialties: ['sports', 'rehab'] },
+    { id: 3, name: 'Initial Assessment', duration: '30 min', price: '$65', icon: <FaStethoscope />, specialties: ['assessment', 'physio'] },
+    { id: 4, name: 'Rehabilitation Session', duration: '45 min', price: '$80', icon: <FaStethoscope />, specialties: ['rehab', 'sports'] },
   ];
 
   const practitioners = [
-    { id: 1, name: 'Dr. Sarah Wilson', role: 'Senior Physio' },
-    { id: 2, name: 'Dr. Michael Chen', role: 'Sports Specialist' },
-    { id: 3, name: 'Dr. John Miller', role: 'Osteopath' },
+    { id: 1, name: 'Dr. Sarah Wilson', role: 'Senior Physio', specialties: ['physio', 'assessment', 'rehab'] },
+    { id: 2, name: 'Dr. Michael Chen', role: 'Sports Specialist', specialties: ['sports', 'rehab'] },
+    { id: 3, name: 'Dr. John Miller', role: 'Osteopath', specialties: ['assessment', 'physio'] },
   ];
+
+  useEffect(() => {
+    if (formData.service) {
+      const selectedService = services.find(s => s.id === formData.service);
+      const filtered = practitioners.filter(p => 
+        p.specialties.some(spec => selectedService.specialties.includes(spec))
+      );
+      setFilteredPractitioners(filtered);
+      // Reset practitioner if not in filtered list
+      if (formData.practitioner && !filtered.find(p => p.id === formData.practitioner)) {
+        setFormData(prev => ({ ...prev, practitioner: '' }));
+      }
+    } else {
+      setFilteredPractitioners(practitioners);
+    }
+  }, [formData.service]);
 
   const timeSlots = ['09:00', '09:45', '10:30', '11:15', '13:00', '13:45', '14:30', '15:15'];
 
+  const handleSave = () => {
+    if (!formData.patient || !formData.service || !formData.practitioner || !formData.date || !formData.time) {
+      alert('Security Protocol: All clinical parameters must be defined before synchronization.');
+      return;
+    }
+    alert('Appointment Node Synchronized: Record archived in the clinical ledger.');
+    navigate('/appointments');
+  };
+
   return (
-    <div className="max-w-[1400px] w-full mx-auto space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+    <div className="p-8 max-w-4xl mx-auto space-y-10 animate-fade-in font-sans custom-scrollbar">
+      <div className="flex items-center gap-6">
+        <button onClick={() => navigate('/appointments')} className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90 shadow-sm">
+          <FaArrowLeft size={18} />
+        </button>
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">Book Appointment</h1>
-          <p className="text-xs sm:text-sm font-bold text-gray-400 mt-1 uppercase tracking-widest">Schedule a new session for a patient.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-          <button className="w-full sm:w-auto px-4 py-2 sm:py-1.5 bg-white border border-gray-200 rounded-lg text-xs sm:text-sm font-black text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest">Draft</button>
-          <button className="w-full sm:w-auto btn-primary flex justify-center items-center gap-2 text-xs sm:text-sm uppercase tracking-widest py-2 px-4 whitespace-nowrap"><FaSave size={10}/> Save Booking</button>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Book Appointment</h1>
+          <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mt-1.5">Initialize clinical encounter node</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          {/* Step 1: Patient & Service */}
-          <div className="card-clinic !p-4 sm:!p-5 space-y-3 sm:space-y-4">
-            <div className="flex items-center gap-2 mb-1 sm:mb-2 text-clinicPrimary">
-              <span className="w-5 h-5 rounded-full bg-clinicPrimary/10 flex items-center justify-center text-sm font-black">1</span>
-              <h3 className="text-sm border-none font-black uppercase tracking-widest m-0 leading-none">Patient & Service</h3>
+      <div className="bg-white rounded-[40px] shadow-premium border border-slate-50 overflow-hidden">
+        <div className="p-10 space-y-10">
+          {/* Patient Selection Partition */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between ml-1">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                <FaUser className="text-clinicPrimary" /> Patient Subject <span className="text-rose-500">*</span>
+              </label>
+              <button 
+                onClick={() => navigate('/patients/add')}
+                className="flex items-center gap-2 text-[10px] font-black text-clinicPrimary uppercase tracking-widest hover:brightness-90 transition-all bg-clinicPrimary/5 px-3 py-1.5 rounded-lg"
+              >
+                <FaUserPlus size={10}/> Create New Node
+              </button>
             </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Patient</label>
-                <div className="relative">
-                  <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={12}/>
-                  <input 
-                    type="text" 
-                    placeholder="Search patient by name or ID..."
-                    className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-clinicPrimary/20 focus:border-clinicPrimary outline-none transition-all font-semibold"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {services.map(service => (
-                  <div 
-                    key={service.id}
-                    onClick={() => setFormData({...formData, service: service.id})}
-                    className={`p-3 rounded-xl border-2 cursor-pointer transition-all group ${formData.service === service.id ? 'border-clinicPrimary bg-clinicPrimary/5' : 'border-gray-50 hover:border-gray-100 bg-white shadow-sm'}`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className={`p-1.5 rounded-lg ${formData.service === service.id ? 'bg-clinicPrimary text-white' : 'bg-gray-50 text-clinicPrimary'}`}>
-                        {service.icon}
-                      </div>
-                      <span className="text-sm font-black text-clinicSecondary">{service.price}</span>
-                    </div>
-                    <h4 className="text-sm sm:text-base font-black text-gray-900 leading-tight mb-1">{service.name}</h4>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{service.duration}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="relative group">
+              <input 
+                type="text" 
+                placeholder="Search or enter verified patient name..." 
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300 shadow-inner-soft"
+                value={formData.patient}
+                onChange={e => setFormData({...formData, patient: e.target.value})}
+              />
             </div>
           </div>
 
-          {/* Step 2: Date & Time */}
-          <div className="card-clinic !p-4 sm:!p-5 space-y-3 sm:space-y-4">
-            <div className="flex items-center gap-2 mb-1 sm:mb-2 text-clinicPrimary">
-              <span className="w-5 h-5 rounded-full bg-clinicPrimary/10 flex items-center justify-center text-sm font-black">2</span>
-              <h3 className="text-sm font-black uppercase tracking-widest m-0 leading-none">Date & Time</h3>
+          {/* Service Matrix Partition */}
+          <div className="space-y-6">
+            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+              <FaStethoscope className="text-clinicPrimary" /> Clinical Service Protocol <span className="text-rose-500">*</span>
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {services.map(service => (
+                <div 
+                  key={service.id}
+                  onClick={() => setFormData({...formData, service: service.id})}
+                  className={`p-6 rounded-[32px] border-2 cursor-pointer transition-all relative overflow-hidden flex items-center gap-4 ${
+                    formData.service === service.id 
+                    ? 'border-clinicPrimary bg-clinicPrimary/5 shadow-premium scale-[1.02]' 
+                    : 'border-slate-50 hover:border-slate-100 bg-slate-50/50 hover:scale-[1.01]'
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                    formData.service === service.id ? 'bg-clinicPrimary text-white shadow-google' : 'bg-white text-clinicPrimary'
+                  }`}>
+                    {service.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-[14px] font-black text-slate-900 leading-tight mb-1">{service.name}</h4>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{service.duration}</p>
+                      <span className="text-sm font-black text-clinicSecondary">{service.price}</span>
+                    </div>
+                  </div>
+                  {formData.service === service.id && (
+                    <FaCheckCircle className="absolute top-4 right-4 text-emerald-500 animate-in zoom-in duration-300" size={14}/>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Specialists & Temporal Configuration */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4 border-t border-slate-50">
+            <div className="space-y-6">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <FaUserMd className="text-clinicPrimary" /> Assigned Specialist <span className="text-rose-500">*</span>
+              </label>
+              <div className="space-y-3 max-h-[280px] overflow-y-auto custom-scrollbar pr-2">
+                {filteredPractitioners.length > 0 ? (
+                  filteredPractitioners.map(p => (
+                    <div 
+                      key={p.id}
+                      onClick={() => setFormData({...formData, practitioner: p.id})}
+                      className={`p-4 rounded-[24px] border flex items-center gap-4 cursor-pointer transition-all ${
+                        formData.practitioner === p.id 
+                        ? 'border-clinicPrimary bg-white shadow-premium' 
+                        : 'border-slate-50 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[14px] font-black transition-all ${
+                        formData.practitioner === p.id ? 'bg-clinicPrimary text-white shadow-google' : 'bg-slate-100 text-slate-400'
+                      }`}>
+                        {p.name[0]}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-[13px] font-black leading-none ${formData.practitioner === p.id ? 'text-slate-900' : 'text-slate-500'}`}>{p.name}</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">{p.role}</p>
+                      </div>
+                      {formData.practitioner === p.id && <FaCheckCircle className="text-clinicPrimary" size={14}/>}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-10 bg-slate-50 rounded-[32px] text-center border border-dashed border-slate-200">
+                    <FaInfoCircle className="mx-auto text-slate-300 mb-3 animate-pulse" size={24}/>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Awaiting service selection...</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
-              <div className="sm:w-1/2">
-                <label className="block text-xs sm:text-sm font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Date</label>
-                <input type="date" className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-sm sm:text-base font-semibold outline-none focus:border-clinicPrimary transition-all uppercase" />
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <FaCalendarAlt className="text-clinicPrimary" /> Schedule Date <span className="text-rose-500">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer shadow-inner-soft"
+                  value={formData.date}
+                  onChange={e => setFormData({...formData, date: e.target.value})}
+                />
               </div>
-              <div className="sm:w-1/2 w-full">
-                <label className="block text-xs sm:text-sm font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Time Slot</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <FaClock className="text-clinicPrimary" /> Availability Grid <span className="text-rose-500">*</span>
+                </label>
+                <div className="grid grid-cols-4 gap-2">
                   {timeSlots.map(time => (
                     <button 
                       key={time}
                       onClick={() => setFormData({...formData, time})}
-                      className={`py-1.5 rounded-md text-xs sm:text-sm font-black transition-all border ${formData.time === time ? 'bg-clinicPrimary text-white border-clinicPrimary shadow-sm' : 'bg-white text-gray-500 border-gray-100 hover:border-clinicPrimary hover:text-clinicPrimary'}`}
+                      className={`py-3 rounded-xl text-[11px] font-black transition-all border ${
+                        formData.time === time 
+                        ? 'bg-clinicPrimary text-white border-clinicPrimary shadow-google active:scale-95' 
+                        : 'bg-white text-slate-400 border-slate-100 hover:border-clinicPrimary hover:text-clinicPrimary'
+                      }`}
                     >
                       {time}
                     </button>
@@ -113,56 +212,27 @@ const BookAppointment = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-1 space-y-4">
-          {/* Summary Sidebar */}
-          <div className="card-clinic !p-4 sm:!p-5 bg-clinicDark text-white border-none shadow-xl overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-clinicPrimary/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-3 text-clinicPrimary relative z-10 m-0 leading-none">Booking Summary</h3>
-            
-            <div className="space-y-3 relative z-10 mt-2">
-              <div className="pb-2.5 border-b border-white/5">
-                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Service</p>
-                <p className="text-sm font-bold text-white leading-tight">{services.find(s => s.id === formData.service)?.name || 'Not selected'}</p>
-              </div>
-              
-              <div className="pb-2.5 border-b border-white/5">
-                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Schedule</p>
-                <div className="flex items-center gap-2">
-                  <FaCalendarAlt className="text-clinicPrimary" size={10}/>
-                  <span className="text-sm font-bold text-white">Mar 18, 2026</span>
-                  <FaClock className="text-clinicPrimary ml-2" size={10}/>
-                  <span className="text-sm font-bold text-white">{formData.time || '--:--'}</span>
-                </div>
-              </div>
-
-              <div className="pt-1">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Estimated Total</span>
-                  <span className="text-sm sm:text-base font-black text-clinicSecondary">{services.find(s => s.id === formData.service)?.price || '$0.00'}</span>
-                </div>
-                <p className="text-xs text-slate-500 font-bold uppercase">Incl. 10% tax for facilities.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-clinic !p-4 sm:!p-5 space-y-3">
-            <h3 className="text-sm font-black uppercase tracking-widest mb-1 m-0 leading-none">Practitioner</h3>
-            <div className="space-y-2 mt-2">
-              {practitioners.map(p => (
-                <div 
-                  key={p.id}
-                  onClick={() => setFormData({...formData, practitioner: p.id})}
-                  className={`p-2 rounded-lg border flex items-center gap-3 cursor-pointer transition-all ${formData.practitioner === p.id ? 'border-clinicPrimary bg-clinicPrimary/5' : 'border-gray-50 hover:bg-gray-50'}`}
-                >
-                  <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-sm font-black text-gray-500">{p.name[0]}</div>
-                  <div>
-                    <p className="text-sm font-black text-gray-900 leading-none">{p.name}</p>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{p.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+           <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinical Session Encryption Active</p>
+           </div>
+           <div className="flex gap-4 w-full md:w-auto">
+              <Button 
+                variant="secondary" 
+                className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-premium hover:bg-white" 
+                onClick={() => navigate('/appointments')}
+              >
+                Abort
+              </Button>
+              <Button 
+                variant="accent" 
+                className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-google active:scale-95 transition-all" 
+                onClick={handleSave}
+              >
+                Finalize Booking
+              </Button>
+           </div>
         </div>
       </div>
     </div>

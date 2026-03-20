@@ -4,6 +4,7 @@ import { FaCalendarPlus, FaFilter, FaChevronLeft, FaChevronRight, FaClock, FaChe
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
+import PageHeader from '../components/ui/PageHeader';
 
 const Appointments = () => {
   const navigate = useNavigate();
@@ -57,30 +58,29 @@ const Appointments = () => {
   };
 
   return (
-    <div className="max-w-[1300px] w-full mx-auto space-y-4 px-4 sm:px-5 lg:px-6 animate-fade-in custom-scrollbar font-sans pb-10">
-      <Card hover={false} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 sm:p-5 border-none shadow-none bg-white relative overflow-hidden group">
-        <div className="relative z-10 text-center lg:text-left">
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Clinical Scheduler</h1>
-          <p className="text-slate-500 font-medium mt-1 text-[10px] sm:text-[11px]">Orchestrate patient visits, practitioner availability, and treatement node synchronization.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 relative z-10 w-full lg:w-auto">
-          <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-100 shadow-none">
-             <button className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day View</button>
-             <button className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-colors ${viewMode === 'week' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
-             <button className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-colors ${viewMode === 'month' ? 'bg-white shadow-sm text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 animate-fade-in custom-scrollbar font-sans pb-10">
+      <PageHeader 
+        title="Clinical Scheduler"
+        subtitle="Orchestrate patient visits, practitioner availability, and treatment node synchronization."
+        icon={<FaCalendarPlus />}
+        actions={
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <div className="flex bg-slate-100/50 p-1 rounded-xl border border-slate-200 shadow-inner-soft">
+               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day</button>
+               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
+               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'month' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
+            </div>
+            <Button 
+              variant="accent" 
+              className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
+              onClick={() => navigate('/appointments/book')}
+              leftIcon={<FaCalendarPlus size={12}/>}
+            >
+              New Booking
+            </Button>
           </div>
-          <Button 
-            variant="accent" 
-            size="md"
-            className="flex-1 sm:flex-none rounded-xl h-10 shadow-none transition-colors text-[10px] sm:text-[11px] font-black uppercase tracking-widest"
-            onClick={() => navigate('/appointments/book')}
-            leftIcon={<FaCalendarPlus size={12}/>}
-          >
-            New Booking
-          </Button>
-        </div>
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-3xl"></div>
-      </Card>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-1 space-y-4">

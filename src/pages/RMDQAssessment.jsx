@@ -72,97 +72,94 @@ const RMDQAssessment = () => {
     const interpretation = getInterpretation();
 
     return (
-        <div className="max-w-5xl mx-auto space-y-10 p-6 md:p-10 animate-fade-in font-sans custom-scrollbar">
-            {/* Header */}
-            <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-10 border-none shadow-premium bg-white relative overflow-hidden group rounded-[40px]">
-                <div className="flex items-center gap-8 relative z-10">
-                    <button 
-                        onClick={() => navigate(-1)}
-                        className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-premium flex items-center justify-center text-slate-300 hover:text-clinicPrimary hover:shadow-google hover:-translate-x-1 transition-all active:scale-90"
-                    >
-                        <FaArrowLeft size={16}/>
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">RMDQ Assessment</h1>
-                        <p className="text-[11px] font-bold text-slate-500 mt-4 uppercase tracking-[0.2em] opacity-80">ROLAND-MORRIS DISABILITY QUESTIONNAIRE • VERIFIED SCALE</p>
-                    </div>
+        <div className="p-8 max-w-4xl mx-auto space-y-10 animate-fade-in font-sans custom-scrollbar">
+            <div className="flex items-center gap-6">
+                <button onClick={() => navigate(-1)} className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-clinicPrimary hover:shadow-google transition-all active:scale-90 shadow-sm">
+                    <FaArrowLeft size={18} />
+                </button>
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">RMDQ Assessment</h1>
+                    <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mt-1.5">Roland-Morris Disability Index Protocol</p>
                 </div>
-                <div className="flex items-center gap-6 relative z-10">
-                    <div className="text-right">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Calculated Index</p>
-                        <h2 className={`text-4xl font-black tracking-tighter text-${interpretation.color}-500`}>{score}<span className="text-slate-200 ml-1">/24</span></h2>
-                    </div>
-                </div>
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-clinicPrimary/5 rounded-full blur-[40px] group-hover:bg-clinicPrimary/10 transition-all duration-1000"></div>
-            </Card>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                {/* Questions List */}
-                <div className="lg:col-span-8 space-y-4">
-                    <Card className="p-8 border-none shadow-premium bg-slate-50/50 rounded-[32px] mb-6">
-                        <div className="flex items-center gap-4 text-slate-500 font-bold text-[11px] uppercase tracking-widest">
-                            <FaInfoCircle className="text-clinicPrimary" />
-                            When your back hurts, you may find it difficult to do some of the things you usually do. This list contains sentences that people have used to describe themselves when they have back pain. When you read them, you may find that some stand out because they describe you today.
+            <Card className="bg-white rounded-[40px] shadow-premium border border-slate-50 overflow-hidden">
+                <div className="p-10 space-y-10">
+                    {/* Instructions & Score Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 p-8 bg-slate-50 rounded-[32px] border border-slate-100">
+                        <div className="flex-1 space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <FaInfoCircle className="text-clinicPrimary" /> Clinical Instructions
+                            </label>
+                            <p className="text-[11px] font-bold text-slate-500 leading-relaxed uppercase tracking-widest opacity-80">
+                                Tick the sentences that describe you today. Every ticked box adds 1 point to your disability index.
+                            </p>
                         </div>
-                    </Card>
+                        <div className="text-right flex flex-col items-end">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Calculated Index</span>
+                            <div className="flex items-end gap-2">
+                                <span className={`text-4xl font-black tracking-tighter text-${interpretation.color}-500`}>{score}</span>
+                                <span className="text-slate-300 font-bold text-lg mb-1">/24</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div className="space-y-3">
+                    {/* Interpretation Chip */}
+                    <div className="flex items-center gap-4">
+                        <div className={`px-5 py-2 rounded-full border border-${interpretation.color}-100 bg-${interpretation.color}-50/50 flex items-center gap-3`}>
+                            <div className={`w-2 h-2 rounded-full bg-${interpretation.color}-500 animate-pulse`}></div>
+                            <span className={`text-[10px] font-black uppercase tracking-widest text-${interpretation.color}-600`}>{interpretation.text}</span>
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol validation active</p>
+                    </div>
+
+                    {/* Questions Grid - 2 columns for better vertical space usage in centered max-w-4xl */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {questions.map((q, idx) => (
                             <div 
                                 key={idx} 
                                 onClick={() => handleToggle(idx)}
-                                className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center gap-6 group ${
+                                className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center gap-4 group ${
                                     checkedItems[idx] 
                                     ? 'bg-clinicPrimary/5 border-clinicPrimary/20 shadow-soft' 
                                     : 'bg-white border-slate-100 hover:border-clinicPrimary/10'
                                 }`}
                             >
-                                <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${
+                                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${
                                     checkedItems[idx] ? 'bg-clinicPrimary border-clinicPrimary text-white shadow-lg' : 'bg-transparent border-slate-100'
                                 }`}>
-                                    {checkedItems[idx] && <FaCheckCircle size={12}/>}
+                                    {checkedItems[idx] && <FaCheckCircle size={10}/>}
                                 </div>
-                                <span className={`text-[13px] font-bold ${checkedItems[idx] ? 'text-slate-900' : 'text-slate-500'}`}>{q}</span>
+                                <span className={`text-[12px] font-bold leading-tight ${checkedItems[idx] ? 'text-slate-900' : 'text-slate-500'}`}>{q}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Interpretation Sidebar */}
-                <div className="lg:col-span-4 space-y-8">
-                    <Card className={`p-10 border-none shadow-premium bg-white group rounded-[32px] border-t-8 border-${interpretation.color}-500`}>
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] mb-8">Clinical Interpretation</h4>
-                        <div className="space-y-8">
-                            <div className="text-center p-8 bg-slate-50 rounded-[28px] border border-slate-100">
-                                <h3 className={`text-2xl font-black uppercase tracking-tighter text-${interpretation.color}-500 mb-2`}>{interpretation.text}</h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Current Functional Delta</p>
-                            </div>
-                            <div className="space-y-4">
-                                <p className="text-[11px] font-bold text-slate-500 leading-relaxed uppercase tracking-widest opacity-80">
-                                    The RMDQ score of {score} indicates a {interpretation.text.toLowerCase()} profile. Clinical trajectory suggests {score > 12 ? 'intensive' : 'maintenance'} physical intervention protocols.
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-10 bg-slate-900 border-none shadow-2xl rounded-[40px] text-white relative overflow-hidden group">
-                        <div className="relative z-10 h-full flex flex-col">
-                            <div className="w-16 h-16 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform"><FaChartLine className="text-clinicPrimary" size={24}/></div>
-                            <h4 className="text-xl font-black tracking-tight mb-4 leading-none">Commit Assessment</h4>
-                            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-10 leading-relaxed">Save this diagnostic node to the clinical timeline for longitudinal analytics.</p>
-                            <Button 
-                                variant="accent" 
-                                className="w-full h-14 rounded-2xl shadow-google text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all mt-auto"
-                                onClick={handleSave}
-                                disabled={isSaving}
-                            >
-                                {isSaving ? 'Synchronizing Node...' : 'Commit Assessment'}
-                            </Button>
-                        </div>
-                        <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-clinicPrimary/10 rounded-full blur-3xl"></div>
-                    </Card>
+                <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Index Calculation Synchronized</p>
+                    </div>
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <Button 
+                            variant="secondary" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-premium hover:bg-white" 
+                            onClick={() => navigate(-1)}
+                        >
+                            Abort
+                        </Button>
+                        <Button 
+                            variant="accent" 
+                            className="flex-1 md:px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-google active:scale-95 transition-all" 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Synchronizing...' : 'Finalize RMDQ Node'}
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 };

@@ -5,6 +5,7 @@ import { FaClock, FaUser, FaPhone, FaCalendarPlus, FaFilter, FaSearch, FaEllipsi
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import PageHeader from '../components/ui/PageHeader';
 
 const Waitlist = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ const Waitlist = () => {
   };
 
   return (
-    <div className="max-w-[1300px] w-full mx-auto space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 font-sans relative">
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 animate-fade-in custom-scrollbar font-sans pb-10 relative">
       <AnimatePresence>
         {toast.visible && (
           <motion.div 
@@ -92,20 +93,22 @@ const Waitlist = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <Card hover={false} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-5 border border-slate-100 shadow-none bg-white relative overflow-hidden group">
-        <div className="relative z-10">
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none">Waitlist Intelligence</h1>
-          <p className="text-slate-500 font-bold mt-1.5 uppercase tracking-widest text-[9px] sm:text-[10px] opacity-80">Synchronize subject queues for optimized slot reclamation.</p>
-        </div>
-        <button 
-          className="rounded-lg h-9 sm:h-10 px-4 sm:px-6 shadow-sm active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest w-full md:w-auto relative z-10 bg-gradient-to-br from-clinicPrimary to-clinicPrimary-dark text-white flex items-center justify-center gap-2"
-          onClick={() => { console.log('Opening form...'); setIsAddModalOpen(true); }}
-        >
-          <FaCalendarPlus size={12}/>
-          ADD TO QUEUE
-        </button>
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-2xl group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
-      </Card>
+      
+      <PageHeader 
+        title="Waitlist Intelligence"
+        subtitle="Synchronize subject queues for optimized slot reclamation."
+        icon={<FaClock />}
+        actions={
+          <Button 
+            variant="accent" 
+            className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
+            onClick={() => setIsAddModalOpen(true)}
+            leftIcon={<FaCalendarPlus size={12}/>}
+          >
+            Add to Queue
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">

@@ -8,6 +8,7 @@ import { FaUserPlus, FaCalendarCheck, FaUsers, FaCalendarAlt, FaFileInvoiceDolla
 import Button, { cn } from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
+import PageHeader from '../components/ui/PageHeader';
 
 const data = [
   { name: 'Mon', appointments: 12, revenue: 1200 },
@@ -57,30 +58,30 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-5 animate-fade-in custom-scrollbar">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Clinic Overview</h1>
-          <p className="text-slate-500 font-medium mt-1 text-sm">Welcome back, Kiaan Paras 👋 Here's what's happening today.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="secondary" 
-            className="flex-1 sm:flex-none h-10 px-4 rounded-xl transition-colors shadow-none" 
-            leftIcon={<FaChartLine size={12} />}
-            onClick={() => navigate('/analytics')}
-          >
-            Analytics
-          </Button>
-          <Button 
-            variant="accent" 
-            className="flex-1 sm:flex-none h-10 px-4 rounded-xl shadow-none transition-colors" 
-            leftIcon={<FaCalendarCheck size={12} />}
-            onClick={() => navigate('/appointments')}
-          >
-            Booking
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title="Clinic Overview"
+        subtitle="Welcome back, Kiaan Paras 👋 Here's what's happening today."
+        actions={
+          <>
+            <Button 
+              variant="secondary" 
+              className="flex-1 sm:flex-none h-10 px-4 rounded-xl transition-colors shadow-none" 
+              leftIcon={<FaChartLine size={12} />}
+              onClick={() => navigate('/analytics')}
+            >
+              Analytics
+            </Button>
+            <Button 
+              variant="accent" 
+              className="flex-1 sm:flex-none h-10 px-4 rounded-xl shadow-none transition-colors" 
+              leftIcon={<FaCalendarCheck size={12} />}
+              onClick={() => navigate('/appointments')}
+            >
+              Booking
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">

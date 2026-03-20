@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUserPlus, FaSearch, FaFilter, FaDownload, FaEllipsisV, FaChevronLeft, FaChevronRight, FaPlus, FaPhoneAlt, FaEnvelope, FaCalendarAlt, FaHistory, FaTrash, FaCheck } from 'react-icons/fa';
+import { FaUserPlus, FaSearch, FaFilter, FaDownload, FaEllipsisV, FaChevronLeft, FaChevronRight, FaPlus, FaPhoneAlt, FaEnvelope, FaCalendarAlt, FaHistory, FaTrash, FaCheck, FaUser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -14,6 +14,8 @@ const INITIAL_PATIENTS = [
   { id: 'PID-105', name: 'Sarah Jenkins', age: 39, gender: 'Female', lastVisit: '2026-03-15', status: 'Active', phone: '+1 234-567-8905', email: 's.jenkins@example.com' },
   { id: 'PID-106', name: 'David Miller', age: 41, gender: 'Male', lastVisit: '2026-03-05', status: 'Inactive', phone: '+1 234-567-8906', email: 'd.miller@example.com' },
 ];
+
+import PageHeader from '../components/ui/PageHeader';
 
 const Patients = () => {
   const navigate = useNavigate();
@@ -85,33 +87,33 @@ const Patients = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <Card className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 border-none shadow-none bg-white relative overflow-hidden group">
-        <div className="relative z-10 text-center lg:text-left">
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Patient Directory</h1>
-          <p className="text-slate-500 font-medium mt-1 text-xs">Manage subject demographics, history, and treatment trajectory nodes.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full lg:w-auto">
-          <Button 
-            variant="secondary" 
-            size="md" 
-            className="flex-1 sm:flex-none rounded-xl h-10 px-4 sm:px-5 border border-slate-200 shadow-none transition-colors uppercase tracking-widest text-[10px] font-black" 
-            leftIcon={<FaDownload size={12}/>}
-            onClick={handleExportXL}
-          >
-            Export XL
-          </Button>
-          <Button 
-            variant="accent" 
-            size="md"
-            className="flex-1 sm:flex-none rounded-xl h-10 px-4 sm:px-5 shadow-none transition-colors text-[10px] font-black uppercase tracking-widest"
-            onClick={() => navigate('/patients/add')}
-            leftIcon={<FaUserPlus size={12}/>}
-          >
-            Add Patient
-          </Button>
-        </div>
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-2xl group-hover:bg-clinicPrimary/10 transition-colors duration-500"></div>
-      </Card>
+      <PageHeader 
+        title="Patient Directory"
+        subtitle="Manage subject demographics, history, and treatment trajectory nodes."
+        icon={<FaUserPlus />}
+        actions={
+          <>
+            <Button 
+              variant="secondary" 
+              size="md" 
+              className="flex-1 sm:flex-none rounded-xl h-10 px-4 sm:px-5 border border-slate-200 shadow-none transition-colors uppercase tracking-widest text-[10px] font-black" 
+              leftIcon={<FaDownload size={12}/>}
+              onClick={handleExportXL}
+            >
+              Export XL
+            </Button>
+            <Button 
+              variant="accent" 
+              size="md"
+              className="flex-1 sm:flex-none rounded-xl h-10 px-4 sm:px-5 shadow-none transition-colors text-[10px] font-black uppercase tracking-widest"
+              onClick={() => navigate('/patients/add')}
+              leftIcon={<FaUserPlus size={12}/>}
+            >
+              Add Patient
+            </Button>
+          </>
+        }
+      />
 
       <div className="bg-white rounded-xl shadow-none overflow-hidden border border-slate-100">
         <div className="p-4 sm:p-5 border-b border-slate-50 flex flex-wrap items-center justify-between gap-4 bg-slate-50/20">
@@ -194,10 +196,10 @@ const Patients = () => {
                       </button>
                       <button 
                         className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary hover:bg-clinicPrimary/5 transition-colors flex items-center justify-center" 
-                        title="Audit Patient Profile"
+                        title="View Patient Profile"
                         onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${p.id}`); }}
                       >
-                        <FaEllipsisV size={10}/>
+                        <FaUser size={10}/>
                       </button>
                     </div>
                   </td>

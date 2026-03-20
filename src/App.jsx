@@ -59,7 +59,11 @@ import Integrations from './pages/Integrations';
 import IntegrationService from './pages/IntegrationService';
 import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
+import AddUser from './pages/AddUser';
+import EditUser from './pages/EditUser';
+import UserAudit from './pages/UserAudit';
 import RolesPermissions from './pages/RolesPermissions';
+import AddRole from './pages/AddRole';
 import ClinicDetails from './pages/ClinicDetails';
 import NotificationSettings from './pages/NotificationSettings';
 import StaffPerformance from './pages/StaffPerformance';
@@ -236,7 +240,11 @@ function App() {
               {/* Settings - 7 Pages */}
               <Route path="settings" element={<Settings />} />
               <Route path="settings/users" element={<UserManagement />} />
+              <Route path="settings/users/add" element={<AddUser />} />
+              <Route path="settings/users/edit/:id" element={<EditUser />} />
+              <Route path="settings/users/audit/:id" element={<UserAudit />} />
               <Route path="settings/roles" element={<RolesPermissions />} />
+              <Route path="settings/roles/add" element={<AddRole />} />
               <Route path="settings/clinic" element={<ClinicDetails />} />
               <Route path="settings/location" element={<MultiLocation />} />
               <Route path="settings/security" element={<SecuritySettings />} />

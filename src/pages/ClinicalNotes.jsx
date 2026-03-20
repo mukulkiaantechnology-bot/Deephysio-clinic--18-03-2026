@@ -17,6 +17,8 @@ const INITIAL_NOTES = [
   { id: 'CN-205', patientName: 'Michael Chen', type: 'Initial Assessment', date: '2026-03-10', time: '16:00 PM', content: 'Initial assessment for shoulder impingement. Positive painful arc test. Exercises provided for rotator cuff strengthening...', category: 'Initial' },
 ];
 
+import PageHeader from '../components/ui/PageHeader';
+
 const ClinicalNotes = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,52 +68,48 @@ const ClinicalNotes = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 md:p-6 lg:p-8 animate-fade-in custom-scrollbar font-sans">
-      <Card hover={false} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 border border-slate-100 shadow-none bg-white relative overflow-hidden group">
-        <div className="relative z-10 text-center lg:text-left">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">Clinical Records</h1>
-          <p className="text-slate-500 font-medium mt-1.5 text-[11px] sm:text-[12px]">Capture observations, plans, and assessments effectively with high-fidelity nodes.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 relative z-10 w-full lg:w-auto mt-4 lg:mt-0">
-          <Button 
-            variant="secondary" 
-            size="md" 
-            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none transition-colors" 
-            leftIcon={<FaHistory size={10}/>}
-            onClick={() => alert('Clinical records archived.')}
-          >
-            Archive
-          </Button>
-          <Button 
-            variant="secondary" 
-            size="md" 
-            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none text-emerald-600 transition-colors bg-emerald-50 hover:bg-emerald-100 border-none" 
-            leftIcon={<FaFileMedical size={10}/>}
-            onClick={handleExportXL}
-          >
-            Export XL
-          </Button>
-          <Button 
-            variant="accent" 
-            size="md"
-            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none transition-colors"
-            onClick={() => navigate('/notes/soap/NEW')}
-            leftIcon={<FaStickyNote size={10}/>}
-          >
-            New SOAP Note
-          </Button>
-          <Button 
-            variant="secondary" 
-            size="md"
-            className="flex-1 sm:flex-none rounded-lg h-10 px-4 sm:px-6 bg-slate-900 text-white hover:bg-black shadow-none transition-colors"
-            onClick={() => navigate('/notes/rmdq/NEW')}
-            leftIcon={<FaChartLine size={10}/>}
-          >
-            New RMDQ
-          </Button>
-        </div>
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-clinicPrimary/5 rounded-full blur-2xl group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
-      </Card>
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 animate-fade-in custom-scrollbar font-sans pb-10">
+      <PageHeader 
+        title="Clinical Records"
+        subtitle="Capture observations, plans, and assessments effectively with high-fidelity nodes."
+        icon={<FaNotesMedical />}
+        actions={
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <Button 
+              variant="secondary" 
+              className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-none border-slate-200" 
+              leftIcon={<FaHistory size={10}/>}
+              onClick={() => alert('Clinical records archived.')}
+            >
+              Archive
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-none border-slate-200 text-emerald-600 bg-emerald-50 hover:bg-emerald-100" 
+              leftIcon={<FaFileMedical size={10}/>}
+              onClick={handleExportXL}
+            >
+              Export XL
+            </Button>
+            <Button 
+              variant="accent" 
+              className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
+              onClick={() => navigate('/notes/soap/NEW')}
+              leftIcon={<FaPlus size={10}/>}
+            >
+              New SOAP
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-black shadow-none border-none"
+              onClick={() => navigate('/notes/rmdq/NEW')}
+              leftIcon={<FaChartLine size={10}/>}
+            >
+              New RMDQ
+            </Button>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">

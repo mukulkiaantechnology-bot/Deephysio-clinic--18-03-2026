@@ -122,14 +122,14 @@ const PatientProfile = () => {
                     <div className="w-8 h-8 bg-white text-emerald-500 rounded-lg flex items-center justify-center text-sm shadow-sm"><FaPhoneAlt /></div>
                     <div>
                       <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mb-0.5 leading-none">Mobile Protocol</p>
-                      <p className="text-[11px] font-black text-slate-800 tracking-tight">{patientData.contact}</p>
+                      <p className="text-[11px] font-black text-slate-800 tracking-tight">{patient.contact}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 sm:p-4 bg-blue-50 border border-blue-100 transition-colors hover:bg-blue-100/50 cursor-pointer rounded-xl" onClick={() => handleAction('Communication Pipe (Email)')}>
                     <div className="w-8 h-8 bg-white text-blue-500 rounded-lg flex items-center justify-center text-sm shadow-sm"><FaEnvelope /></div>
                     <div>
                       <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5 leading-none">Electronic Ledger</p>
-                      <p className="text-[11px] font-black text-slate-800 tracking-tight">{patientData.email}</p>
+                      <p className="text-[11px] font-black text-slate-800 tracking-tight">{patient.email}</p>
                     </div>
                   </div>
                 </div>
@@ -304,6 +304,84 @@ const PatientProfile = () => {
              </div>
           </div>
         );
+      case 'Billing':
+        const allInvoices = JSON.parse(localStorage.getItem('deephysio_payments') || '[]');
+        const patientInvoices = allInvoices.filter(inv => inv.patient.includes(patient.name)) || [];
+        
+        return (
+          <div className="space-y-6 animate-fade-in font-sans">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <Card className="p-8 bg-slate-900 border-none shadow-premium relative overflow-hidden group">
+                <div className="relative z-10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Subject Balance Due</p>
+                  <h3 className="text-3xl font-black text-white tracking-tighter">{patient.balance}</h3>
+                  <div className="mt-6 flex items-center gap-3">
+                    <Button variant="accent" size="sm" className="rounded-xl px-6" onClick={() => navigate('/billing/new')}>Raise Invoice</Button>
+                    <button className="text-[10px] font-black text-clinicPrimary uppercase tracking-widest hover:text-white transition-colors" onClick={() => setIsPaymentModalOpen(true)}>Process Settlement</button>
+                  </div>
+                </div>
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-clinicPrimary/10 rounded-full blur-2xl group-hover:bg-clinicPrimary/20 transition-all duration-1000"></div>
+              </Card>
+
+              <Card className="p-8 bg-white border border-slate-100 shadow-none relative overflow-hidden">
+                <div className="relative z-10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Total Lifetime Valuation</p>
+                  <h3 className="text-3xl font-black text-slate-900 tracking-tighter">£{ (patientInvoices.reduce((acc, inv) => acc + parseFloat(inv.amount?.replace('£', '') || 0), 0) + 120).toFixed(2) }</h3>
+                  <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mt-4 flex items-center gap-2">
+                    <FaCheckCircle size={10} /> Account in Good Standing
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+            <div className="bg-white rounded-[32px] border border-slate-100 shadow-none overflow-hidden">
+              <div className="p-6 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
+                <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] leading-none">Transaction Chronology</h4>
+                <div className="flex gap-2">
+                  <button className="p-2 text-slate-300 hover:text-clinicPrimary transition-colors"><FaFilter size={12}/></button>
+                  <button className="p-2 text-slate-300 hover:text-clinicPrimary transition-colors"><FaDownload size={12}/></button>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50/50 text-slate-400 font-bold text-[9px] uppercase tracking-widest">
+                    <tr>
+                      <th className="px-8 py-3">Invoice Node</th>
+                      <th className="px-8 py-3">Description</th>
+                      <th className="px-8 py-3">Valuation</th>
+                      <th className="px-8 py-3">Status</th>
+                      <th className="px-8 py-3 text-right"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {patientInvoices.length > 0 ? patientInvoices.map((inv, i) => (
+                      <tr key={i} className="hover:bg-slate-50/50 transition-colors cursor-pointer group" onClick={() => navigate(`/billing/invoice/${inv.id}`)}>
+                        <td className="px-8 py-4">
+                          <p className="text-[12px] font-black text-slate-900 tracking-tight leading-none group-hover:text-clinicPrimary transition-colors">{inv.id}</p>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase mt-1 leading-none">{inv.date}</p>
+                        </td>
+                        <td className="px-8 py-4 text-[11px] font-bold text-slate-600 truncate max-w-[200px]">{inv.description}</td>
+                        <td className="px-8 py-4 text-[13px] font-black text-slate-900">{inv.amount}</td>
+                        <td className="px-8 py-4">
+                          <span className={`px-2.5 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border ${
+                            inv.status === 'Paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                          }`}>{inv.status}</span>
+                        </td>
+                        <td className="px-8 py-4 text-right">
+                          <FaChevronRight className="text-slate-200 group-hover:text-clinicPrimary ml-auto" size={10} />
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr>
+                        <td colSpan="5" className="px-8 py-10 text-center font-bold text-[10px] text-slate-300 uppercase tracking-widest">Zero historical transaction nodes detected</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="p-10 border border-slate-100 shadow-none bg-white rounded-xl flex flex-col items-center justify-center text-center animate-fade-in relative overflow-hidden group">
@@ -311,7 +389,7 @@ const PatientProfile = () => {
               <span className="text-2xl text-clinicPrimary opacity-80 group-hover:opacity-100">{tabs.find(t => t.name === activeTab).icon}</span>
             </div>
             <h3 className="text-lg font-black text-slate-900 mb-2 relative z-10 tracking-tight uppercase tracking-widest">{activeTab} Ledger</h3>
-            <p className="text-slate-500 max-w-xs font-medium px-4 relative z-10 text-[11px] leading-relaxed">System scan complete. No secondary nodes detected for {patientData.name} in this partition.</p>
+            <p className="text-slate-500 max-w-xs font-medium px-4 relative z-10 text-[11px] leading-relaxed">System scan complete. No secondary nodes detected for {patient.name} in this partition.</p>
             <Button variant="accent" className="mt-6 px-6 h-10 shadow-none relative z-10 rounded-lg uppercase tracking-widest font-black text-[10px]" leftIcon={<FaPlus />} onClick={() => handleInitializeClick(activeTab)}>
               {getInitializeButtonName(activeTab)}
             </Button>
@@ -338,15 +416,15 @@ const PatientProfile = () => {
             </div>
             <div className="w-full flex flex-col justify-center min-h-[64px]">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 w-full">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{patientData.name}</h1>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{patient.name}</h1>
                 <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-md text-[9px] font-black uppercase tracking-widest border border-emerald-100 flex items-center justify-center gap-2 shrink-0">
                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                   {patientData.status}
+                   {patient.status}
                 </span>
               </div>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3">
                  <div className="flex items-center gap-2">
-                    <span className="bg-slate-900 text-[9px] font-black text-white px-2 py-1 rounded tracking-widest shadow-sm">{patientData.id}</span>
+                    <span className="bg-slate-900 text-[9px] font-black text-white px-2 py-1 rounded tracking-widest shadow-sm">{patient.id}</span>
                     <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest hidden sm:block">•</span>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                        <FaCalendarAlt size={10} className="text-clinicPrimary opacity-40" /> Registered Node: 12 JAN 24
@@ -407,7 +485,7 @@ const PatientProfile = () => {
            <div className="flex justify-between items-center p-5 bg-slate-900 rounded-xl border border-white/5 shadow-none">
               <div>
                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 leading-none">Total Authorization Required</p>
-                 <h2 className="text-xl font-black text-white tracking-tighter">{patientData.balance}</h2>
+                 <h2 className="text-xl font-black text-white tracking-tighter">{patient.balance}</h2>
               </div>
               <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center border border-white/10 text-clinicPrimary">
                  <FaFileInvoiceDollar size={16} />

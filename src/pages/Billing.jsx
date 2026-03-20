@@ -5,6 +5,8 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 
+import PageHeader from '../components/ui/PageHeader';
+
 const Billing = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,26 +35,26 @@ const Billing = () => {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 md:p-6 animate-fade-in custom-scrollbar font-sans">
-      <Card hover={false} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 border border-slate-100 shadow-none bg-white relative overflow-hidden group">
-        <div className="relative z-10">
-          <h1 className="text-xl lg:text-2xl font-black text-slate-900 tracking-tighter leading-none uppercase">Financial Ledger</h1>
-          <p className="text-slate-500 font-bold mt-1.5 uppercase tracking-widest text-[10px] opacity-80">Acknowledge payments, generate professional invoices, and monitor clinic revenue streams.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 relative z-10 w-full lg:w-auto mt-4 lg:mt-0">
-           <Button variant="secondary" size="md" className="flex-1 lg:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none text-[10px] font-black uppercase tracking-widest bg-white text-slate-700 hover:bg-slate-50" leftIcon={<FaDownload size={10} />} onClick={() => window.print()}>Export Statement</Button>
-           <Button 
-            variant="accent" 
-            size="md"
-            className="flex-1 lg:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-sm text-[10px] font-black uppercase tracking-widest"
-            onClick={() => navigate('/billing/new')}
-            leftIcon={<FaFileInvoiceDollar size={10} />}
-          >
-            Issue New Invoice
-          </Button>
-        </div>
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-2xl group-hover:bg-clinicPrimary/10 transition-colors duration-1000"></div>
-      </Card>
+    <div className="space-y-4 sm:space-y-6 animate-fade-in custom-scrollbar font-sans px-4 md:px-6 py-4">
+      <PageHeader 
+        title="Financial Ledger"
+        subtitle="Acknowledge payments, generate professional invoices, and monitor clinic revenue streams."
+        icon={<FaFileInvoiceDollar />}
+        actions={
+          <>
+            <Button variant="secondary" size="md" className="flex-1 lg:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-none text-[10px] font-black uppercase tracking-widest bg-white text-slate-700 hover:bg-slate-50" leftIcon={<FaDownload size={10} />} onClick={() => window.print()}>Export Statement</Button>
+            <Button 
+              variant="accent" 
+              size="md"
+              className="flex-1 lg:flex-none rounded-lg h-10 px-4 sm:px-6 shadow-sm text-[10px] font-black uppercase tracking-widest"
+              onClick={() => navigate('/billing/new')}
+              leftIcon={<FaFileInvoiceDollar size={10} />}
+            >
+              Issue New Invoice
+            </Button>
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         <Card hover={false} className="bg-slate-900 border border-slate-800 p-5 sm:p-6 relative overflow-hidden group shadow-sm">

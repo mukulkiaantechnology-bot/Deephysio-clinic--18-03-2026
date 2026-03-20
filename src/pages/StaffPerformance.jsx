@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUserMd, FaArrowUp, FaArrowDown, FaStar, FaClock, FaCheckCircle, FaCalendarAlt, FaChartPie, FaHistory, FaChevronRight, FaMicroscope, FaBrain, FaFilter, FaDownload, FaSync, FaChartLine } from 'react-icons/fa';
+import { FaUserMd, FaArrowUp, FaArrowDown, FaStar, FaClock, FaCheckCircle, FaCalendarAlt, FaChartPie, FaHistory, FaChevronRight, FaMicroscope, FaBrain, FaFilter, FaDownload, FaSync, FaChartLine, FaUsers, FaBolt } from 'react-icons/fa';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
