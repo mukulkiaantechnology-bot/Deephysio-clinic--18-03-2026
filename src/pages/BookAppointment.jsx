@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FaCalendarAlt, FaClock, FaUser, FaStethoscope, FaChevronRight, 
   FaSave, FaTimes, FaUserPlus, FaCheckCircle, FaInfoCircle, FaUserMd,
-  FaArrowLeft
+  FaArrowLeft, FaChevronDown
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -21,6 +21,13 @@ const BookAppointment = () => {
   });
 
   const [filteredPractitioners, setFilteredPractitioners] = useState([]);
+  const mockPatients = [
+    'James Wilson',
+    'Alice Johnson',
+    'Henry Adams',
+    'Sarah Parker',
+    'Emma Davis'
+  ];
 
   const services = [
     { id: 1, name: 'Physiotherapy Consultation', duration: '45 min', price: '$85', icon: <FaStethoscope />, specialties: ['physio', 'assessment'] },
@@ -90,13 +97,19 @@ const BookAppointment = () => {
               </button>
             </div>
             <div className="relative group">
-              <input 
-                type="text" 
-                placeholder="Search or enter verified patient name..." 
-                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300 shadow-inner-soft"
+              <select 
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all cursor-pointer shadow-inner-soft appearance-none"
                 value={formData.patient}
                 onChange={e => setFormData({...formData, patient: e.target.value})}
-              />
+              >
+                <option value="" className="text-slate-300">Select verified patient...</option>
+                {mockPatients.map((p, i) => (
+                  <option key={i} value={p} className="text-slate-700 font-medium">{p}</option>
+                ))}
+              </select>
+              <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                 <FaChevronDown size={14} />
+              </div>
             </div>
           </div>
 

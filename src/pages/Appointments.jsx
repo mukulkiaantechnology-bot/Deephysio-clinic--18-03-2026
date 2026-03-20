@@ -1,18 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarPlus, FaFilter, FaChevronLeft, FaChevronRight, FaClock, FaCheckCircle, FaUserMd, FaPlus, FaSearch } from 'react-icons/fa';
+import { 
+  FaCalendarPlus, FaFilter, FaChevronLeft, FaChevronRight, 
+  FaClock, FaCheckCircle, FaUserMd, FaPlus, FaSearch, 
+  FaTimes, FaEllipsisV, FaRegCalendarCheck, FaUserSlash 
+} from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import PageHeader from '../components/ui/PageHeader';
+import CalendarHeader from '../components/appointments/CalendarHeader';
+import CalendarGrid from '../components/appointments/CalendarGrid';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Appointments = () => {
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date('2026-03-18'));
-  const [selectedPractitioner, setSelectedPractitioner] = useState('All Practitioners');
-  const [isBookModalOpen, setIsBookModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPractitioner, setSelectedPractitioner] = useState('all');
   const [viewMode, setViewMode] = useState('day');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Context Menu State
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, appointment: null });
+  // Side Panel State
+  const [sidePanel, setSidePanel] = useState({ isOpen: false, type: 'book', data: null });
 
   const practitioners = [
     { id: 1, name: 'Dr. Sarah Wilson', role: 'Senior Physiotherapist', color: 'bg-emerald-500' },
@@ -20,36 +31,15 @@ const Appointments = () => {
     { id: 3, name: 'Dr. Emily Brown', role: 'Rehabilitation Expert', color: 'bg-indigo-500' }
   ];
 
-  const timeSlots = [
-    '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
-  ];
-
   const [appointments, setAppointments] = useState([
-    { id: 101, patient: 'James Wilson', patientId: 'PID-102', date: '2026-03-18', time: '09:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed' },
-    { id: 102, patient: 'Alice Johnson', patientId: 'PID-101', date: '2026-03-18', time: '11:00 AM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived' },
-    { id: 103, patient: 'Robert Fox', patientId: 'PID-103', date: '2026-03-18', time: '02:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending' }
+    { id: 101, patientName: 'James Wilson', patientId: 'PID-102', date: '2026-03-18', startTime: '09:00 AM', endTime: '10:00 AM', type: 'Physio Session', practitioner: 'Dr. Sarah Wilson', status: 'Confirmed', hasNotes: true, isPaid: true },
+    { id: 102, patientName: 'Alice Johnson', patientId: 'PID-101', date: '2026-03-18', startTime: '11:00 AM', endTime: '12:00 PM', type: 'Initial Assessment', practitioner: 'Dr. Michael Chen', status: 'Arrived', hasNotes: false, isPaid: false },
+    { id: 103, patientName: 'Robert Fox', patientId: 'PID-103', date: '2026-03-18', startTime: '02:00 PM', endTime: '03:00 PM', type: 'Review Session', practitioner: 'Dr. Sarah Wilson', status: 'Pending', hasNotes: true, isPaid: false }
   ]);
 
   const [newBooking, setNewBooking] = useState({
-    patient: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', time: '09:00 AM'
+    patientName: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', startTime: '09:00 AM'
   });
-
-  const [selectedAppt, setSelectedAppt] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-  const handleAddAppointment = () => {
-    if (!newBooking.patient) return;
-    const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 101;
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    setAppointments([...appointments, { ...newBooking, id: newId, date: formattedDate, status: 'Confirmed' }]);
-    setIsBookModalOpen(false);
-    setNewBooking({ patient: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', time: '09:00 AM' });
-  };
-
-  const handleCancelAppointment = (id) => {
-    setAppointments(appointments.filter(a => a.id !== id));
-    setIsDetailModalOpen(false);
-  };
 
   const handleDateChange = (days) => {
     const d = new Date(currentDate);
@@ -57,294 +47,278 @@ const Appointments = () => {
     setCurrentDate(d);
   };
 
+  const handleSlotClick = (date, hour) => {
+    const formattedTime = `${hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour)}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+    setNewBooking({
+      ...newBooking,
+      startTime: formattedTime,
+      practitioner: selectedPractitioner !== 'all' ? selectedPractitioner : 'Dr. Sarah Wilson'
+    });
+    setSidePanel({ isOpen: true, type: 'book', data: { date, hour } });
+    setContextMenu({ visible: false, x: 0, y: 0, appointment: null });
+  };
+
+  const handleAppointmentClick = (appointment) => {
+    // Navigate directly to Patient's Clinical Record
+    navigate(`/patients/profile/${appointment.patientId}`);
+  };
+
+  const handleAppointmentContextMenu = (appointment, e) => {
+    setContextMenu({
+      visible: true,
+      x: e.pageX,
+      y: e.pageY,
+      appointment
+    });
+  };
+
+  const handleStatusChange = (status) => {
+    if (contextMenu.appointment) {
+      setAppointments(appointments.map(a => 
+        a.id === contextMenu.appointment.id ? { ...a, status } : a
+      ));
+    }
+    setContextMenu({ visible: false, x: 0, y: 0, appointment: null });
+  };
+
+  const handleAddAppointment = () => {
+    if (!newBooking.patientName) return;
+    const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 101;
+    const formattedDate = sidePanel.data?.date ? new Date(sidePanel.data.date).toISOString().split('T')[0] : currentDate.toISOString().split('T')[0];
+    
+    // Calculate endTime (1 hour later for simplicity)
+    const hour = parseInt(newBooking.startTime.split(':')[0]);
+    const amPm = newBooking.startTime.split(' ')[1];
+    let nextHour = hour + 1;
+    let nextAmPm = amPm;
+    if (nextHour === 12) {
+      nextAmPm = amPm === 'AM' ? 'PM' : 'AM';
+    } else if (nextHour > 12) {
+      nextHour = 1;
+    }
+    const endTime = `${nextHour}:00 ${nextAmPm}`;
+
+    setAppointments([...appointments, { 
+      ...newBooking, 
+      id: newId, 
+      date: formattedDate, 
+      endTime,
+      status: 'Confirmed',
+      hasNotes: false,
+      isPaid: false
+    }]);
+    setSidePanel({ isOpen: false, type: 'book', data: null });
+    setNewBooking({ patientName: '', practitioner: 'Dr. Sarah Wilson', type: 'Physio Assessment', startTime: '09:00 AM' });
+  };
+
+  const filteredAppointments = appointments.filter(a => {
+    const matchesPractitioner = selectedPractitioner === 'all' || a.practitioner === selectedPractitioner;
+    const matchesSearch = searchTerm === '' || a.patientName.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesPractitioner && matchesSearch;
+  });
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 animate-fade-in custom-scrollbar font-sans pb-10">
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 animate-fade-in custom-scrollbar font-sans pb-10" onClick={() => setContextMenu({ visible: false, x: 0, y: 0, appointment: null })}>
       <PageHeader 
-        title="Clinical Scheduler"
-        subtitle="Orchestrate patient visits, practitioner availability, and treatment node synchronization."
+        title="Clinical Diary"
+        subtitle="Manage patient appointments, clinical schedules, and multi-disciplinary node synchronization."
         icon={<FaCalendarPlus />}
         actions={
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <div className="flex bg-slate-100/50 p-1 rounded-xl border border-slate-200 shadow-inner-soft">
-               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('day')}>Day</button>
-               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('week')}>Week</button>
-               <button className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'month' ? 'bg-white shadow-premium text-clinicPrimary' : 'text-slate-400'}`} onClick={() => setViewMode('month')}>Month</button>
-            </div>
-            <Button 
-              variant="accent" 
-              className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
-              onClick={() => navigate('/appointments/book')}
-              leftIcon={<FaCalendarPlus size={12}/>}
-            >
-              New Booking
-            </Button>
-          </div>
+          <Button 
+            variant="accent" 
+            className="h-10 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-google"
+            onClick={() => setSidePanel({ isOpen: true, type: 'book', data: null })}
+            leftIcon={<FaCalendarPlus size={12}/>}
+          >
+            New Booking
+          </Button>
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-1 space-y-4">
-           <Card hover={false} className="p-4 border border-slate-100 shadow-none bg-white relative overflow-hidden">
-             <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <div className="w-1 h-4 bg-clinicPrimary rounded-full"></div> Practitioner Node
-             </h3>
-             <div className="space-y-2 relative z-10">
-               <button 
-                onClick={() => setSelectedPractitioner('All Practitioners')}
-                className={`w-full text-left p-3 rounded-lg border transition-colors flex items-center justify-between cursor-pointer ${selectedPractitioner === 'All Practitioners' ? 'bg-clinicPrimary/10 text-clinicPrimary border-clinicPrimary/30 shadow-none' : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-slate-100'}`}
-               >
-                 <span className="text-[10px] font-bold uppercase tracking-widest">All Practitioners</span>
-                 <FaUserMd size={10} className={selectedPractitioner === 'All Practitioners' ? 'text-clinicPrimary' : 'text-slate-400'}/>
-               </button>
-               {practitioners.map(dr => (
-                 <button 
-                  key={dr.id}
-                  onClick={() => setSelectedPractitioner(dr.name)}
-                  className={`w-full text-left p-2.5 rounded-lg border transition-colors cursor-pointer ${selectedPractitioner === dr.name ? 'bg-slate-900 border-slate-900 shadow-none' : 'bg-slate-50 border-slate-100 hover:bg-slate-100'}`}
-                 >
-                   <div className="flex items-center gap-2">
-                     <div className={`w-6 h-6 rounded-md ${dr.color} flex items-center justify-center text-white text-[9px] font-black`}>
-                        {dr.name.split('. ')[1][0]}
-                     </div>
-                     <div>
-                        <p className={`text-[10px] font-bold leading-none ${selectedPractitioner === dr.name ? 'text-white' : 'text-slate-700'}`}>{dr.name}</p>
-                        <p className={`text-[8px] mt-0.5 font-black uppercase tracking-widest ${selectedPractitioner === dr.name ? 'text-slate-400' : 'text-slate-400'}`}>{dr.role}</p>
-                     </div>
-                   </div>
-                 </button>
-               ))}
-             </div>
-             <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-clinicPrimary/5 rounded-full blur-2xl"></div>
-           </Card>
+      {/* Calendar Controller */}
+      <CalendarHeader 
+        view={viewMode}
+        setView={setViewMode}
+        currentDate={currentDate}
+        onPrev={() => handleDateChange(viewMode === 'week' ? -7 : (viewMode === 'month' ? -30 : -1))}
+        onNext={() => handleDateChange(viewMode === 'week' ? 7 : (viewMode === 'month' ? 30 : 1))}
+        onToday={() => setCurrentDate(new Date('2026-03-18'))}
+        practitioners={practitioners}
+        selectedPractitioner={selectedPractitioner}
+        setSelectedPractitioner={setSelectedPractitioner}
+      />
 
-           <Card hover={false} className="p-4 border border-slate-100 shadow-none bg-white">
-              <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Queue Status</h3>
-              <div className="space-y-2">
-                 {[
-                   { label: 'Verified Arrived', count: 12, color: 'text-emerald-500' },
-                   { label: 'Pending Processing', count: 3, color: 'text-amber-500' },
-                   { label: 'Next Call Node', count: 'Room 4', color: 'text-clinicPrimary' }
-                 ].map((stat, i) => (
-                   <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</span>
-                      <span className={`text-[10px] font-black ${stat.color}`}>{stat.count}</span>
-                   </div>
-                 ))}
-              </div>
-           </Card>
-        </div>
-
-        <div className="lg:col-span-3">
-           <Card hover={false} className="p-0 overflow-hidden border border-slate-100 shadow-none bg-white">
-             <div className="p-4 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/50 border-b border-slate-100 gap-4">
-                <div className="flex items-center gap-3">
-                   <button className="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => handleDateChange(-1)}>
-                      <FaChevronLeft size={8} className="mx-auto"/>
-                   </button>
-                   <div className="text-center">
-                      <h2 className="text-xs font-bold text-slate-900 tracking-tight">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h2>
-                      <p className="text-[8px] font-black text-clinicPrimary uppercase tracking-widest mt-0.5">Daily Protocol</p>
-                   </div>
-                   <button className="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => handleDateChange(1)}>
-                      <FaChevronRight size={8} className="mx-auto"/>
-                   </button>
-                </div>
-                <div className="relative w-full md:max-w-[240px] bg-white rounded-lg border border-slate-200 transition-colors focus-within:border-clinicPrimary">
-                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={10}/>
-                   <input 
-                    type="text" 
-                    placeholder="Filter by subject..." 
-                    className="w-full pl-8 pr-3 py-2 bg-transparent text-[10px] font-bold text-slate-600 outline-none"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                   />
-                </div>
-             </div>
-
-             <div className="relative">
-                {viewMode === 'day' ? timeSlots.map((slot, index) => {
-                  const formattedCurrentDate = currentDate.toISOString().split('T')[0];
-                  const appointment = appointments.find(a => 
-                    a.time === slot && 
-                    a.date === formattedCurrentDate &&
-                    (selectedPractitioner === 'All Practitioners' || a.practitioner === selectedPractitioner) &&
-                    (searchTerm === '' || a.patient.toLowerCase().includes(searchTerm.toLowerCase()))
-                  );
-                  return (
-                    <div key={index} className="flex border-b border-slate-50 last:border-none">
-                       <div className="w-16 sm:w-20 p-3 sm:p-4 border-r border-slate-50 bg-slate-50/20 flex flex-col items-center justify-center shrink-0">
-                          <span className="text-[10px] sm:text-[11px] font-bold text-slate-900">{slot.split(' ')[0]}</span>
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{slot.split(' ')[1]}</span>
-                       </div>
-                       <div className="flex-1 p-2 relative group/node">
-                          {appointment ? (
-                             <div 
-                              className={`p-3 rounded-lg border border-clinicPrimary/10 transition-colors cursor-pointer relative overflow-hidden ${
-                                appointment.status === 'Confirmed' ? 'bg-emerald-50 text-emerald-900 select-none border-emerald-100' : 
-                                appointment.status === 'Arrived' ? 'bg-blue-50 text-blue-900 select-none border-blue-100' : 
-                                'bg-white hover:bg-slate-50'
-                              }`}
-                              onClick={() => { setSelectedAppt(appointment); setIsDetailModalOpen(true); }}
-                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                   <div>
-                                      <div className="flex items-center gap-2 mb-1">
-                                         <p className="text-[11px] font-bold text-slate-900">{appointment.patient}</p>
-                                         <button className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border transition-colors ${
-                                           appointment.status === 'Confirmed' ? 'bg-emerald-500 text-white border-emerald-500' : 
-                                           appointment.status === 'Arrived' ? 'bg-blue-500 text-white border-blue-500' : 
-                                           'bg-slate-900 text-white border-slate-900'
-                                         }`} onClick={(e) => e.stopPropagation()}>
-                                            {appointment.status}
-                                         </button>
-                                      </div>
-                                      <p className="text-[9px] font-medium text-slate-500 flex items-center gap-1">
-                                         <FaClock size={8} className="text-slate-300"/> {appointment.type} • {appointment.practitioner}
-                                      </p>
-                                   </div>
-                                   <div className="flex gap-1.5">
-                                       <button className="w-6 h-6 rounded bg-white border border-slate-200 text-slate-400 hover:text-clinicPrimary hover:border-clinicPrimary transition-colors cursor-pointer flex items-center justify-center" onClick={(e) => { e.stopPropagation(); navigate(`/patients/profile/${appointment.patientId}`); }}>
-                                         <FaUserMd size={10}/>
-                                      </button>
-                                      <button className="w-6 h-6 rounded bg-clinicPrimary text-white shadow-none transition-colors hover:bg-clinicPrimaryDark cursor-pointer flex items-center justify-center" onClick={(e) => { e.stopPropagation(); navigate('/billing'); }}>
-                                         <FaCheckCircle size={10}/>
-                                      </button>
-                                   </div>
-                                </div>
-                             </div>
-                          ) : (
-                             <button 
-                              className="w-full h-full py-4 min-h-[40px] rounded-lg border border-dashed border-slate-200 bg-slate-50 text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center cursor-pointer select-none transition-colors hover:bg-clinicPrimary/5 hover:text-clinicPrimary hover:border-clinicPrimary/30"
-                              onClick={() => {
-                                setNewBooking({ ...newBooking, time: slot, practitioner: selectedPractitioner !== 'All Practitioners' ? selectedPractitioner : 'Dr. Sarah Wilson' });
-                                setIsBookModalOpen(true);
-                              }}
-                             >
-                                <FaPlus size={8} className="mr-1.5"/> Available Slot Node
-                             </button>
-                          )}
-                       </div>
-                    </div>
-                  );
-                }) : (
-                  <div className="p-20 text-center space-y-4">
-                     <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{viewMode} View Grid Pipeline setup</p>
-                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Temporal Nodes display buffers activated.</p>
-                  </div>
-                )}
-             </div>
-           </Card>
-        </div>
+      {/* Grid Container */}
+      <div className="relative">
+        <CalendarGrid 
+          view={viewMode}
+          currentDate={currentDate}
+          appointments={filteredAppointments}
+          onSlotClick={handleSlotClick}
+          onAppointmentClick={handleAppointmentClick}
+          onAppointmentContextMenu={handleAppointmentContextMenu}
+          practitioners={practitioners}
+          selectedPractitioner={selectedPractitioner}
+        />
       </div>
 
-      <Modal 
-        isOpen={isBookModalOpen} 
-        onClose={() => setIsBookModalOpen(false)}
-        title="Initialize New Booking Node"
-        footer={
-          <div className="flex gap-2 justify-end w-full">
-            <Button variant="secondary" onClick={() => setIsBookModalOpen(false)}>Discard</Button>
-            <Button variant="accent" onClick={handleAddAppointment} leftIcon={<FaPlus />}>Finalize</Button>
-          </div>
-        }
-      >
-        <div className="space-y-4 p-2 font-sans">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Subject Identity</label>
-            <div className="relative group">
-               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={10}/>
-               <input 
-                type="text" 
-                className="w-full pl-8 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-clinicPrimary transition-colors" 
-                placeholder="Search registered subjects..." 
-                value={newBooking.patient}
-                onChange={(e) => setNewBooking({...newBooking, patient: e.target.value})}
-               />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Practitioner</label>
-              <select 
-                className="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-clinicPrimary transition-colors"
-                value={newBooking.practitioner}
-                onChange={(e) => setNewBooking({...newBooking, practitioner: e.target.value})}
-              >
-                {practitioners.map(dr => <option key={dr.id}>{dr.name}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Protocol</label>
-              <select 
-                className="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-clinicPrimary transition-colors"
-                value={newBooking.type}
-                onChange={(e) => setNewBooking({...newBooking, type: e.target.value})}
-              >
-                <option>Physio Assessment</option>
-                <option>Follow-up Review</option>
-                <option>Rehab Exercise Session</option>
-                <option>Initial Consultation</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Date</label>
-              <input type="date" className="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none" value="2026-03-18" readOnly />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Time</label>
-              <select 
-                className="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-clinicPrimary transition-colors"
-                value={newBooking.time}
-                onChange={(e) => setNewBooking({...newBooking, time: e.target.value})}
-              >
-                {timeSlots.map(t => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Detail Modal */}
-      <Modal 
-        isOpen={isDetailModalOpen} 
-        onClose={() => setIsDetailModalOpen(false)}
-        title="Appointment Details"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="danger" onClick={() => handleCancelAppointment(selectedAppt?.id)}>Cancel Appointment</Button>
-            <Button variant="secondary" onClick={() => setIsDetailModalOpen(false)}>Close Node</Button>
-          </div>
-        }
-      >
-        {selectedAppt && (
-          <div className="space-y-3 p-2 font-sans">
-             <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Subject Node</p>
-                <p className="text-md font-black text-slate-900 mt-1">{selectedAppt.patient}</p>
+      {/* Context Menu */}
+      <AnimatePresence>
+        {contextMenu.visible && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.1 }}
+            className="fixed bg-white rounded-xl shadow-premium border border-slate-100 p-1.5 z-[100] w-48 font-sans"
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+            onClick={(e) => e.stopPropagation()}
+          >
+             <div className="px-3 py-2 border-b border-slate-50 mb-1">
+                <p className="text-[10px] font-black text-slate-900 uppercase truncate">{contextMenu.appointment?.patientName}</p>
+                <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{contextMenu.appointment?.status}</p>
              </div>
-             <div className="grid grid-cols-2 gap-3">
-                <div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Practitioner</p>
-                   <p className="text-xs font-bold text-slate-700 mt-0.5">{selectedAppt.practitioner}</p>
-                </div>
-                <div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol Type</p>
-                   <p className="text-xs font-bold text-slate-700 mt-0.5">{selectedAppt.type}</p>
-                </div>
-                <div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Session Time</p>
-                   <p className="text-xs font-bold text-slate-700 mt-0.5">{selectedAppt.time}</p>
-                </div>
-                <div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                   <p className="text-xs font-bold text-emerald-600 mt-0.5">{selectedAppt.status}</p>
-                </div>
-             </div>
-          </div>
+             {[
+               { label: 'Arrived', icon: <FaCheckCircle className="text-emerald-500" />, status: 'Arrived' },
+               { label: 'Wait List', icon: <FaClock className="text-amber-500" />, status: 'Pending' },
+               { label: 'Cancel Node', icon: <FaTimes className="text-red-500" />, status: 'Cancelled' }
+             ].map((item, i) => (
+               <button 
+                key={i}
+                onClick={() => handleStatusChange(item.status)}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-clinicPrimary transition-colors text-left"
+               >
+                 <span className="text-xs">{item.icon}</span>
+                 <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+               </button>
+             ))}
+          </motion.div>
         )}
-      </Modal>
+      </AnimatePresence>
+
+      {/* Right-Side Panel */}
+      <AnimatePresence>
+        {sidePanel.isOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-40"
+              onClick={() => setSidePanel({ isOpen: false, type: 'book', data: null })}
+            />
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-premium z-50 flex flex-col font-sans border-l border-slate-100"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                 <div>
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                      {sidePanel.type === 'book' ? 'Initialize Booking Node' : 'Record Node'}
+                    </h3>
+                    <p className="text-[8px] font-black text-clinicPrimary uppercase tracking-[0.2em] mt-1">Personnel Management</p>
+                 </div>
+                 <button 
+                  onClick={() => setSidePanel({ isOpen: false, type: 'book', data: null })}
+                  className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
+                 >
+                    <FaTimes size={12} />
+                 </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+                 <div className="space-y-1.5">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Identity</label>
+                    <div className="relative">
+                       <input 
+                        type="text" 
+                        placeholder="Search registered subjects..." 
+                        className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-700 outline-none focus:border-clinicPrimary focus:ring-4 focus:ring-clinicPrimary/10 transition-all shadow-inner-soft"
+                        value={newBooking.patientName}
+                        onChange={(e) => setNewBooking({...newBooking, patientName: e.target.value})}
+                       />
+                       <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300" size={10} />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Practitioner</label>
+                       <select 
+                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-700 uppercase tracking-widest outline-none focus:border-clinicPrimary transition-all cursor-pointer shadow-soft"
+                        value={newBooking.practitioner}
+                        onChange={(e) => setNewBooking({...newBooking, practitioner: e.target.value})}
+                       >
+                         {practitioners.map(dr => <option key={dr.id}>{dr.name}</option>)}
+                       </select>
+                    </div>
+                    <div className="space-y-1.5">
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Protocol Node</label>
+                       <select 
+                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-700 uppercase tracking-widest outline-none focus:border-clinicPrimary transition-all cursor-pointer shadow-soft"
+                        value={newBooking.type}
+                        onChange={(e) => setNewBooking({...newBooking, type: e.target.value})}
+                       >
+                          <option>Physio Assessment</option>
+                          <option>Follow-up Review</option>
+                          <option>Initial Consultation</option>
+                          <option>Sports Massage</option>
+                       </select>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Date</label>
+                       <input 
+                        type="text" 
+                        className="w-full p-3 bg-slate-100 border border-slate-50 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest outline-none" 
+                        value={sidePanel.data?.date ? new Date(sidePanel.data.date).toLocaleDateString('en-GB') : currentDate.toLocaleDateString('en-GB')} 
+                        readOnly 
+                       />
+                    </div>
+                    <div className="space-y-1.5">
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Session Time</label>
+                       <input 
+                        type="text" 
+                        className="w-full p-3 bg-slate-100 border border-slate-50 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest outline-none" 
+                        value={newBooking.startTime} 
+                        readOnly 
+                       />
+                    </div>
+                 </div>
+
+                 {sidePanel.type === 'book' && (
+                    <div className="pt-4 border-t border-slate-50">
+                       <p className="text-[8px] font-bold text-slate-400 uppercase text-center">Empty nodes can be calibrated post-allocation.</p>
+                    </div>
+                 )}
+              </div>
+
+              <div className="p-6 border-t border-slate-100 bg-slate-50/30 flex gap-3">
+                 <Button 
+                  variant="ghost" 
+                  className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-800"
+                  onClick={() => setSidePanel({ isOpen: false, type: 'book', data: null })}
+                 >
+                    Discard
+                 </Button>
+                 <Button 
+                  variant="accent" 
+                  className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest shadow-google"
+                  onClick={handleAddAppointment}
+                  leftIcon={<FaPlus />}
+                 >
+                    Finalize Node
+                 </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
