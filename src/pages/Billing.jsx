@@ -34,6 +34,16 @@ const Billing = () => {
     inv.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalsSummary = filteredInvoices.reduce((acc, inv) => {
+    const amt = parseFloat(inv.amount.replace('£', '').replace(',', ''));
+    if (inv.status === 'Paid') acc.paid += amt;
+    else acc.outstanding += amt;
+    acc.total += amt;
+    return acc;
+  }, { total: 0, paid: 0, outstanding: 0 });
+
+  const efficiencyRate = totalsSummary.total > 0 ? (totalsSummary.paid / totalsSummary.total) * 100 : 100;
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in custom-scrollbar font-sans px-4 md:px-6 py-4">
       <PageHeader 
@@ -63,7 +73,7 @@ const Billing = () => {
                 <FaWallet className="text-clinicPrimary" size={12}/> Outstanding Asset
              </p>
              <div className="flex items-baseline gap-3">
-                <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tighter">£4,250.60</h3>
+                <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tighter">£{totalsSummary.outstanding.toFixed(2)}</h3>
                 <span className="text-rose-400 text-[9px] font-bold uppercase tracking-widest bg-rose-400/10 px-2 py-0.5 rounded border border-rose-400/20">+12% Var</span>
              </div>
           </div>
@@ -75,7 +85,7 @@ const Billing = () => {
              <FaChartLine className="text-emerald-500" size={12}/> Monthly Yield (MTD)
           </p>
           <div className="flex items-baseline gap-3">
-            <h3 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">£18,500.00</h3>
+            <h3 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">£{totalsSummary.paid.toFixed(2)}</h3>
             <span className="text-emerald-600 text-[9px] font-bold uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">+8.2%</span>
           </div>
           <div className="mt-4 flex gap-1 h-1.5 bg-slate-50 rounded-full overflow-hidden">
@@ -89,7 +99,7 @@ const Billing = () => {
              <FaPercentage className="text-blue-500" size={12}/> Efficiency Rate
           </p>
           <div className="flex items-baseline gap-3">
-            <h3 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">94.8%</h3>
+            <h3 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">{efficiencyRate.toFixed(1)}%</h3>
             <span className="text-blue-600 text-[9px] font-bold uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Optimum</span>
           </div>
           <div className="absolute top-5 right-5 opacity-10 pointer-events-none">

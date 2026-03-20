@@ -2,6 +2,7 @@ import React from 'react';
 import { FaShieldAlt, FaKey, FaUserLock, FaHistory, FaMobileAlt, FaUniversalAccess, FaSave, FaCheckCircle, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 
 const SecuritySettings = () => {
   const navigate = useNavigate();

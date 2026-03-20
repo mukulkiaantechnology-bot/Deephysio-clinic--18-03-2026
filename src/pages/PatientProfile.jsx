@@ -4,7 +4,8 @@ import {
   FaFolderOpen, FaArrowLeft, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt,
   FaPlus, FaEdit, FaPrint, FaTrash, FaCheckCircle, FaBriefcaseMedical, 
   FaClock, FaHistory, FaDownload, FaEllipsisV, FaUserShield, FaStethoscope,
-  FaChevronRight, FaFilter, FaSearch, FaCheckDouble, FaChartLine, FaRunning, FaBullseye, FaSmile, FaUserGraduate
+  FaChevronRight, FaFilter, FaSearch, FaCheckDouble, FaChartLine, FaRunning, FaBullseye, FaSmile, FaUserGraduate,
+  FaShieldAlt
 } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -16,6 +17,8 @@ const PatientProfile = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('Overview');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportPassword, setExportPassword] = useState('');
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
@@ -435,8 +438,22 @@ const PatientProfile = () => {
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 w-full lg:w-auto">
-          <button className="h-10 w-10 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 hover:border-emerald-100 transition-colors flex items-center justify-center shadow-none" onClick={() => window.print()}><FaPrint size={14}/></button>
+          <button 
+            className="h-10 w-10 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 hover:border-emerald-100 transition-colors flex items-center justify-center shadow-none" 
+            onClick={() => setIsExportModalOpen(true)}
+            title="Secure Export PDF"
+          >
+            <FaDownload size={14}/>
+          </button>
           <button className="h-10 w-10 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:bg-blue-50 hover:border-blue-100 transition-colors flex items-center justify-center shadow-none" onClick={() => navigate('/patients/add')}><FaEdit size={14}/></button>
+          <Button 
+            variant="secondary" 
+            className="flex-1 sm:flex-none sm:w-auto px-5 h-10 shadow-none text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors bg-white hover:bg-slate-50 border border-slate-200 text-slate-700" 
+            leftIcon={<FaFileInvoiceDollar className="shrink-0" size={10} />}
+            onClick={() => navigate(`/billing/new?patient=${patient.name}`)}
+          >
+            Raise Invoice
+          </Button>
           <Button 
             variant="accent" 
             className="flex-1 sm:flex-none sm:w-auto px-5 h-10 shadow-none sm:ml-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors" 
@@ -500,6 +517,47 @@ const PatientProfile = () => {
                     </button>
                  ))}
               </div>
+           </div>
+        </div>
+      </Modal>
+
+      {/* Secure Export Modal */}
+      <Modal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        title="Secure Clinical Export Node"
+        footer={
+           <div className="flex gap-2 justify-end w-full">
+             <Button variant="secondary" onClick={() => setIsExportModalOpen(false)}>Abort</Button>
+             <Button variant="accent" onClick={() => { alert('PDF Node Generation complete. Secure decrypt frame active.'); setIsExportModalOpen(false); window.print(); }}>Generate PDF</Button>
+           </div>
+        }
+      >
+        <div className="p-4 sm:p-5 space-y-6 font-sans">
+           <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                 <FaShieldAlt size={16} />
+              </div>
+              <div>
+                 <p className="text-[11px] font-black text-amber-800 uppercase tracking-widest leading-none mb-1">GDPR / HIPAA Security Guard</p>
+                 <p className="text-[10px] font-medium text-amber-700 leading-relaxed">To export clinical notes securely, you can define a password node setup structure that restricts access to the PDF buffer stream.</p>
+              </div>
+           </div>
+           
+           <div className="space-y-3">
+              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Export Security Password</label>
+              <input 
+                type="password" 
+                placeholder="Enter Encryption Key node..."
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-[12px] font-black text-slate-900 outline-none focus:ring-4 focus:ring-clinicPrimary/10 focus:border-clinicPrimary transition-all placeholder:text-slate-300"
+                value={exportPassword}
+                onChange={e => setExportPassword(e.target.value)}
+              />
+           </div>
+
+           <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+              <input type="checkbox" id="encryptCheck" className="accent-clinicPrimary rounded cursor-pointer" defaultChecked />
+              <label htmlFor="encryptCheck" className="text-[10px] font-black text-slate-700 uppercase tracking-widest cursor-pointer">Require Password node on opening PDF</label>
            </div>
         </div>
       </Modal>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaArrowLeft, FaReceipt, FaFileInvoiceDollar, FaPlus, FaTrash, FaCalculator } from 'react-icons/fa';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -7,12 +7,27 @@ import PageHeader from '../components/ui/PageHeader';
 
 const NewInvoice = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const patientParam = searchParams.get('patient');
+
   const [newInvoice, setNewInvoice] = useState({
-    patient: 'James Wilson (PID-102)', 
+    patient: patientParam ? `${patientParam}` : 'James Wilson', 
     date: new Date().toISOString().split('T')[0],
     terms: 'Net 30',
     notes: ''
   });
+
+  const [patientsList, setPatientsList] = useState([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('deephysio_patients') || '[]');
+    // Fallback if empty to match components
+    const defaultList = [
+      { id: 'DP-001', name: 'James Wilson' },
+      { id: 'DP-002', name: 'Emily Brown' }
+    ];
+    setPatientsList(saved.length > 0 ? saved : defaultList);
+  }, []);
 
   const [lineItems, setLineItems] = useState([
     { id: 1, service: 'General Consultation', rate: 85, qty: 1 }
@@ -90,9 +105,10 @@ const NewInvoice = () => {
                                 value={newInvoice.patient}
                                 onChange={(e) => setNewInvoice({...newInvoice, patient: e.target.value})}
                             >
-                                <option>James Wilson (PID-102)</option>
-                                <option>Emily Brown (PID-205)</option>
-                                <option>Corporate Client: TechHub UK</option>
+                                <option value="" disabled>Select Subject...</option>
+                                {patientsList.map((p, idx) => (
+                                    <option key={idx} value={p.name}>{p.name} ({p.id})</option>
+                                ))}
                             </select>
                         </div>
                         <div className="space-y-4">

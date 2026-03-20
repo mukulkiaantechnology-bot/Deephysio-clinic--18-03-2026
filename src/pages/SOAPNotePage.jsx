@@ -24,8 +24,33 @@ const SOAPNotePage = () => {
         pulse: '',
         painLevel: 5
     },
-    redFlagCheck: false
+    redFlagCheck: false,
+    painPins: []
   });
+
+  const handleBodyClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setSoapData(prev => ({
+       ...prev, 
+       painPins: [...(prev.painPins || []), { x, y, label: '' }]
+    }));
+  };
+
+  const updatePinLabel = (index, value) => {
+     setSoapData(prev => ({
+        ...prev,
+        painPins: prev.painPins.map((pin, i) => i === index ? { ...pin, label: value } : pin)
+     }));
+  };
+
+  const removePin = (index) => {
+     setSoapData(prev => ({
+        ...prev,
+        painPins: prev.painPins.filter((_, i) => i !== index)
+     }));
+  };
 
   React.useEffect(() => {
     const savedData = localStorage.getItem(`deephysio_soap_${id}`);
@@ -106,6 +131,64 @@ const SOAPNotePage = () => {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* Interactive Body Chart */}
+            <div className="space-y-4 pt-6">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anatomical Pain Mapping</label>
+               <div className="flex flex-col md:flex-row gap-8 items-start">
+                  <div className="w-full md:w-1/2 bg-slate-50 border border-slate-100 rounded-3xl p-6 flex flex-col items-center relative group">
+                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Click area to place mapping pin</p>
+                     
+                     <div className="relative w-44 h-80 bg-white/80 rounded-2xl border border-slate-100 flex items-center justify-center cursor-crosshair overflow-hidden group-hover:shadow-soft transition-all" onClick={handleBodyClick}>
+                        <svg width="100%" height="100%" viewBox="0 0 100 200" className="text-slate-300 opacity-30">
+                            <path d="M50 10 C55 10, 60 15, 60 20 C60 25, 55 30, 50 30 C45 30, 40 25, 40 20 C40 15, 45 10, 50 10" fill="currentColor" />
+                            <path d="M40 30 L60 30 L65 70 L35 70 Z" fill="currentColor" />
+                            <path d="M35 30 L20 65 L25 70 L38 35 Z" fill="currentColor" />
+                            <path d="M65 30 L80 65 L75 70 L62 35 Z" fill="currentColor" />
+                            <path d="M40 70 L43 140 L38 140 L35 70 Z" fill="currentColor" />
+                            <path d="M60 70 L57 140 L62 140 L65 70 Z" fill="currentColor" />
+                        </svg>
+                        
+                        {(soapData.painPins || []).map((pin, index) => (
+                           <div 
+                             key={index} 
+                             className="absolute w-4 h-4 rounded-full bg-rose-500 border-2 border-white shadow-sm flex items-center justify-center cursor-pointer group/pin"
+                             style={{ left: `${pin.x}%`, top: `${pin.y}%`, transform: 'translate(-50%, -50%)' }}
+                             onClick={(e) => { e.stopPropagation(); removePin(index); }}
+                           >
+                              <span className="text-[8px] font-black text-white">{index + 1}</span>
+                              <div className="absolute left-6 top-0 bg-slate-900 shadow-premium p-2 rounded-lg text-[9px] font-bold text-white opacity-0 group-hover/pin:opacity-100 transition-opacity z-20 pointer-events-none whitespace-nowrap">
+                                 {pin.label || `Pain Node ${index+1}`}
+                              </div>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+
+                  <div className="flex-1 space-y-2 w-full">
+                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pin Annotation Records</p>
+                     <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                         {(soapData.painPins || []).length > 0 ? (soapData.painPins || []).map((pin, i) => (
+                             <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                 <span className="w-5 h-5 bg-rose-500 text-white rounded-md flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</span>
+                                 <input 
+                                   type="text" 
+                                   placeholder="Add notation (e.g., Dull Pain)" 
+                                   className="flex-1 bg-transparent border-none outline-none text-[12px] font-bold text-slate-700 placeholder:text-slate-300"
+                                   value={pin.label || ''}
+                                   onChange={(e) => updatePinLabel(i, e.target.value)}
+                                 />
+                                 <button className="text-slate-300 hover:text-rose-500 transition-colors" onClick={() => removePin(i)}><FaTrashAlt size={10}/></button>
+                             </div>
+                         )) : (
+                            <div className="p-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-100">
+                               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">No pins plotted</p>
+                            </div>
+                         )}
+                     </div>
+                  </div>
+               </div>
             </div>
 
             <textarea 

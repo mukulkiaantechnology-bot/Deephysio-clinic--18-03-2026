@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTag, FaPlus, FaSearch, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import Button from '../components/ui/Button';
 
 const PricingServices = () => {
   const navigate = useNavigate();
@@ -151,6 +152,24 @@ const PricingServices = () => {
                     </div>
                  </div>
               </div>
+           </div>
+
+           {/* Stripe Integration Card */}
+           <div className="card-clinic p-8 bg-white border border-slate-100 shadow-premium rounded-[32px] relative overflow-hidden group mt-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 relative z-10 flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div> Payment Gateway Node
+              </h3>
+              <div className="space-y-4 relative z-10">
+                 <p className="text-[11px] font-bold text-slate-600 leading-relaxed">Synchronize your Stripe ledger to enable interactive card processing for remote settlements.</p>
+                 <Button 
+                   variant="secondary" 
+                   className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl font-black uppercase tracking-widest text-[9px] text-slate-700 hover:bg-slate-100 transition-colors" 
+                   onClick={() => alert('Initiating Stripe Connect Neural Handshake Node...')}
+                 >
+                     Establish Stripe Connect
+                 </Button>
+              </div>
+              <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all duration-1000"></div>
            </div>
         </div>
       </div>

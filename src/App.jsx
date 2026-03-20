@@ -119,12 +119,17 @@ function App() {
   const roleMenuAccess = {
     admin: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Communication', 'Billing & Payments', 'Forms', 'Analytics', 'Marketing', 'Integrations', 'Settings'],
     therapist: ['Dashboard', 'Appointments', 'Patients', 'Clinical Notes', 'Forms', 'Communication'],
-    receptionist: ['Dashboard', 'Appointments', 'Patients', 'Forms', 'Communication'],
+    receptionist: ['Dashboard', 'Appointments', 'Patients', 'Forms', 'Communication', 'Billing & Payments'],
     billing: ['Dashboard', 'Patients', 'Billing & Payments', 'Analytics']
   };
 
-  const hasAccess = (menuName) => {
-    return (roleMenuAccess[userRole] || []).includes(menuName);
+  const hasAccess = (menuName, subItemName = null) => {
+    if (!(roleMenuAccess[userRole] || []).includes(menuName)) return false;
+    
+    if (userRole === 'receptionist' && menuName === 'Billing & Payments') {
+      if (subItemName && !['Invoices', 'New Invoice'].includes(subItemName)) return false;
+    }
+    return true;
   };
 
   return (
@@ -168,12 +173,12 @@ function App() {
               <Route path="notes" element={<ClinicalNotes />} />
               <Route path="notes/new" element={<NewNote />} />
               <Route path="/notes/soap/:id" element={<SOAPNotePage />} />
-            <Route path="/notes/rmdq/:id" element={<RMDQAssessment />} />
-            <Route path="/notes/intake/:id" element={<IntakeAssessment />} />
-            <Route path="/notes/hep/:id" element={<HomeExercises />} />
-            <Route path="/notes/plan/:id" element={<TreatmentPlan />} />
-            <Route path="/notes/survey/:id" element={<PatientSurvey />} />
-            <Route path="/notes/discharge/:id" element={<DischargeSummary />} />
+              <Route path="/notes/rmdq/:id" element={<RMDQAssessment />} />
+              <Route path="/notes/intake/:id" element={<IntakeAssessment />} />
+              <Route path="/notes/hep/:id" element={<HomeExercises />} />
+              <Route path="/notes/plan/:id" element={<TreatmentPlan />} />
+              <Route path="/notes/survey/:id" element={<PatientSurvey />} />
+              <Route path="/notes/discharge/:id" element={<DischargeSummary />} />
               <Route path="notes/view/:id" element={<ViewNote />} />
               <Route path="notes/templates" element={<NoteTemplates />} />
               <Route path="notes/templates/new" element={<CreateTemplate />} />
@@ -188,20 +193,20 @@ function App() {
               <Route path="communication/templates" element={<CommTemplates />} />
 
               {/* Billing & Payments - 6 Pages */}
-              <Route path="billing" element={hasAccess('Billing & Payments') ? <Billing /> : <Navigate to="/" />} />
-              <Route path="billing/new" element={hasAccess('Billing & Payments') ? <NewInvoice /> : <Navigate to="/" />} />
-              <Route path="billing/payments" element={hasAccess('Billing & Payments') ? <Payments /> : <Navigate to="/" />} />
-              <Route path="billing/payments/record" element={hasAccess('Billing & Payments') ? <RecordPaymentPage /> : <Navigate to="/" />} />
-              <Route path="billing/payments/view/:id" element={hasAccess('Billing & Payments') ? <InvoiceDetailPage /> : <Navigate to="/" />} />
-              <Route path="billing/claims" element={hasAccess('Billing & Payments') ? <InsuranceClaims /> : <Navigate to="/" />} />
-              <Route path="billing/claims/new" element={hasAccess('Billing & Payments') ? <NewClaimPage /> : <Navigate to="/" />} />
-              <Route path="billing/claims/batch" element={hasAccess('Billing & Payments') ? <SubmitBatchPage /> : <Navigate to="/" />} />
-              <Route path="billing/claims/view/:id" element={hasAccess('Billing & Payments') ? <ClaimDetailPage /> : <Navigate to="/" />} />
-              <Route path="billing/reminders" element={hasAccess('Billing & Payments') ? <PaymentReminders /> : <Navigate to="/" />} />
-              <Route path="billing/reminders/add" element={hasAccess('Billing & Payments') ? <AddReminderRulePage /> : <Navigate to="/" />} />
-              <Route path="billing/pricing" element={hasAccess('Billing & Payments') ? <PricingServices /> : <Navigate to="/" />} />
-              <Route path="billing/pricing/add" element={hasAccess('Billing & Payments') ? <AddServicePage /> : <Navigate to="/" />} />
-              <Route path="billing/pricing/edit/:id" element={hasAccess('Billing & Payments') ? <EditServicePage /> : <Navigate to="/" />} />
+              <Route path="billing" element={hasAccess('Billing & Payments', 'Invoices') ? <Billing /> : <Navigate to="/" />} />
+              <Route path="billing/new" element={hasAccess('Billing & Payments', 'New Invoice') ? <NewInvoice /> : <Navigate to="/" />} />
+              <Route path="billing/payments" element={hasAccess('Billing & Payments', 'Payments') ? <Payments /> : <Navigate to="/" />} />
+              <Route path="billing/payments/record" element={hasAccess('Billing & Payments', 'Payments') ? <RecordPaymentPage /> : <Navigate to="/" />} />
+              <Route path="billing/payments/view/:id" element={hasAccess('Billing & Payments', 'Invoices') ? <InvoiceDetailPage /> : <Navigate to="/" />} />
+              <Route path="billing/claims" element={hasAccess('Billing & Payments', 'Claims') ? <InsuranceClaims /> : <Navigate to="/" />} />
+              <Route path="billing/claims/new" element={hasAccess('Billing & Payments', 'Claims') ? <NewClaimPage /> : <Navigate to="/" />} />
+              <Route path="billing/claims/batch" element={hasAccess('Billing & Payments', 'Claims') ? <SubmitBatchPage /> : <Navigate to="/" />} />
+              <Route path="billing/claims/view/:id" element={hasAccess('Billing & Payments', 'Claims') ? <ClaimDetailPage /> : <Navigate to="/" />} />
+              <Route path="billing/reminders" element={hasAccess('Billing & Payments', 'Claims') ? <PaymentReminders /> : <Navigate to="/" />} />
+              <Route path="billing/reminders/add" element={hasAccess('Billing & Payments', 'Claims') ? <AddReminderRulePage /> : <Navigate to="/" />} />
+              <Route path="billing/pricing" element={hasAccess('Billing & Payments', 'Pricing') ? <PricingServices /> : <Navigate to="/" />} />
+              <Route path="billing/pricing/add" element={hasAccess('Billing & Payments', 'Pricing') ? <AddServicePage /> : <Navigate to="/" />} />
+              <Route path="billing/pricing/edit/:id" element={hasAccess('Billing & Payments', 'Pricing') ? <EditServicePage /> : <Navigate to="/" />} />
 
               {/* Forms & Intake - 5 Pages */}
               <Route path="forms" element={hasAccess('Forms') ? <FormBuilder /> : <Navigate to="/" />} />

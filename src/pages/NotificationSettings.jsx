@@ -1,7 +1,8 @@
 import React from 'react';
-import { FaBell, FaSms, FaEnvelope, FaRobot, FaCalendarCheck, FaMoneyBillWave, FaShieldAlt, FaSave, FaSyncAlt, FaTimes } from 'react-icons/fa';
+import { FaBell, FaSms, FaEnvelope, FaRobot, FaCalendarCheck, FaMoneyBillWave, FaShieldAlt, FaSave, FaSyncAlt, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 
 const NotificationSettings = () => {
   const navigate = useNavigate();

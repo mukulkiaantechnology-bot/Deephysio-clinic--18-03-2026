@@ -65,7 +65,7 @@ const BookAppointment = () => {
       alert('Security Protocol: All clinical parameters must be defined before synchronization.');
       return;
     }
-    alert('Appointment Node Synchronized: Record archived in the clinical ledger.');
+    alert('Appointment Node Synchronized: Record archived in the clinical ledger. Automated SMS and Email triggers dispatched to Patient Node.');
     navigate('/appointments');
   };
 

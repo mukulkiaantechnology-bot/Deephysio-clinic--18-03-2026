@@ -85,7 +85,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
         { name: 'Consent Forms', path: '/forms/consent' },
         { name: 'Health History', path: '/forms/history' },
         { name: 'Assessments', path: '/forms/assessments' },
-        { name: 'Form Builder', path: '/forms/builder' },
+        // { name: 'Form Builder', path: '/forms/builder' },
       ]
     },
     { 
@@ -105,7 +105,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
       icon: <FaBullhorn className="text-orange-400" />, 
       path: '/marketing',
       subItems: [
-        { name: 'Email Campaigns', path: '/communication/email' },
+        // { name: 'Email Campaigns', path: '/communication/email' },
         { name: 'Patient Segments', path: '/marketing/segments' },
         { name: 'Follow-up Automation', path: '/marketing/automation' },
         { name: 'Campaign Analytics', path: '/marketing/analytics' },
@@ -281,7 +281,12 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogout, userRole }) => {
               {/* Submenu Items */}
               {hasSubItems && isExpanded && isOpen && (
                 <div className="ml-8 space-y-0.5 mt-1 mb-2 border-l-2 border-slate-800/50 pl-2 animate-in slide-in-from-top-2 duration-300 text-[11px]">
-                  {item.subItems.map((sub) => (
+                  {(item.subItems.filter(sub => {
+                    if (userRole === 'receptionist' && item.name === 'Billing & Payments') {
+                      return ['Invoices'].includes(sub.name);
+                    }
+                    return true;
+                  })).map((sub) => (
                     <NavLink
                       key={sub.name}
                       to={sub.path}

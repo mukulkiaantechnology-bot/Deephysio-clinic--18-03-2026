@@ -60,7 +60,7 @@ const Dashboard = () => {
     <div className="space-y-5 animate-fade-in custom-scrollbar">
       <PageHeader 
         title="Clinic Overview"
-        subtitle="Welcome back, Kiaan Paras 👋 Here's what's happening today."
+        subtitle={`Welcome back, ${role.charAt(0).toUpperCase() + role.slice(1)} 👋 Here's what's happening today.`}
         actions={
           <>
             <Button 
